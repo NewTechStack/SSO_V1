@@ -1,0 +1,68 @@
+version: '3'
+networks:
+  traefik_internal:
+    external:
+      name: traefik_internal
+  auth_db:
+    driver: overlay
+    driver_opts:
+      encrypted: ""
+    # internal: true
+
+services:
+  auth_back:
+    image: auth_back:custom
+    tty: true
+    networks:
+      - traefik_internal
+      - auth_db
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_internal"
+        - "traefik.http.routers.auth_back.rule=Host(`auth.localhost`)"
+        - "traefik.http.routers.auth_back.tls.certresolver=le"
+        - "traefik.http.services.auth_back.loadbalancer.passhostheader=true"
+        - "traefik.http.services.auth_back.loadbalancer.server.port=8080"
+    healthcheck:
+      test: exit $$( curl -so /dev/null --fail http://127.0.0.1:8080 && echo 0 || echo 1 )
+      interval: 30s
+      timeout: 1s
+      retries: 1
+    volumes:
+      - ./back/src:/home/api:ro
+
+  rethink:
+    image: rethinkdb:latest
+    restart: always
+    expose:
+      - 8080
+      - 28015
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.docker.network=traefik_internal"
+        - "traefik.http.routers.auth_back_rethink.rule=Host(`rethink.localhost`)"
+        - "traefik.http.routers.auth_back_rethink.tls.certresolver=le"
+        - "traefik.http.services.auth_back_rethink.loadbalancer.passhostheader=true"
+        - "traefik.http.services.auth_back_rethink.loadbalancer.server.port=8080"
+    volumes:
+      - ./back/rethink/data:/data
+    command: rethinkdb --bind all -d /data
+    networks:
+      - traefik_internal
+      - auth_db
