@@ -29,7 +29,8 @@ class user:
         self.scale_change_pass = {"limit": True, "scale": [0, 0, 0]}
         self.scale_verify_email = {"limit": False, "scale": [0, 0, 0, 1, 5, 10, 60, 120]}
         self.scale_verify_phone = {"limit": True, "scale": [0, 0]}
-        self.data = None
+        self.d = None
+        self.data()
         self.model = {
             "username": {
                 "main" : None,
@@ -132,6 +133,13 @@ class user:
             "last_update": None,
             "signup": None,
         }
+
+    def data(self, update = False):
+        if (self.d is None or update is True) and self.id != "-1":
+            self.d = self.red.get(self.id).run()
+            if self.d != None:
+                self.d = dict(self.d)
+        return self.d
 
     def get_key(self):
         key = str(uuid.uuid4())
@@ -246,7 +254,7 @@ class user:
             ret.append({"usr_token": str(token)})
         return ret
 
-    def verify(self, token):
+    def verify(self, token, reenable = False):
         if not isinstance(token, str):
             return [False, "Invalid param type"]
         public_key = open(f'{secret_path}jwt-key.pub').read()
@@ -277,10 +285,14 @@ class user:
             return [False, "Invalid time", 400]
         except jwt.DecodeError:
             return [False, "Invalid jwt", 400]
-        self.data = self.red.get(self.id).run()
-        if self.data is None:
+        if self.data() is None:
             return [False, "User does not exist", 400]
-        self.data = dict(self.data)
+        if "disabled" in self.roles()[1] \
+           and self.roles()[1]["disabled"]["active"] is True:
+            if reenable != True:
+                return [False, "User is disabled", 400]
+            email = self.data()["email"]["main"]
+            self.set_role(self.id, "disabled", False)
         return [True, {"usr_id": id}, None]
 
     def invite(self, email):
@@ -367,9 +379,13 @@ class user:
         ).run())
         if len(res) == 0:
             return [False, "Invalid email or password", 403]
-        if "disabled" in res[0]["roles"] and res[0]["roles"]["disabled"]["active"] is True:
-            return [False, "Account is disabled", 403]
         self.id = res[0]["id"]
+        if "disabled" in self.roles()[1] \
+           and self.roles()[1]["disabled"]["active"] is True:
+            if reenable != True:
+                return [False, "User is disabled", 400]
+            email = self.data()["email"]["main"]
+            self.set_role(self.id, "disabled", False)
         return [True, {"usr_id": self.id}, None]
 
 
@@ -387,7 +403,6 @@ class user:
 
     def updetails(self, phone = {}, fname = {}, lname = {}, account_lang = []):
         up = {}
-        self.data = dict(self.red.get(self.id).run())
         date = str(datetime.datetime.utcnow())
         if isinstance(phone, dict) and "lang" in phone and "number" in phone and \
             isinstance(phone["lang"], str) and isinstance(phone["number"], str) and \
@@ -401,7 +416,7 @@ class user:
                 phone["number"] = phone["number"].replace(" ", "")
                 up["phone"] = {}
                 up["phone"]["main"] = { "number": phone["number"], "lang": phone["lang"] }
-                if up["phone"]["main"] != self.data["details"]["phone"]["main"]:
+                if up["phone"]["main"] != self.data()["details"]["phone"]["main"]:
                     up["phone"]["verified"] =  {
                         "main": False,
                         "check_key": {
@@ -434,7 +449,7 @@ class user:
             up["first_name"]["main"] = fname["first_name"]
             if "public" in fname and isinstance(fname["public"], bool):
                 up["first_name"]["public"] = fname["public"]
-            if up["first_name"]["main"] != self.data["details"]["first_name"]["main"]:
+            if up["first_name"]["main"] != self.data()["details"]["first_name"]["main"]:
                 up["first_name"]["verified"] = {
                     "main": False,
                     "using": [],
@@ -458,7 +473,7 @@ class user:
             up["last_name"]["main"] = lname["last_name"]
             if "public" in lname and isinstance(lname["public"], bool):
                 up["last_name"]["public"] = lname["public"]
-            if up["last_name"]["main"] != self.data["details"]["last_name"]["main"]:
+            if up["last_name"]["main"] != self.data()["details"]["last_name"]["main"]:
                 up["last_name"]["verified"] = {
                     "main": False,
                     "using": [],
@@ -485,17 +500,16 @@ class user:
     def has_role(self, role):
         ret = {}
         try:
-            d = dict(self.red.get(self.id).run())
-            if role in list(d["roles"].keys()):
+            if role in list(self.data()["roles"].keys()):
                 return [True, {}, None]
         except:
             return [False, "User not logged", 401]
-        return [False, f"User is not {role}", None]
+        return [False, f"User is not {role}", 401]
 
     def roles(self):
         ret = {}
         try:
-            ret = dict(self.red.get(self.id).run())["roles"]
+            ret = self.data()["roles"]
         except:
             return [False, "User not logged", 401]
         return [True, ret, None]
@@ -504,10 +518,9 @@ class user:
         if not isinstance(extended, bool):
             return [False, "Invalid param type", 400]
         id = self.__getid(id, self.id)
-        res = self.red.get(id).run()
+        res = self.data()
         if res is None:
             return [False, f"User {id} does not exist", 401]
-        res = dict(res)
         ret = {
             "username": res["username"]["main"],
             "email": res["email"]["main"] if res["email"]["public"] or id == self.id else None,
@@ -577,7 +590,7 @@ class user:
         if role not in self.av_roles:
             return False
         date = str(datetime.datetime.utcnow())
-        roles = dict(self.red.get(id).run())["roles"]
+        roles = self.data()["roles"]
         if role not in roles:
             self.red.get(id).update({
                 "roles": {
@@ -604,7 +617,7 @@ class user:
         return ret
 
     def check_email(self):
-        u = dict(self.red.get(self.id).run())
+        u = self.data()
         if u["email"]["verified"]["main"] == True:
             return [False, "already verified", 401]
         key = self.__random_key(6)
@@ -636,7 +649,7 @@ class user:
     def verify_email_key(self, key):
         if self.id == '-1':
             return [False, "User not logged", 401]
-        u = dict(self.red.get(self.id).run())
+        u = self.data()
         k = u["email"]["verified"]["check_key"]
         if k["main"] == None:
             return [False, "Invalid key", 401]
@@ -692,7 +705,7 @@ class user:
         return [True, {}, None]
 
     def check_phone(self):
-        u = dict(self.red.get(self.id).run())
+        u = self.data()
         if u["details"]["phone"]["verified"]["main"] == True:
             return [False, "already verified", 401]
         key = self.__random_key(6)
@@ -728,7 +741,7 @@ class user:
             return [False, "Invalid param type", 400]
         if self.id == '-1':
             return [False, "User not logged", 401]
-        u = dict(self.red.get(self.id).run())
+        u = self.data()
         k = u["details"]["phone"]["verified"]["check_key"]
         if k["main"] == None:
             return [False, "Invalid key", 401]
@@ -816,7 +829,7 @@ class user:
             return [False, "Invalid param type"]
         if self.id == '-1':
             return [False, "User not logged", 401]
-        u = dict(self.red.get(self.id).run())
+        u = self.data()
         k = u["password"]["reset_key"]
         if k["main"] == None:
             return [False, "Invalid key", 401]

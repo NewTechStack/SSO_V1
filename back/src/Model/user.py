@@ -26,7 +26,7 @@ def user_wait_token(cn, nextc):
 def user_get_token(cn, nextc):
     id = None
     key = cn.rt["key"] if "key" in cn.rt else None
-    asked = cn.pr["asked"] if "asked" in cn.pr and key is not None else []
+    asked = cn.pr["asked"] if cn.pr and "asked" in cn.pr and key is not None else []
     registeries = []
     if "id" in cn.get and cn.private["user"].has_role("creator")[0]:
         id = cn.get["id"]
@@ -41,11 +41,12 @@ def user_get_token(cn, nextc):
     return cn.call_next(nextc, err)
 
 def user_verify_token(cn, nextc):
+    reenable = True if "reenable" in cn.get else False
     err = check.contain(cn.hd, ["usr_token"], "HEAD")
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
     cn.private["user"] = user()
-    err = cn.private["user"].verify(cn.hd["usr_token"])
+    err = cn.private["user"].verify(cn.hd["usr_token"], reenable)
     return cn.call_next(nextc, err)
 
 def user_register(cn, nextc):
@@ -117,7 +118,7 @@ def user_invite(cn, nextc):
     err = check.contain(cn.pr, ["email"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    cn.private["user"].get_infos(email)
+    cn.private["user"].get_infos(cn.pr["email"])
     err = [True, {}, None]
     return cn.call_next(nextc, err)
 

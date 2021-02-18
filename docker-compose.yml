@@ -1,21 +1,21 @@
 version: '3'
 networks:
-  traefik_internal:
+  internal:
     external:
       name: traefik_internal
-  auth_db:
+  db:
     driver: overlay
     driver_opts:
       encrypted: ""
-    # internal: true
+      internal: "true"
 
 services:
-  auth_back:
-    image: auth_back:custom
+  back:
+    image: back:custom
     tty: true
     networks:
-      - traefik_internal
-      - auth_db
+      - internal
+      - db
     deploy:
       mode: replicated
       replicas: 1
@@ -64,5 +64,5 @@ services:
       - ./back/rethink/data:/data
     command: rethinkdb --bind all -d /data
     networks:
-      - traefik_internal
-      - auth_db
+      - internal
+      - db

@@ -33,4 +33,5 @@ def get_conn():
     r.connect("rethink", 28015, password="").repl()
     return r
 
+init()
 r = RethinkDB()

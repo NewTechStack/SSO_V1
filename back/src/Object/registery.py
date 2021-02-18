@@ -10,10 +10,15 @@ class registery:
         self.id = str(id)
         self.last_check = None
         self.red = get_conn().db("auth").table('registery')
+        self.d = None
         self.model = {
             "name": {
                 "main": None,
                 "creator": None,
+                "last_update": None
+            },
+            "description": {
+                "main": None,
                 "last_update": None
             },
             "roles": {
@@ -57,18 +62,26 @@ class registery:
             "date": None
         }
 
+    def data(self, update = False):
+        if (self.d is None or update is True) and self.id != "-1":
+            self.d = self.red.get(self.id).run()
+            if self.d != None:
+                self.d = dict(self.d)
+        return self.d
+
     def create(self, name, creator, actions, roles, open = False):
-        if not isinstance(name, str):
+        if not isinstance(name, str) or not isinstance(creator, str) or \
+           not len(name) < 30:
             return [False, "Invalid name", 400]
         if self.__exist(name, creator):
             return [False, f"Registery {name} already exist"]
-        if not isinstance(actions, list):
-            return [False, "Invalid role dict", 400]
+        if not isinstance(actions, list) and len(action) < 255:
+            return [False, "Invalid action list", 400]
         if not all(isinstance(self.i, str) for self.i in actions):
             return [False, f"Invalid actions list: {self.i}", 400]
         if not all(len(self.i) < 30 for self.i in actions):
             return [False, f"Action too long: {self.i}", 400]
-        if not isinstance(roles, dict):
+        if not isinstance(roles, dict) and len(dict) < 255:
             return [False, "Invalid role dict", 400]
         if not all(isinstance(roles[self.i], dict) for self.i in roles):
             return [False, f"Invalid role type {self.i}", 400]
@@ -286,9 +299,11 @@ class registery:
             return [False, "error", 500]
         return [True, {}, None]
 
-    def set_name(self, name = None):
+    def set_name(self, name):
         if not isinstance(name, str):
             return [False, "Invalid name", 400]
+        if self.__exist(name, creator):
+            return [False, f"Registery {name} already exist"]
         date = str(datetime.datetime.utcnow())
         self.red.get(self.id).update({
             "name": {

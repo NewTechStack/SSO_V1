@@ -4,13 +4,56 @@ from .rethink import red, r
 red = red.db("auth").table('user_registery')
 
 class user_registery:
-    def __init__(self, registery):
-        self.reg_id = registery.id
+    def __init__(self, user, registery):
+        self.user = user
+        self.reg = registery
+        self.user.data(True)
         self.usr_id = user.id
+        self.reg_id = registery.id
         self.roles = registery.roles
+        self.d = None
 
-    def add_user(self, id_user, roles, by):
-        if self.exist():
+    def data(self, id_user = None,update = False):
+        id_user = id_user if id_user is not None else self.usr_id
+        if ((self.d is None or update is True) and self.usr_id != "-1") or \
+            id_user is None:
+            d = red.filter(
+                r.row["id_user"] == id_user
+                & "id_registery" == self.reg_id
+            ).run()
+            if id_user is not None:
+                if len(d) == 1:
+                    return dict(list(d)[0])
+                else:
+                    return None
+            if len(d) == 1:
+                self.d = dict(list(d)[0])
+            else:
+                self.d = None
+        return self.d
+
+    def add_user(self, id_user, roles, email = None):
+        if not (isinstance(roles, list) and all(isinstance(i, str) for i in roles)) and not isinstance(roles, str):
+            return [False, "Invalid roles format", 400]
+        if not isinstance(roles, list):
+            roles = [roles]
+        if str(self.usr_id) == str("-1"):
+            return [False, "Invalid user", 401]
+        if str(self.reg_id) == str("-1"):
+            return [False, "Invalid registery", 401]
+        if not all(self.i in self.reg.roles() for self.i in roles):
+            return [False, f"Invalid role: {self.i}", 400]
+        if not self.can("invite"):
+            return [False, "User cannot invite other users", 401]
+        if email is not None:
+            u = user(-1, email)
+            if u.id == "-1":
+                u.invite(email)
+                u = user(-1, email)
+            id_user = u.id
+        if id_user == "-1":
+            return [False, "Invalid user", 401]
+        if self.exist(id_user):
             return [False, "User already in registery", 401]
         date = str(datetime.datetime.now())
         res = dict(red.insert([{
@@ -19,27 +62,68 @@ class user_registery:
             "date": date,
             "last_update": None,
             "roles": {},
-            "by": by
+            "by": self.usr_id
         }]))
-        if isinstance(roles, list):
-            for i in roles:
-                self.__status(id_user, i)
-        else:
-            self.__status(roles, i)
+        for i in roles:
+            self.__status(id_user, i)
         id = res["generated_keys"][0]
-        return id
+        return [True, {"id": id}, None]
 
-    def user(user_id):
-        res = list(red.filter(r.row["id_user"] == id_user and "id_registery" == self.reg_id).run())[0]
-        return res
+    def roles(self, id_user = None, active = None):
+        id_user = id_user if id_user is not None else self.usr_id
+        d = self.data(id_user)
+        if d is None:
+            return [False, "Invalid user", 400]
+        roles = list(d["roles"].keys())
+        if active != None:
+            to_del = []
+            for i in roles:
+                if d["roles"][i]["active"] != active:
+                    to_del.append(i)
+            for i in to_del:
+                roles = list(filter((i).__ne__, roles))
+        return [True, {"roles": roles}, None]
 
-    def exist(self, id_user):
-        res = list(red.filter(r.row["id_user"] == id_user and "id_registery" == self.reg_id).run())
-        if len(res) > 0:
-            return True
+    def is(self, role, id_user = None, active = True):
+        id_user = id_user if id_user is not None else self.usr_id
+        r = self.roles(id_user, active)
+        return role in r[1]["roles"] if r[0] else False
+
+    def actions(self, id_user = None):
+        id_user = id_user if id_user is not None else self.usr_id
+        r = self.roles(id_user, True)
+        if not r[0]:
+            return r
+        d = self.reg.data()
+        ret = []
+        for i in r[1]["roles"]:
+            if i in d["actions"]["builtin"]["main"]:
+                ret.extend(d["actions"]["builtin"]["main"][i])
+            elif i in d["actions"]["custom"]["main"]:
+                ret.extend(d["actions"]["custom"]["main"][i])
+        return [True, {"actions": list(set(ret))}, None]
+
+    def can(self, action, id_user = None):
+        id_user = id_user if id_user is not None else self.usr_id
+        a = self.actions(id_user)
+        return action in a[1]["actions"] if a[0] else False
+
+    def exist(self, id_user = None):
+        if id_user is None:
+            if self.d != None:
+                return True
+            res = list(red.filter(r.row["id_user"] == self.usr_id & "id_registery" == self.reg_id).run())
+            if len(res) == 1:
+                self.d = res[0]
+            if len(res) > 0:
+                return True
+        else:
+            res = list(red.filter(r.row["id_user"] == id_user & "id_registery" == self.reg_id).run())
+            if len(res) > 0:
+                return True
         return False
 
-    def __status(self, id_user, role, from, active = True):
+    def __status(self, id_user, role, active = True):
         if self.roles is None:
             return None
         role = str(role)
@@ -55,7 +139,7 @@ class user_registery:
                     role: {
                         "active": active,
                         "last_update": date,
-                        "by": from,
+                        "by": self.usr_id,
                     }
                 },
                 "last_update": date
@@ -67,7 +151,7 @@ class user_registery:
                     role: {
                         "active": active,
                         "last_update": date,
-                        "by": from
+                        "by": self.usr_id
                     }
                 },
                 "last_update": date
