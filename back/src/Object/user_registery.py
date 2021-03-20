@@ -1,7 +1,5 @@
 import datetime
-from .rethink import red, r
-
-red = red.db("auth").table('user_registery')
+from .rethink import get_conn, r
 
 class user_registery:
     def __init__(self, user, registery):
@@ -13,6 +11,7 @@ class user_registery:
         self.roles = registery.roles
         self.invite = False
         self.d = None
+        self.red = get_conn().db("auth").table('user_registery')
 
     def data(self, id_user = None,update = False):
         id_user = id_user if id_user is not None else self.usr_id
@@ -33,9 +32,9 @@ class user_registery:
             }
         if ((self.d is None or update is True) and self.usr_id != "-1") or \
             id_user is None:
-            d = red.filter(
+            d = self.red.filter(
                 r.row["id_user"] == id_user
-                & "id_registery" == self.reg_id
+                & r.row["id_registery"] == self.reg_id
             ).run()
             if id_user is not None:
                 if len(d) == 1:
@@ -72,7 +71,7 @@ class user_registery:
         if self.exist(id_user):
             return [False, "User already in registery", 401]
         date = str(datetime.datetime.now())
-        res = dict(red.insert([{
+        res = dict(self.red.insert([{
             "id_registery": self.id,
             "id_user": id_user,
             "date": date,
@@ -100,7 +99,7 @@ class user_registery:
                 roles = list(filter((i).__ne__, roles))
         return [True, {"roles": roles}, None]
 
-    def is(self, role, id_user = None, active = True):
+    def has_role(self, role, id_user = None, active = True):
         id_user = id_user if id_user is not None else self.usr_id
         r = self.roles(id_user, active)
         return role in r[1]["roles"] if r[0] else False
@@ -128,7 +127,7 @@ class user_registery:
         if id_user is None:
             if self.d != None:
                 return True
-            res = list(red.filter(r.row["id_user"] == self.usr_id & "id_registery" == self.reg_id).run())
+            res = list(self.red.filter(r.row["id_user"] == self.usr_id & r.row["id_registery"] == self.reg_id).run())
             if len(res) == 1:
                 self.d = res[0]
             if len(res) > 0:
@@ -139,7 +138,7 @@ class user_registery:
                 self.invite = True
                 return [True, {}, None]
         else:
-            res = list(red.filter(r.row["id_user"] == id_user & "id_registery" == self.reg_id).run())
+            res = list(self.red.filter(r.row["id_user"] == id_user & r.row["id_registery"] == self.reg_id).run())
             if len(res) > 0:
                 if end is True:
                     return [True, res[0], None]
@@ -154,11 +153,11 @@ class user_registery:
         if role not in self.roles:
             return False
         date = str(datetime.datetime.now())
-        roles = list(red.filter(
-            r.row["id_user"] == id_user and "id_registery" == self.id
+        roles = list(self.red.filter(
+            r.row["id_user"] == id_user and r.row["id_registery"] == self.id
         ).run())[0]["roles"]
         if role not in roles:
-            red.get(id).update({
+            self.red.get(id).update({
                 "roles": {
                     role: {
                         "active": active,
@@ -170,7 +169,7 @@ class user_registery:
             }).run()
             ret = True
         else:
-            ret = dict(red.get(id).update({
+            ret = dict(self.red.get(id).update({
                 "roles": {
                     role: {
                         "active": active,

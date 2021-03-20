@@ -366,5 +366,9 @@ def test():
     r.actions()
     r.delete()
     logging.warning("Ending registery's test")
-
-test()
+    
+try:
+    test()
+except:
+    logging.error("Registery's test error")
+    exit(1)

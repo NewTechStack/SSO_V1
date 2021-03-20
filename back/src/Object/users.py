@@ -17,6 +17,8 @@ TOKEN_ARR = {}
 
 class user:
     def __init__(self, id = -1, email = None):
+        if id is None:
+            id = -1
         self.id = str(id)
         self.red = get_conn().db("auth").table('users')
         email = str(email)
@@ -991,5 +993,8 @@ def test():
     u = user(None, email2)
     u.delete(True)
     logging.warning("Ending user's test")
-
-test()
+try:
+    test()
+except:
+    logging.error("User's test error")
+    exit(1)

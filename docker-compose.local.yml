@@ -6,6 +6,7 @@ services:
   back:
     build: .
     tty: true
+    restart: always
     networks:
       - default
     ports:
