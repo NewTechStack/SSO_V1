@@ -205,26 +205,42 @@ class user:
             payload["id"] = id
         else:
             possible = {
-             "id": lambda: id,
-             "username": lambda : data["username"]["main"],
-             "email": lambda : data["email"]["main"],
-             "phone": lambda : data["details"]["phone"]["main"],
-             "first_name": lambda : data["details"]["first_name"]["main"],
-             "last_name": lambda : data["details"]["last_name"]["main"],
-             "age": lambda : data["details"]["last_name"]["main"],
-             "is_over_12": lambda : data["details"]["age"]["main"] is not None and \
-                           data["details"]["age"]["main"] >= 12,
-             "is_over_16": lambda : data["details"]["age"]["main"] is not None and \
-                           data["details"]["age"]["main"] >= 12,
-             "is_over_18": lambda : data["details"]["age"]["main"] is not None and \
-                           data["details"]["age"]["main"] >= 12,
-             "is_over_21": lambda : data["details"]["age"]["main"] is not None and \
-                           data["details"]["age"]["main"] >= 12,
-             "is_phone_verified": lambda : data["details"]["phone"]["verified"]["main"],
-             "is_email_verified": lambda : data["email"]["verified"]["main"],
-             "is_age_verified": lambda : data["details"]["age"]["verified"]["main"],
-             "is_first_name_verified": lambda : data["details"]["first_name"]["verified"]["main"],
-             "is_last_name_verified": lambda : data["details"]["last_name"]["verified"]["main"]
+             "id":
+             lambda: id,
+             "username":
+             lambda : data["username"]["main"],
+             "email":
+             lambda : data["email"]["main"],
+             "phone":
+             lambda : data["details"]["phone"]["main"],
+             "first_name":
+             lambda : data["details"]["first_name"]["main"],
+             "last_name":
+             lambda : data["details"]["last_name"]["main"],
+             "age":
+             lambda : data["details"]["last_name"]["main"],
+             "is_over_12":
+             lambda : data["details"]["age"]["main"] is not None and \
+                      data["details"]["age"]["main"] >= 12,
+             "is_over_16":
+             lambda : data["details"]["age"]["main"] is not None and \
+                      data["details"]["age"]["main"] >= 16,
+             "is_over_18":
+             lambda : data["details"]["age"]["main"] is not None and \
+                      data["details"]["age"]["main"] >= 18,
+             "is_over_21":
+             lambda : data["details"]["age"]["main"] is not None and \
+                      data["details"]["age"]["main"] >= 21,
+             "is_phone_verified":
+             lambda : data["details"]["phone"]["verified"]["main"],
+             "is_email_verified":
+             lambda : data["email"]["verified"]["main"],
+             "is_age_verified":
+             lambda : data["details"]["age"]["verified"]["main"],
+             "is_first_name_verified":
+             lambda : data["details"]["first_name"]["verified"]["main"],
+             "is_last_name_verified":
+             lambda : data["details"]["last_name"]["verified"]["main"]
             }
             if not all(a in possible for a in asked):
                 return [False, "Invalid information asked", 401]

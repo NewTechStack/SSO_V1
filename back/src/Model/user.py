@@ -118,7 +118,7 @@ def user_invite(cn, nextc):
     err = check.contain(cn.pr, ["email"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    cn.private["user"].get_infos(cn.pr["email"])
+    cn.private["user"].invite(cn.pr["email"])
     err = [True, {}, None]
     return cn.call_next(nextc, err)
 

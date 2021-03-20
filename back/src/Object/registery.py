@@ -25,7 +25,7 @@ class registery:
                 "builtin": {
                     "main": {
                         "creator": {
-                            "actions": ["delete", "edit", "invite", "use", "get_ress"]
+                            "actions": ["delete", "edit", "invite", "use", "get_infos"]
                         },
                         "admin": {
                             "actions": ["edit", "invite", "use", "get_infos"]
@@ -68,6 +68,20 @@ class registery:
             if self.d != None:
                 self.d = dict(self.d)
         return self.d
+
+    def name(self):
+        return [True, {"name": self.data()["name"]}, None]
+
+    def infos(self):
+        d = self.data()
+        ret = {
+        "name": d["name"],
+        "description": d["description"],
+        "open": d["open"],
+        "last_update": d["last_update"],
+        "date": d["date"]
+        }
+        return [True, ret, None]
 
     def create(self, name, creator, actions, roles, open = False):
         if not isinstance(name, str) or not isinstance(creator, str) or \

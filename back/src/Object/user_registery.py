@@ -11,10 +11,26 @@ class user_registery:
         self.usr_id = user.id
         self.reg_id = registery.id
         self.roles = registery.roles
+        self.invite = False
         self.d = None
 
     def data(self, id_user = None,update = False):
         id_user = id_user if id_user is not None else self.usr_id
+        if id_user is None and self.invite is True:
+            return {
+                "id_registery": self.id,
+                "id_user": -1,
+                "date": 0,
+                "last_update": None,
+                "roles": {
+                    "others": {
+                        "active": True,
+                        "last_update": 0,
+                        "by": None,
+                    }
+                },
+                "by": self.usr_id
+            }
         if ((self.d is None or update is True) and self.usr_id != "-1") or \
             id_user is None:
             d = red.filter(
@@ -108,7 +124,7 @@ class user_registery:
         a = self.actions(id_user)
         return action in a[1]["actions"] if a[0] else False
 
-    def exist(self, id_user = None):
+    def exist(self, id_user = None, end = False):
         if id_user is None:
             if self.d != None:
                 return True
@@ -116,11 +132,19 @@ class user_registery:
             if len(res) == 1:
                 self.d = res[0]
             if len(res) > 0:
+                if end is True:
+                    return [True, self.d, None]
                 return True
+            if end is True:
+                self.invite = True
+                return [True, {}, None]
         else:
             res = list(red.filter(r.row["id_user"] == id_user & "id_registery" == self.reg_id).run())
             if len(res) > 0:
+                if end is True:
+                    return [True, res[0], None]
                 return True
+            return [False, "Invalid user for this registery", 404]
         return False
 
     def __status(self, id_user, role, active = True):
