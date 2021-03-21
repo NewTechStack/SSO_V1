@@ -821,7 +821,7 @@ class user:
     def reset_key(self):
         key = self.__random_key(5)
         if self.id == '-1':
-            return [True, {"key": key}, None]
+            return [False, "INVALID EMAIL TEMP ERROR MESSAGE", 404] #####TEMP !!!
         date = str(datetime.datetime.utcnow())
         until = str(datetime.datetime.utcnow() + datetime.timedelta(hours=2))
         k = self.__hash(self.id, key)
@@ -846,11 +846,11 @@ class user:
         if not isinstance(key, str) or not isinstance(password, str):
             return [False, "Invalid param type"]
         if self.id == '-1':
-            return [False, "User not logged", 401]
+            return [False, "Invalid email / key", 401]
         u = self.data()
         k = u["password"]["reset_key"]
         if k["main"] == None:
-            return [False, "Invalid key", 401]
+            return [False, "Invalid email / key", 401]
         count = k["try"]["count"]
         until = datetime.datetime.strptime(k["until"], '%Y-%m-%d %H:%M:%S.%f')
         last = datetime.datetime.strptime(k["try"]["last"], '%Y-%m-%d %H:%M:%S.%f')

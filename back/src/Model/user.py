@@ -49,6 +49,15 @@ def user_verify_token(cn, nextc):
     err = cn.private["user"].verify(cn.hd["usr_token"], reenable)
     return cn.call_next(nextc, err)
 
+
+def user_tmp_spoof(cn, nextc):
+    err = check.contain(cn.pr, ["email"])
+    if not err[0]:
+        return cn.toret.add_error(err[1], err[2])
+    cn.private["user"] = user()
+    err = [True, {}, None]
+    return cn.call_next(nextc, err)
+
 def user_register(cn, nextc):
     err = check.contain(cn.pr, ["email", "pass1", "pass2"])
     if not err[0]:
@@ -112,6 +121,17 @@ def user_infos(cn, nextc):
     id = cn.rt["user"] if "user" in cn.rt else None
     extended = cn.get["extended"] if "extended" in cn.get else False
     err = cn.private["user"].get_infos(extended, id)
+    return cn.call_next(nextc, err)
+
+def user_password_reset(cn, nextc):
+    err = cn.private["user"].reset_key()
+    return cn.call_next(nextc, err)
+
+def user_password_change(cn, nextc):
+    err = check.contain(cn.pr, ["key", "password"])
+    if not err[0]:
+        return cn.toret.add_error(err[1], err[2])
+    err = cn.private["user"].verify_reset_key(cn.pr["key"], cn.pr["password"])
     return cn.call_next(nextc, err)
 
 def user_invite(cn, nextc):
