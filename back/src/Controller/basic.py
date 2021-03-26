@@ -133,13 +133,14 @@ class check:
 
     def head_json(request, cookie = None):
         res = {}
-        try:
-            for i in cookie:
-                res[i.lower()] = cookie[i]
-            for i in request.headers.keys():
-                res[i.lower()] = request.headers.raw(i)
-        except:
-            pass
+        print(request.headers.keys())
+        # try:
+        for i in cookie:
+            res[i.lower()] = cookie[i]
+        for i in request.headers.keys():
+            res[i.lower()] = request.headers.raw(i)
+        # except:
+            # pass
         return res
 
     def cookies_json(request):
