@@ -133,7 +133,6 @@ class check:
 
     def head_json(request, cookie = None):
         res = {}
-        print(request.headers.keys())
         # try:
         for i in cookie:
             res[i.lower()] = cookie[i]

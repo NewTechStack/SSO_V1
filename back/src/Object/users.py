@@ -267,9 +267,9 @@ class user:
             if not key in TOKEN_ARR or TOKEN_ARR[key]["token"] is not None:
                 return [False, "Invalid key", 401]
             TOKEN_ARR[key]["token"] = token
-        ret = [True, {'exp': str(exp), "usr_token": token}, None, ]
+        ret = [True, {'exp': str(exp), "usrtoken": token}, None, ]
         if registeries == []:
-            ret.append({"usr_token": str(token)})
+            ret.append({"usrtoken": str(token)})
         return ret
 
     def verify(self, token, reenable = False):
@@ -961,7 +961,7 @@ def test():
     u.get_token(registeries=["test"], key=key)
     u.wait_token(key, sec)
     token = u.get_token()
-    token = token[1]["usr_token"] if isinstance(token[1], dict) else None
+    token = token[1]["usrtoken"] if isinstance(token[1], dict) else None
     u.verify(token)
     key = u.reset_key()
     del u
@@ -982,7 +982,7 @@ def test():
     u2.get_infos(True, u.id)
     u2.get_infos(True)
     u2.delete(True)
-    token = u.get_token()[1]["usr_token"]
+    token = u.get_token()[1]["usrtoken"]
     del u
     u = user()
     u.verify(token)

@@ -42,11 +42,11 @@ def user_get_token(cn, nextc):
 
 def user_verify_token(cn, nextc):
     reenable = True if "reenable" in cn.get else False
-    err = check.contain(cn.hd, ["usr_token"], "HEAD")
+    err = check.contain(cn.hd, ["usrtoken"], "HEAD")
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
     cn.private["user"] = user()
-    err = cn.private["user"].verify(cn.hd["usr_token"], reenable)
+    err = cn.private["user"].verify(cn.hd["usrtoken"], reenable)
     return cn.call_next(nextc, err)
 
 
