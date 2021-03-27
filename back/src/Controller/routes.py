@@ -42,6 +42,7 @@ def setuproute(app, call):
     @app.route('/registeries/<>/key/<>/signin', ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_get_token])) #done
 
     @app.route('/user/password/reset',          ['OPTIONS', 'POST'],        lambda x = None: call([user_tmp_spoof, user_password_reset])) #done not imp
+    @app.route('/user/password/change',         ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_password_reset])) #done not imp
     @app.route('/user/password/change',         ['OPTIONS', 'POST'],        lambda x = None: call([user_tmp_spoof, user_password_change])) # done not imp
 
     @app.route('/card',                         ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token]))
