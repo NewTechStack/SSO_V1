@@ -434,6 +434,7 @@ class user:
                 phone["number"] = phone["number"].replace(" ", "")
                 up["phone"] = {}
                 up["phone"]["main"] = { "number": phone["number"], "lang": phone["lang"] }
+                up["phone"]["last_update"] = date
                 if up["phone"]["main"] != self.data()["details"]["phone"]["main"]:
                     up["phone"]["verified"] =  {
                         "main": False,
@@ -465,6 +466,7 @@ class user:
             isinstance(fname["first_name"], str):
             up["first_name"] = {}
             up["first_name"]["main"] = fname["first_name"]
+            up["first_name"]["last_update"] = date
             if "public" in fname and isinstance(fname["public"], bool):
                 up["first_name"]["public"] = fname["public"]
             if up["first_name"]["main"] != self.data()["details"]["first_name"]["main"]:
@@ -476,7 +478,7 @@ class user:
             self.red.get(self.id).update(
                 {
                     "details": {
-                        "first_name": up["first_name"],
+                        "first_name": up["first_name"]
                     },
                     "last_update": date
                 }
@@ -489,6 +491,7 @@ class user:
             isinstance(lname["last_name"], str):
             up["last_name"] = {}
             up["last_name"]["main"] = lname["last_name"]
+            up["last_name"]["last_update"] = date
             if "public" in lname and isinstance(lname["public"], bool):
                 up["last_name"]["public"] = lname["public"]
             if up["last_name"]["main"] != self.data()["details"]["last_name"]["main"]:
@@ -561,16 +564,19 @@ class user:
                    }
                    if id == self.id:
                        ret[i]["last_update"] = res["details"][i]["last_update"]
+                       ret[i]["public"] =  res["details"][i]["public"]
             vscore = res["email"]["verified"]["main"] + \
                      res["details"]["phone"]["verified"]["main"]
             iscore = res["details"]["first_name"]["verified"]["main"] + \
                      res["details"]["last_name"]["verified"]["main"] + \
                      res["details"]["age"]["verified"]["main"]
             ret["verified"] = {}
-            if id != self.id:
-                ret["verified"]["contact"] = False if vscore < 1 else True
-                ret["verified"]["identity"] = False if iscore < 3 else True
-            else:
+            if id == self.id:
+                ret["email"] = {
+                    "main": res["email"]["main"],
+                    "last_update": res["email"]["last_update"],
+                    "public": res["email"]["public"]
+                }
                 ret["verified"]["contact"] = {
                     "score":  vscore,
                     "data": {
@@ -601,6 +607,9 @@ class user:
                         },
                     }
                 }
+            else:
+                ret["verified"]["contact"] = False if vscore < 1 else True
+                ret["verified"]["identity"] = False if iscore < 3 else True
         return [True, ret, None]
 
     def set_role(self, id, role, active = True):

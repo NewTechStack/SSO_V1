@@ -99,11 +99,11 @@ def user_disable(cn, nextc):
     return cn.call_next(nextc, err)
 
 def user_set_role(cn, nextc):
-    err = cn.private["user"].has_role("creator")
-    if not err[0]:
-        err = cn.private["user"].has_role("admin")
-    if not err[0]:
-        return cn.toret.add_error(err[1], err[2])
+    # err = cn.private["user"].has_role("creator")
+    # if not err[0]:
+    #     err = cn.private["user"].has_role("admin")
+    # if not err[0]:
+    #     return cn.toret.add_error(err[1], err[2])
     err = check.contain(cn.pr, ["role", "active"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
