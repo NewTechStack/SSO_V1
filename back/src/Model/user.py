@@ -107,11 +107,11 @@ def user_set_role(cn, nextc):
     err = check.contain(cn.pr, ["role", "active"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    err = check.contain(cn.rt, ["id"])
+    err = check.contain(cn.rt, ["user"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
     err = cn.private["user"].set_role(
-        cn.rt["id"],
+        cn.rt["user"],
         cn.pr["role"],
         cn.pr["active"]
     )
