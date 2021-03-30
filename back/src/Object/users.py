@@ -614,8 +614,9 @@ class user:
 
     def set_role(self, id, role, active = True):
         role = str(role)
+        ret = False
         if role not in self.av_roles:
-            return False
+            return ret
         date = str(datetime.datetime.utcnow())
         roles = self.data()["roles"]
         if role not in roles:

@@ -1,3 +1,4 @@
+from Controller.basic import check
 from Object.registery import registery
 from Object.user_registery import user_registery
 
