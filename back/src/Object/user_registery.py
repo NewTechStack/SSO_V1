@@ -48,7 +48,7 @@ class user_registery:
                 self.d = None
         return self.d
 
-    def add_user(self, id_user, roles, email = None):
+    def add_user(self, id_user, roles, email = None, force = False):
         if not (isinstance(roles, list) and all(isinstance(i, str) for i in roles)) and not isinstance(roles, str):
             return [False, "Invalid roles format", 400]
         if not isinstance(roles, list):
@@ -61,7 +61,7 @@ class user_registery:
         roles = roles["builtin"] + roles["custom"]
         if not all(self.i in roles for self.i in roles):
             return [False, f"Invalid role: {self.i}", 400]
-        if not self.can("invite"):
+        if not force and not self.can("invite"):
             return [False, "User cannot invite other users", 401]
         if email is not None:
             u = user(-1, email)
