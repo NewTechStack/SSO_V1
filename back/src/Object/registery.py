@@ -127,7 +127,7 @@ class registery:
         data["date"] = date
         data["name"]["main"] = name
         res = dict(self.red.insert([data]).run())
-        self.id = res["generated_keys"][0]
+        self.id = res["generated_keys"][0]    
         return [True, {"id": self.id}, None]
 
     def add_role(self, roles):
@@ -366,7 +366,7 @@ def test():
     r.actions()
     r.delete()
     logging.warning("Ending registery's test")
-    
+
 try:
     test()
 except:

@@ -13,6 +13,11 @@ def regi_create(cn, nextc):
         cn.pr["actions"],
         cn.pr["roles"]
     )
+    cn.private["reg_user"] = user_registery(
+        cn.private["user"],
+        cn.private["reg"]
+    )
+    err = cn.private["reg_user"].add_user(cn.private["user"].id, ["creator"])
     return cn.call_next(nextc, err)
 
 def regi_delete(cn, nextc):
