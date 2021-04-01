@@ -36,13 +36,14 @@ class user_registery:
                 r.row["id_user"] == id_user
                 & r.row["id_registery"] == self.reg_id
             ).run()
+            d = list(d)
             if id_user is not None:
                 if len(d) == 1:
-                    return dict(list(d)[0])
+                    return dict(d[0])
                 else:
                     return None
             if len(d) == 1:
-                self.d = dict(list(d)[0])
+                self.d = dict(d[0])
             else:
                 self.d = None
         return self.d
