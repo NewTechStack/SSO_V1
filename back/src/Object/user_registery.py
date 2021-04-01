@@ -84,7 +84,7 @@ class user_registery:
         id = res["generated_keys"][0]
         return [True, {"id": id}, None]
 
-    def roles(self, id_user = None, active = None):
+    def froles(self, id_user = None, active = None):
         id_user = id_user if id_user is not None else self.usr_id
         d = self.data(id_user)
         if d is None:
