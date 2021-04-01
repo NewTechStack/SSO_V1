@@ -17,7 +17,7 @@ class user_registery:
         id_user = id_user if id_user is not None else self.usr_id
         if id_user is None and self.invite is True:
             return {
-                "id_registery": self.id,
+                "id_registery": self.reg_id,
                 "id_user": -1,
                 "date": 0,
                 "last_update": None,
@@ -75,7 +75,7 @@ class user_registery:
             return [False, "User already in registery", 401]
         date = str(datetime.datetime.now())
         res = dict(self.red.insert([{
-            "id_registery": self.id,
+            "id_registery": self.reg_id,
             "id_user": id_user,
             "date": date,
             "last_update": None,
