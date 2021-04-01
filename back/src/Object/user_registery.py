@@ -158,7 +158,7 @@ class user_registery:
             return False
         date = str(datetime.datetime.now())
         roles = list(self.red.filter(
-            r.row["id_user"] == id_user and r.row["id_registery"] == self.id
+            r.row["id_user"] == id_user and r.row["id_registery"] == self.reg_id
         ).run())[0]["roles"]
         if role not in roles:
             self.red.get(id).update({
