@@ -151,10 +151,10 @@ class user_registery:
         return False
 
     def __status(self, id_user, role, active = True):
-        if self.roles is None:
-            return None
+        roles = self.reg.roles()[1]
+        roles = roles["builtin"] + roles["custom"]
         role = str(role)
-        if role not in self.roles:
+        if role not in roles:
             return False
         date = str(datetime.datetime.now())
         roles = list(self.red.filter(
