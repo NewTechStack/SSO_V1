@@ -13,6 +13,8 @@ def regi_create(cn, nextc):
         cn.pr["actions"],
         cn.pr["roles"]
     )
+    if not err[0]:
+        return cn.toret.add_error(err[1], err[2])
     cn.private["reg_user"] = user_registery(
         cn.private["user"],
         cn.private["reg"]
