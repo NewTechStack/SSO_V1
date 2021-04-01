@@ -160,9 +160,9 @@ class user_registery:
         roles = list(self.red.filter(
             r.row["id_user"] == id_user and r.row["id_registery"] == self.reg_id
         ).run())
-        print(roles)
-
-        if role not in roles[0]["roles"]:
+        id = roles[0]["id"]
+        roles = roles[0]["roles"]
+        if role not in roles:
             self.red.get(id).update({
                 "roles": {
                     role: {
