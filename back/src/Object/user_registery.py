@@ -146,7 +146,8 @@ class user_registery:
                 if end is True:
                     return [True, res[0], None]
                 return True
-            return [False, "Invalid user for this registery", 404]
+            if end is True:
+                return [False, "Invalid user for this registery", 404]
         return False
 
     def __status(self, id_user, role, active = True):
