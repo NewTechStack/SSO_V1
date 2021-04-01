@@ -81,7 +81,7 @@ class user_registery:
             "last_update": None,
             "roles": {},
             "by": self.usr_id
-        }]))
+        }]).run())
         for i in roles:
             self.__status(id_user, i)
         id = res["generated_keys"][0]
