@@ -99,10 +99,18 @@ def user_regi_exist(cn, nextc):
 
 def regi_can_delete(cn, nextc):
     err = cn.private["reg_user"].can("delete")
+    if err is True:
+        err = [True, {}, None]
+    else:
+        err = [False, "Invalid rights", 403]
     return cn.call_next(nextc, err)
 
 def regi_can_edit(cn, nextc):
     err = cn.private["reg_user"].can("edit")
+    if err is True:
+        err = [True, {}, None]
+    else:
+        err = [False, "Invalid rights", 403]
     return cn.call_next(nextc, err)
 
 def regi_can_invite(cn, nextc):
@@ -111,8 +119,16 @@ def regi_can_invite(cn, nextc):
 
 def regi_can_use(cn, nextc):
     err = cn.private["reg_user"].can("use")
+    if err is True:
+        err = [True, {}, None]
+    else:
+        err = [False, "Invalid rights", 403]
     return cn.call_next(nextc, err)
 
 def regi_can_get_infos(cn, nextc):
     err = cn.private["reg_user"].can("get_infos")
+    if err is True:
+        err = [True, {}, None]
+    else:
+        err = [False, "Invalid rights", 403]
     return cn.call_next(nextc, err)
