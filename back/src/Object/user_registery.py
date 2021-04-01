@@ -101,12 +101,12 @@ class user_registery:
 
     def has_role(self, role, id_user = None, active = True):
         id_user = id_user if id_user is not None else self.usr_id
-        r = self.roles(id_user, active)
+        r = self.froles(id_user, active)
         return role in r[1]["roles"] if r[0] else False
 
     def actions(self, id_user = None):
         id_user = id_user if id_user is not None else self.usr_id
-        r = self.roles(id_user, True)
+        r = self.froles(id_user, True)
         if not r[0]:
             return r
         d = self.reg.data()
