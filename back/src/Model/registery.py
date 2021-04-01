@@ -90,6 +90,7 @@ def user_regi(cn, nextc):
         cn.private["user"],
         cn.private["reg"]
     )
+    err = [True, {}, None]
     return cn.call_next(nextc, err)
 
 def user_regi_exist(cn, nextc):
