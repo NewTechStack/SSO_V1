@@ -13,6 +13,14 @@ class user_registery:
         self.d = None
         self.red = get_conn().db("auth").table('user_registery')
 
+    def all_from_user(self, usr_id):
+        res = list(self.red.filter((r.row["id_user"] == usr_id)).run())
+        return [True, {"registries": res}, None]
+
+    def all_user(self, reg_id):
+        res = list(self.red.filter((r.row["id_registery"] == reg_id)).run())
+        return [True, {"users": res}, None]
+
     def data(self, id_user = None,update = False):
         id_user = id_user if id_user is not None else self.usr_id
         if id_user is None and self.invite is True:

@@ -107,6 +107,15 @@ def user_regi(cn, nextc):
     err = [True, {}, None]
     return cn.call_next(nextc, err)
 
+def registry_users(cn, nextc):
+    reg_id = cn.rt["registery"] if "registery" in cn.rt else -1
+    err = user_registery().all_user(reg_id)
+    return cn.call_next(nextc, err)
+
+def user_registries(cn, nextc):
+    err = user_registery().all_from_user(cn.private["user"].id)
+    return cn.call_next(nextc, err)
+
 def user_regi_exist(cn, nextc):
     err = cn.private["reg_user"].exist(end=True)
     return cn.call_next(nextc, err)

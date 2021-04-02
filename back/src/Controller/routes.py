@@ -16,8 +16,8 @@ def setuproute(app, call):
     @app.route('/user/<>',                      ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_infos])) #done
     @app.route('/user/<>/role',                 ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_role])) #done
     @app.route('/user/<>/role',                 ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_set_role])) #done
+    @app.route('/user/registery',               ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_registries])) #done
 
-    @app.route('/registery',                    ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, ]))
     @app.route('/registery',                    ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_is_admin, regi_create])) #done
 
     @app.route('/registery/<>',                 ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, regi_infos])) #done
@@ -36,6 +36,8 @@ def setuproute(app, call):
     @app.route('/registery/<>/actions',         ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, regi_actions])) #done
     @app.route('/registery/<>/action',          ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit, regi_add_action])) #done
     @app.route('/registery/<>/action/<>',       ['OPTIONS', 'DELETE'],      lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit, regi_delete_action])) #done
+
+    @app.route('/registery/<>/users',           ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, registry_users])) #done
 
     @app.route('/extern/key',                   ['OPTIONS', 'GET'],         lambda x = None: call([user_get_key])) #done
     @app.route('/extern/key/<>/token',          ['OPTIONS', 'POST'],        lambda x = None: call([user_wait_token])) #done
