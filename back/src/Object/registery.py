@@ -90,7 +90,7 @@ class registery:
            not len(name) < 30:
             return [False, "Invalid name", 400]
         if self.__exist(name, creator):
-            return [False, f"Registery {name} already exist"]
+            return [False, f"Registery {name} already exist", 401]
         if not isinstance(actions, list) and len(action) < 255:
             return [False, "Invalid action list", 400]
         if not all(isinstance(self.i, str) for self.i in actions):
@@ -127,6 +127,7 @@ class registery:
         data["actions"]["custom"]["main"] = actions_custom
         data["roles"]["custom"]["main"] = roles_custom
         data["date"] = date
+        data["name"]["creator"] = creator
         data["name"]["main"] = name
         res = dict(self.red.insert([data]).run())
         self.id = res["generated_keys"][0]
@@ -134,6 +135,8 @@ class registery:
 
     def add_role(self, roles):
         res = self.red.get(self.id).run()
+        if res is None:
+            return [False, "Invalid registry_id", 404]
         date = str(datetime.datetime.utcnow())
         if not isinstance(roles, dict):
             return [False, "Invalid role", 400]
@@ -348,8 +351,8 @@ class registery:
 
     def __exist(self, name, creator):
         res = list(self.red.filter(
-            r.row["name"]["main"] == name
-            and r.row["name"]["creator"] == creator
+            (r.row["name"]["main"] == name)
+            & (r.row["name"]["creator"] == creator)
         ).run())
         if len(res) > 0:
             return True
@@ -373,4 +376,3 @@ try:
     test()
 except:
     logging.error("Registery's test error")
-    exit(1)

@@ -20,6 +20,8 @@ def regi_create(cn, nextc):
         cn.private["reg"]
     )
     err = cn.private["reg_user"].add_user(cn.private["user"].id, ["creator"], force=True)
+    if err[0] is True:
+        err = [True, {"registry_id": cn.private["reg"].id}, None]
     return cn.call_next(nextc, err)
 
 def regi_delete(cn, nextc):

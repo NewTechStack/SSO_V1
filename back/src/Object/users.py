@@ -389,11 +389,11 @@ class user:
             return [False, "Invalid param type", 400]
         password = self.__hash(login, password)
         res = list(self.red.filter(
-            (r.row["email"]["main"] == login
-            & r.row["password"]["main"]["by_mail"] == password)
+            ((r.row["email"]["main"] == login)
+            & (r.row["password"]["main"]["by_mail"] == password))
             |
-            (r.row["username"]["main"] == login
-            & r.row["password"]["main"]["by_usr"] == password)
+            ((r.row["username"]["main"] == login)
+            & (r.row["password"]["main"]["by_usr"] == password))
         ).run())
         if len(res) == 0:
             return [False, "Invalid email or password", 403]
@@ -613,14 +613,18 @@ class user:
         return [True, ret, None]
 
     def set_role(self, id, role, active = True):
+        if not isinstance(role, str):
+            return False
+        if not isinstance(active, bool):
+            return False
         role = str(role)
         ret = False
         if role not in self.av_roles:
-            return ret
+            return False
         date = str(datetime.datetime.utcnow())
         roles = self.data()["roles"]
         if role not in roles:
-            self.red.get(id).update({
+            ret = dict(self.red.get(id).update({
                 "roles": {
                     role: {
                         "active": active,
@@ -629,8 +633,8 @@ class user:
                     }
                 },
                 "last_update": date
-            }).run()
-            ret = True
+            }).run())
+            ret = ret["skipped"] == 0
         else:
             ret = dict(self.red.get(id).update({
                 "roles": {
@@ -641,7 +645,8 @@ class user:
                     }
                 },
                 "last_update": date
-            }).run())["skipped"] == 0
+            }).run())
+            ret = ret["skipped"] == 0
         return ret
 
     def check_email(self):
@@ -952,8 +957,8 @@ def test():
     logging.warning("Starting user's test")
     u = user()
     u2 = user()
-    email = "eliot@test.fr"
-    email2 = "test@test.fr"
+    email = "eliot1@test.fr"
+    email2 = "test1@test.fr"
     password = "T2*eeeee"
     phone = "0626232886"
     prenom = "eliot"

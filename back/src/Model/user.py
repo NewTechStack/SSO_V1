@@ -115,6 +115,10 @@ def user_set_role(cn, nextc):
         cn.pr["role"],
         cn.pr["active"]
     )
+    if err is not True:
+        err = [False, "Invalid role", 404]
+    else:
+        err = [True, {}, None]
     return cn.call_next(nextc, err)
 
 def user_infos(cn, nextc):

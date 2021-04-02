@@ -33,8 +33,8 @@ class user_registery:
         if ((self.d is None or update is True) and self.usr_id != "-1") or \
             id_user is None:
             d = self.red.filter(
-                r.row["id_user"] == id_user
-                & r.row["id_registery"] == self.reg_id
+                (r.row["id_user"] == id_user)
+                & (r.row["id_registery"] == self.reg_id)
             ).run()
             d = list(d)
             if id_user is not None:
@@ -115,10 +115,10 @@ class user_registery:
         d = self.reg.data()
         ret = []
         for i in r[1]["roles"]:
-            if i in d["actions"]["builtin"]["main"]:
-                ret.extend(d["actions"]["builtin"]["main"][i])
-            elif i in d["actions"]["custom"]["main"]:
-                ret.extend(d["actions"]["custom"]["main"][i])
+            if i in d["roles"]["builtin"]["main"]:
+                ret.extend(d["roles"]["builtin"]["main"][i]["actions"])
+            elif i in d["roles"]["custom"]["main"]:
+                ret.extend(d["roles"]["custom"]["main"][i]["actions"])
         return [True, {"actions": list(set(ret))}, None]
 
     def can(self, action, id_user = None):
@@ -130,7 +130,7 @@ class user_registery:
         if id_user is None:
             if self.d != None:
                 return True
-            res = list(self.red.filter(r.row["id_user"] == self.usr_id & r.row["id_registery"] == self.reg_id).run())
+            res = list(self.red.filter((r.row["id_user"] == self.usr_id) & (r.row["id_registery"] == self.reg_id)).run())
             if len(res) == 1:
                 self.d = res[0]
             if len(res) > 0:
@@ -141,7 +141,7 @@ class user_registery:
                 self.invite = True
                 return [True, {}, None]
         else:
-            res = list(self.red.filter(r.row["id_user"] == id_user & r.row["id_registery"] == self.reg_id).run())
+            res = list(self.red.filter((r.row["id_user"] == id_user) & (r.row["id_registery"] == self.reg_id)).run())
             if len(res) > 0:
                 if end is True:
                     return [True, res[0], None]
@@ -158,7 +158,7 @@ class user_registery:
             return False
         date = str(datetime.datetime.now())
         roles = list(self.red.filter(
-            r.row["id_user"] == id_user and r.row["id_registery"] == self.reg_id
+            (r.row["id_user"] == id_user) & (r.row["id_registery"] == self.reg_id)
         ).run())
         id = roles[0]["id"]
         roles = roles[0]["roles"]
