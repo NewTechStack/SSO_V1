@@ -200,7 +200,7 @@ class registery:
         self.red.get(self.id).update({
             "roles": {
                 "custom": {
-                    "main": roles_customs,
+                    "main": roles_custom,
                     "last_update": date
                 }
             },
