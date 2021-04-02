@@ -73,7 +73,9 @@ class registery:
         return [True, {"name": self.data()["name"]}, None]
 
     def infos(self):
-        d = self.data()
+        d = self.data(True)
+        if d is None:
+            return [False, f"Registry {self.id} doesn't exist", 404]
         ret = {
         "name": d["name"],
         "description": d["description"],
@@ -127,7 +129,7 @@ class registery:
         data["date"] = date
         data["name"]["main"] = name
         res = dict(self.red.insert([data]).run())
-        self.id = res["generated_keys"][0]    
+        self.id = res["generated_keys"][0]
         return [True, {"id": self.id}, None]
 
     def add_role(self, roles):
