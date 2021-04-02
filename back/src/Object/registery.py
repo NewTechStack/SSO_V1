@@ -196,7 +196,7 @@ class registery:
             return [False, f"{role} does not exist", 400]
         if not all(self.i in all_actions for self.i in actions):
             return [False, f"{self.i} does not exist", 400]
-        roles_custom[roles]["actions"] = actions
+        roles_custom[role]["actions"] = actions
         self.red.get(self.id).update({
             "roles": {
                 "custom": {
