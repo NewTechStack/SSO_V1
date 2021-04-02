@@ -29,6 +29,7 @@ def setuproute(app, call):
 
     @app.route('/registery/<>/roles',           ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, regi_roles])) #done
     @app.route('/registery/<>/role',            ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit, regi_add_role])) #done
+    @app.route('/registery/<>/role/<>',         ['OPTIONS', 'GET'],        lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, regi_role])) #done
     @app.route('/registery/<>/role/<>',         ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit, regi_edit_role])) #done
     @app.route('/registery/<>/role/<>',         ['OPTIONS', 'DELETE'],      lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit, regi_delete_role])) #done
 

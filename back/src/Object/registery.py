@@ -232,6 +232,19 @@ class registery:
         }).run()
         return [True, {}, None]
 
+    def get_role(self, role):
+        ret = {}
+        if not isinstance(role, str):
+            return [False, f"Invalid param type", 400]
+        res = self.red.get(self.id).run()
+        roles_builtin = res["roles"]["builtin"]["main"]
+        roles_custom = res["roles"]["custom"]["main"]
+        all_actions = res["actions"]["builtin"]["main"] + res["actions"]["custom"]["main"]
+        if role not in list(all_actions.keys()):
+            return [False, f"Invalid role {role}", 404]
+        ret[role] = all_actions[role]
+        return [True, {ret}, None]
+
     def roles(self, details = False):
         res = self.red.get(self.id).run()
         roles_builtin = res["roles"]["builtin"]["main"]

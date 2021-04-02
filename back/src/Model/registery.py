@@ -72,6 +72,11 @@ def regi_delete_role(cn, nextc):
     err = cn.private["reg"].delete_role(role)
     return cn.call_next(nextc, err)
 
+def regi_role(cn, nextc):
+    role = cn.rt["role"] if "role" in cn.rt else None
+    err = cn.private["reg"].get_role(role)
+    return cn.call_next(nextc, err)
+
 def regi_roles(cn, nextc):
     err = cn.private["reg"].roles()
     return cn.call_next(nextc, err)
