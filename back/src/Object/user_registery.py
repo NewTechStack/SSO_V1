@@ -57,9 +57,9 @@ class user_registery:
             return [False, "Invalid user", 401]
         if str(self.reg_id) == str("-1"):
             return [False, "Invalid registery", 401]
-        roles = self.reg.roles()[1]
-        roles = roles["builtin"] + roles["custom"]
-        if not all(self.i in roles for self.i in roles):
+        base_roles = self.reg.roles()[1]
+        base_roles = base_roles["builtin"] + base_roles["custom"]
+        if not all(self.i in base_roles for self.i in roles):
             return [False, f"Invalid role: {self.i}", 400]
         if not force and not self.can("invite"):
             return [False, "User cannot invite other users", 401]
