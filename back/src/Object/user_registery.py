@@ -6,9 +6,11 @@ class user_registery:
         self.user = user
         self.reg = registery
         self.user.data(True)
-        self.usr_id = user.id
-        self.reg_id = registery.id
-        self.roles = registery.roles
+        if user is not None:
+            self.usr_id = user.id
+        if registery is not None:
+            self.reg_id = registery.id
+            self.roles = registery.roles
         self.invite = False
         self.d = None
         self.red = get_conn().db("auth").table('user_registery')

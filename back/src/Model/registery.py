@@ -113,7 +113,7 @@ def registry_users(cn, nextc):
     return cn.call_next(nextc, err)
 
 def user_registries(cn, nextc):
-    err = user_registery().all_from_user(cn.private["user"].id)
+    err = user_registery(None, None).all_from_user(cn.private["user"].id)
     return cn.call_next(nextc, err)
 
 def user_regi_exist(cn, nextc):

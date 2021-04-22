@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/static/css/main.e7d49bb5.chunk.css",
+    "main.js": "/static/js/main.b7a7e07c.chunk.js",
+    "main.js.map": "/static/js/main.b7a7e07c.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.660e0c58.js",
+    "runtime-main.js.map": "/static/js/runtime-main.660e0c58.js.map",
+    "static/css/2.992b1dc8.chunk.css": "/static/css/2.992b1dc8.chunk.css",
+    "static/js/2.04793e8a.chunk.js": "/static/js/2.04793e8a.chunk.js",
+    "static/js/2.04793e8a.chunk.js.map": "/static/js/2.04793e8a.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.e7133ea0359b2867f02ed5be4c95cd05.js": "/precache-manifest.e7133ea0359b2867f02ed5be4c95cd05.js",
+    "service-worker.js": "/service-worker.js",
+    "static/css/2.992b1dc8.chunk.css.map": "/static/css/2.992b1dc8.chunk.css.map",
+    "static/css/main.e7d49bb5.chunk.css.map": "/static/css/main.e7d49bb5.chunk.css.map",
+    "static/media/rainbow-styles.css": "/static/media/Lato-Regular.e9d329fb.svg",
+    "static/media/semantic-ui_clone.css": "/static/media/flags.9c74e172.png",
+    "static/media/signup2.jpg": "/static/media/signup2.19ff40c0.jpg"
+  }
+}
