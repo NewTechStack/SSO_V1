@@ -16,7 +16,7 @@ class user_registery:
         self.red = get_conn().db("auth").table('user_registery')
 
     def all_from_user(self, usr_id):
-        res = list(self.red.filter((r.row["id_user"] == usr_id)).run())
+        res = list(self.red.filter((r.row["id_user"] == usr_id)).eq_join("id_registery", r.table("registery")).zip().run())
         return [True, {"registries": res}, None]
 
     def all_user(self, reg_id):
