@@ -5,8 +5,8 @@ class user_registery:
     def __init__(self, user, registery):
         self.user = user
         self.reg = registery
-        self.user.data(True)
         if user is not None:
+            self.user.data(True)
             self.usr_id = user.id
         if registery is not None:
             self.reg_id = registery.id

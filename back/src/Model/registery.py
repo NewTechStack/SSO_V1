@@ -109,7 +109,7 @@ def user_regi(cn, nextc):
 
 def registry_users(cn, nextc):
     reg_id = cn.rt["registery"] if "registery" in cn.rt else -1
-    err = user_registery().all_user(reg_id)
+    err = user_registery(None, None).all_user(reg_id)
     return cn.call_next(nextc, err)
 
 def user_registries(cn, nextc):
