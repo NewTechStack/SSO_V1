@@ -16,33 +16,28 @@ class user_registery:
         self.red = get_conn().db("auth").table('user_registery')
 
     def all_from_user(self, usr_id):
-        ret = []
-        res = list(self.red.filter(
-            (r.row["id_user"] == usr_id)
-        ).eq_join(
-            'id_registery',
-            get_conn().db("auth").table('registery')
-        ).without({right: ["id"]}
-        ).withFields('left', {right: "name"}
-        ).map( lambda res : {
-                "date": res['left']['date'],
-                "by": res['left']['by'],
-                "id": res['left']['id'],
-                "last_update": res['left']['date'],
-                "registery": {
-                  "id": res['left']['id_registery'],
-                  "name": res['right']['name'],
-                  "roles": res['left']['roles'],
-                }
-        ).run())
-        i = 0
-        while (i < len(res)):
-            res[i]["right"]["id"] = res[i]["left"]["id_registery"]
-            res[i]["left"]["repository"] = res[i]["right"]
-            del res[i]["left"]["id_registery"]
-            ret.append(res[i]["left"])
-            i += 1
-        return [True, {"registries": ret}, None]
+        res = list(
+            self.red.filter(
+                (r.row["id_user"] == usr_id)
+            ).eq_join(
+                'id_registery',
+                get_conn().db("auth").table('registery')
+            ).without({right: ["id"]}
+            ).withFields('left', {right: "name"}
+            ).map( lambda res : {
+                        "date": res['left']['date'],
+                        "by": res['left']['by'],
+                        "id": res['left']['id'],
+                        "last_update": res['left']['date'],
+                        "registery": {
+                          "id": res['left']['id_registery'],
+                          "name": res['right']['name'],
+                          "roles": res['left']['roles'],
+                        }
+                    }
+            ).run()
+        )
+        return [True, {"registries": res}, None]
 
     def all_user(self, reg_id):
         res = list(
@@ -63,8 +58,8 @@ class user_registery:
                       "username": res['right']['username'],
                       "roles": res['left']['roles'],
                     }
-                };
-            }).run()
+                }
+            ).run()
         )
         return [True, {"users": res}, None]
 
