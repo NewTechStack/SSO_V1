@@ -22,8 +22,18 @@ class user_registery:
         ).eq_join(
             'id_registery',
             get_conn().db("auth").table('registery')
-        ).without(
-            [{ 'left': [], 'right': ["id", "actions", "date", "roles"]}]
+        ).without({right: ["id"]}
+        ).withFields('left', {right: "name"}
+        ).map( lambda res : {
+                "date": res['left']['date'],
+                "by": res['left']['by'],
+                "id": res['left']['id'],
+                "last_update": res['left']['date'],
+                "registery": {
+                  "id": res['left']['id_registery'],
+                  "name": res['right']['name'],
+                  "roles": res['left']['roles'],
+                }
         ).run())
         i = 0
         while (i < len(res)):
@@ -35,7 +45,27 @@ class user_registery:
         return [True, {"registries": ret}, None]
 
     def all_user(self, reg_id):
-        res = list(self.red.filter((r.row["id_registery"] == reg_id)).run())
+        res = list(
+            self.red.filter(
+                (r.row["id_registery"] == reg_id)
+            ).eqJoin('id_user', get_conn().db("auth").table('users')
+            ).without(
+                {right: ["id"]}
+            ).with_fields(
+                'left', {"right": 'username'}
+            ).map( lambda res : {
+                    "date": res['left']['date'],
+                    "by": res['left']['by'],
+                    "id": res['left']['id'],
+                    "last_update": res['left']['date'],
+                    "user": {
+                      "id": res['left']['id_user'],
+                      "username": res['right']['username'],
+                      "roles": res['left']['roles'],
+                    }
+                };
+            }).run()
+        )
         return [True, {"users": res}, None]
 
     def data(self, id_user = None,update = False):
