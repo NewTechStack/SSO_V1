@@ -22,7 +22,7 @@ class user_registery:
             ).eq_join(
                 'id_registery',
                 get_conn().db("auth").table('registery')
-            ).without({right: ["id"]}
+            ).without({'right': ["id"]}
             ).withFields('left', {right: "name"}
             ).map( lambda res : {
                         "date": res['left']['date'],
@@ -45,7 +45,7 @@ class user_registery:
                 (r.row["id_registery"] == reg_id)
             ).eqJoin('id_user', get_conn().db("auth").table('users')
             ).without(
-                {right: ["id"]}
+                {'right': ["id"]}
             ).with_fields(
                 'left', {"right": 'username'}
             ).map( lambda res : {
