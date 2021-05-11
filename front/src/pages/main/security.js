@@ -186,12 +186,12 @@ export default function Security(props){
                                         aria-controls="panel1bh-content"
                                         id="panel1bh-header"
                                     >
-                                        <Typography className={classes.heading}>Mon compte</Typography>
+                                        <Typography className={classes.heading}>Email</Typography>
                                         <div>
                                             {
                                                 !loading &&
                                                 <Typography className={classes.secondaryHeadingTitle}>
-                                                    {infoAccount.roles.user.active === true ? "Activé" : "Désactivé"}
+                                                    {localStorage.getItem("email")}
                                                 </Typography>
                                             }
 
@@ -339,11 +339,6 @@ export default function Security(props){
                                         id="panel4bh-header"
                                     >
                                         <Typography className={classes.heading} style={{color:"red"}}>Supprimer mon compte</Typography>
-                                        <div>
-                                            <Typography className={classes.secondaryHeadingTitle}>
-                                                ••••••••
-                                            </Typography>
-                                        </div>
 
                                     </AccordionSummary>
                                     <AccordionDetails>

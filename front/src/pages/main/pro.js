@@ -53,16 +53,12 @@ export default function Pro(props){
         {
             name: 'Date de création',
             selector: 'date',
+            cell: row => moment(row.date).format("DD-MM-YYYY HH:mm"),
             sortable: true,
         },
         {
             name: 'Nom',
             selector: 'name',
-            sortable: true,
-        },
-        {
-            name: 'Statut',
-            selector: 'statut',
             sortable: true,
         }
     ];
@@ -74,13 +70,14 @@ export default function Pro(props){
     const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
     const [openAddModal, setOpenAddModal] = React.useState(false);
     const [newReg_name, setNewReg_name] = React.useState("");
+    const [registres, setRegistres] = React.useState();
     const [selectedRegId, setSelectedRegId] = React.useState("");
 
 
     useEffect(() => {
         setTimeout(() => {
             if(verifSession() === true){
-
+                getRegistres()
             }else{
                 enqueueSnackbar('Session expirée', { variant:"warning" })
                 enqueueSnackbar('Reconnexion en cours...', { variant:"info" })
@@ -94,6 +91,22 @@ export default function Pro(props){
 
     const verifSession = () => {
         return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
+    }
+
+    const getRegistres = () => {
+        setLoading(true)
+        SSO_service.get_registres(localStorage.getItem("usrtoken")).then(res => {
+            console.log(res)
+            if(res.status === 200 && res.succes === true){
+                setLoading(false)
+                setRegistres(res.data.registries || [])
+            }else{
+                enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
+            }
+        }).catch(err => {
+            console.log(err)
+            enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
+        })
     }
 
     const addNewRegistre = () => {
@@ -150,7 +163,7 @@ export default function Pro(props){
                     </div>
                     <DataTable
                         columns={columns}
-                        data={data}
+                        data={registres}
                         defaultSortField="name"
                         selectableRows={false}
                         selectableRowsHighlight={true}
@@ -162,13 +175,13 @@ export default function Pro(props){
                         paginationComponentOptions={paginationOptions}
                         highlightOnHover={false}
                         contextMessage={tableContextMessage}
-                        progressPending={false}
+                        progressPending={registres === null || registres === undefined}
                         progressComponent={<h6>Chargement...</h6>}
                         noDataComponent="Il n'y a aucun enregistrement à afficher"
                         noHeader={true}
                         pointerOnHover={true}
                         onRowClicked={(row, e) => {
-                            props.history.push("/main/pro/registre/" + row.id )
+                            props.history.push("/main/pro/registre/" + row.id_registery )
                         }}
                     />
 

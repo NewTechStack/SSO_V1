@@ -125,6 +125,15 @@ let SSO_service = {
         });
     },
 
+    get_registres(usrtoken){
+        return fetch(endpoint + '/user/registery', {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
     add_registre(data,usrtoken){
         return fetch(endpoint + '/registery', {
             method: 'POST',

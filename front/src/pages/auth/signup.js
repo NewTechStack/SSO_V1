@@ -80,7 +80,7 @@ class signup extends Component {
                        <div style={{display:"flex"}}>
                            <div className="padding-form">
 
-                               <h5>Créer votre compte</h5>
+                               <h5 style={{fontSize:"1.4rem"}}>Créer votre compte</h5>
 
                                <form id="signup-form" style={{maxWidth:500,alignSelf:"center"}}
                                      onSubmit={(e) => {

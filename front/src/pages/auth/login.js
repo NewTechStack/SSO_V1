@@ -29,7 +29,9 @@ class login extends Component {
     };
 
 
-    componentDidMount() {}
+    componentDidMount() {
+
+    }
 
     handleObjectChange = (object,name) => event => {
         let obj = this.state[object];
@@ -98,7 +100,7 @@ class login extends Component {
                         <div style={{display:"flex"}}>
                             <div className="padding-form">
 
-                                <h5>Connexion</h5>
+                                <h4 style={{fontSize:"1.4rem",marginBottom:5}}>Connexion</h4>
                                 <h6>Accéder à votre compte</h6>
 
                                 <form id="login-form" style={{maxWidth:500,alignSelf:"center"}}

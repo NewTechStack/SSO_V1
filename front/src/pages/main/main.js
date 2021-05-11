@@ -6,7 +6,6 @@ import Sidebar from 'react-rainbow-components/components/Sidebar';
 import SidebarItem from 'react-rainbow-components/components/SidebarItem';
 import ButtonIcon from 'react-rainbow-components/components/ButtonIcon';
 import RenderIf from 'react-rainbow-components/components/RenderIf';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import Routes from './routes';
 import SectionHeading from '../../components/SectionHeading';
@@ -18,6 +17,8 @@ import {
 } from '../../components/icons';
 import { navigateTo } from './history';
 import moment from "moment";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar } from '@fortawesome/free-regular-svg-icons';
 
 
 
@@ -71,6 +72,7 @@ export default class main extends React.Component{
                 </RenderIf>
                 <div className={this.getSidebarClassNames()}>
                     <Sidebar
+                        id="sidebar-1"
                         className="react-rainbow-admin-app_sidebar"
                         selectedItem={selectedItem}
                         onSelect={(e,selected) => {this.setState({selectedItem:selected})}}>
@@ -79,10 +81,12 @@ export default class main extends React.Component{
                             icon={<DashboardIcon size={20} />}
                             name="dash"
                             label="Accueil"
-                            onClick={() => navigateTo('/main/dash')} />
+                            onClick={() => navigateTo('/main/dash')}
+
+                        />
                         <SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
-                            icon={<PagesIcon size={20} />}
+                            icon={<PagesIcon size={18} />}
                             name="infos"
                             label="Informations personnelles"
                             onClick={() => navigateTo('/main/infos')} />
@@ -94,8 +98,8 @@ export default class main extends React.Component{
                             onClick={() => navigateTo('/main/security')} />
                         <SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
-                            icon={<TwitterIcon size={20} />}
-                            name="Pro"
+                            icon={<FontAwesomeIcon icon={faStar} size={20} color="orange" />}
+                            name="pro"
                             label="Pro"
                             onClick={() => navigateTo('/main/pro')} />
                     </Sidebar>

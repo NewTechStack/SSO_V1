@@ -7,7 +7,7 @@ export default function Pages(props) {
         style,
     } = props;
     return (
-        <svg className={className} style={style} xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 23 18">
+        <svg className={className} style={style} xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 16 16">
             <g fill="none" fillRule="evenodd">
                 <path fill="#B3B5BD" d="M15.152 17.45c-.261-.172-1.758-.737-1.758-.737h-.008l-.394-3.157H9.085l-.394 3.156h-.007s-1.498.566-1.76.738l-.221.34c-.092.06.002.162.147.162H15.227c.146 0 .239-.102.147-.163l-.222-.339z" />
                 <path fill="#CED0D9" d="M20.952.008H1.074C.481.008 0 .513 0 1.137v12.41c0 .623.481 1.128 1.074 1.128h19.878c.593 0 1.074-.505 1.074-1.128V1.137c0-.624-.48-1.129-1.074-1.129" />

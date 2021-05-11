@@ -31,6 +31,8 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import Switch from '@material-ui/core/Switch';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import Divider from '@material-ui/core/Divider';
+import {IconButton} from "@material-ui/core";
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -398,12 +400,15 @@ export default function Info(props){
                                                         </ListItemIcon>
                                                         <ListItemText primary={item.role} secondary={moment(item.data.last_update).format("DD-MM-YYYY HH:mm")} />
                                                         <ListItemSecondaryAction>
-                                                            <Switch
+                                                            {/*<Switch
                                                                 edge="end"
                                                                 //onChange={}
                                                                 checked={item.data.active === true}
                                                                 inputProps={{ 'aria-labelledby': 'switch-list-label-bluetooth' }}
-                                                            />
+                                                            />*/}
+                                                            <IconButton>
+                                                                <CheckCircleIcon color="secondary"/>
+                                                            </IconButton>
                                                         </ListItemSecondaryAction>
                                                     </ListItem>
                                                         <Divider variant="inset" component="li" />
