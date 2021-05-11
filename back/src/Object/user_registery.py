@@ -45,7 +45,7 @@ class user_registery:
                 (r.row["id_registery"] == reg_id)
             ).eqJoin('id_user', get_conn().db("auth").table('users')
             ).without(
-                {right: ["id"]}
+                {'right': ["id"]}
             ).with_fields(
                 'left', {"right": 'username'}
             ).map( lambda res : {
