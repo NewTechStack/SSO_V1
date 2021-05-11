@@ -14,10 +14,10 @@ def setuproute(app, call):
     @app.route('/user',                         ['OPTIONS', 'DELETE'],      lambda x = None: call([user_verify_token, user_disable])) #done
     @app.route('/user/invite',                  ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_invite, ])) #done
     @app.route('/user/registery',               ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_registries])) #done
-    
+
     @app.route('/user/<>',                      ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_infos])) #done
     @app.route('/user/<>/role',                 ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_role])) #done
-    @app.route('/user/<>/role',                 ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_set_role])) #done
+    @app.route('/user/<>/role',                 ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_is_admin, user_set_role])) #done
 
 
     @app.route('/registery',                    ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_is_admin, regi_create])) #done

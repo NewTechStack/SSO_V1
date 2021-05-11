@@ -22,8 +22,10 @@ class user_registery:
             ).eq_join(
                 'id_registery',
                 get_conn().db("auth").table('registery')
-            ).without({right: ["id"]}
-            ).with_fields('left', {right: "name"}
+            ).without(
+                {'right': ["id"]}
+            ).with_fields(
+                'left', {'right': "name"}
             ).map( lambda res : {
                         "date": res['left']['date'],
                         "by": res['left']['by'],
