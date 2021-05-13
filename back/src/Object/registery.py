@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+import uuid
 from .rethink import get_conn, r
 
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='[ %m/%d/%Y-%I:%M:%S%p ]')
@@ -25,10 +26,13 @@ class registery:
                 "builtin": {
                     "main": {
                         "creator": {
-                            "actions": ["delete", "edit", "invite", "use", "get_infos"]
+                            "actions": ["delete", "use_api", "edit", "invite", "use", "get_infos", ]
                         },
                         "admin": {
                             "actions": ["edit", "invite", "use", "get_infos"]
+                        },
+                        "developper": {
+                            "actions": ["use_api", "use", "get_infos"]
                         },
                         "user": {
                             "actions": ["use", "get_infos"]
@@ -46,7 +50,7 @@ class registery:
             },
             "actions": {
                 "builtin": {
-                    "main": ["delete", "edit", "invite", "use", "get_infos"],
+                    "main": ["delete", "edit", "invite", "use", "get_infos", "use_api"],
                     "last_update": None
                 },
                 "custom": {
@@ -56,6 +60,17 @@ class registery:
             },
             "open": {
                 "main": False,
+                "last_update": None
+            },
+            "dev_settings": {
+                "keys": {
+                    "main": {
+                        "shared": False,
+                        "key_number": 0,
+                        "key_per_dev": 0
+                    },
+                    "last_update": None
+                },
                 "last_update": None
             },
             "last_update": None,

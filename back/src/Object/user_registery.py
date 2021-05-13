@@ -1,5 +1,6 @@
 import datetime
 from .rethink import get_conn, r
+from .registery_key import registery_key
 
 class user_registery:
     def __init__(self, user, registery):
@@ -11,6 +12,8 @@ class user_registery:
         if registery is not None:
             self.reg_id = registery.id
             self.roles = registery.roles
+        if registery is not None and user is not None:
+            self.keys = registery_key(self.id)
         self.invite = False
         self.d = None
         self.red = get_conn().db("auth").table('user_registery')
@@ -201,6 +204,19 @@ class user_registery:
             if end is True:
                 return [False, "Invalid user for this registery", 404]
         return False
+
+    def add_key(self, name):
+        shared = self.reg.data()["dev_settings"]["keys"]["main"]["shared"]
+        return self.keys.add(name, shared, self.usr_id, self.reg_id)
+
+    def delete_key(self, id):
+        shared = self.reg.data()["dev_settings"]["keys"]["main"]["shared"]
+        return self.keys.delete(id, shared, self.usr_id)
+
+    def get_keys(self):
+        shared = self.reg.data()["dev_settings"]["keys"]["main"]["shared"]
+        return self.keys.get(shared, self.usr_id, self.reg_id)
+
 
     def __status(self, id_user, role, active = True):
         roles = self.reg.roles()[1]

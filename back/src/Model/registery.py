@@ -97,6 +97,22 @@ def regi_actions(cn, nextc):
     err = cn.private["reg"].actions()
     return cn.call_next(nextc, err)
 
+def regi_add_key(cn, nextc):
+    err = check.contain(cn.pr, ["name"])
+    if not err[0]:
+        return cn.toret.add_error(err[1], err[2])
+    err = cn.private["reg_user"].add_key(cn.pr["name"])
+    return cn.call_next(nextc, err)
+
+def regi_delete_key(cn, nextc):
+    key_id = cn.rt["key"] if "key" in cn.rt else None
+    err = cn.private["reg_user"].delete_key(key_id)
+    return cn.call_next(nextc, err)
+
+def regi_keys(cn, nextc):
+    err = cn.private["reg_user"].get_keys()
+    return cn.call_next(nextc, err)
+
 def user_regi(cn, nextc):
     reg_id = cn.rt["registery"] if "registery" in cn.rt else -1
     cn.private["reg"] = registery(reg_id)
@@ -142,6 +158,14 @@ def regi_can_invite(cn, nextc):
 
 def regi_can_use(cn, nextc):
     err = cn.private["reg_user"].can("use")
+    if err is True:
+        err = [True, {}, None]
+    else:
+        err = [False, "Invalid rights", 403]
+    return cn.call_next(nextc, err)
+
+def regi_can_use_api(cn, nextc):
+    err = cn.private["reg_user"].can("use_api")
     if err is True:
         err = [True, {}, None]
     else:
