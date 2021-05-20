@@ -67,5 +67,5 @@ class registery_key:
             ).run())
         return [True, {"keys": ret}, None]
 
-    def check(self):
+    def check(self, key):
         return [True, {}, None]
