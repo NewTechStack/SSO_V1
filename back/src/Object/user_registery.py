@@ -14,6 +14,8 @@ class user_registery:
             self.roles = registery.roles
         if registery is not None and user is not None:
             self.keys = registery_key(self.id)
+        else:
+            self.keys = registery_key()
         self.invite = False
         self.d = None
         self.red = get_conn().db("auth").table('user_registery')
@@ -48,7 +50,7 @@ class user_registery:
         res = list(
             self.red.filter(
                 (r.row["id_registery"] == reg_id)
-            ).eqJoin('id_user', get_conn().db("auth").table('users')
+            ).eq_join('id_user', get_conn().db("auth").table('users')
             ).without(
                 {'right': ["id"]}
             ).with_fields(
@@ -217,6 +219,8 @@ class user_registery:
         shared = self.reg.data()["dev_settings"]["keys"]["main"]["shared"]
         return self.keys.get(shared, self.usr_id, self.reg_id)
 
+    def check_key(self, key):
+        return self.keys.check(key)
 
     def __status(self, id_user, role, active = True):
         roles = self.reg.roles()[1]

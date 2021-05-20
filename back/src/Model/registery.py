@@ -113,6 +113,13 @@ def regi_keys(cn, nextc):
     err = cn.private["reg_user"].get_keys()
     return cn.call_next(nextc, err)
 
+def regi_check_key(cn, nextc):
+    err = check.contain(cn.hd, ["apitoken"], "HEAD")
+    if not err[0]:
+        return cn.toret.add_error(err[1], err[2])
+    err = cn.private["reg_user"].check_key(cn.hd["apitoken"])
+    return cn.call_next(nextc, err)
+
 def user_regi(cn, nextc):
     reg_id = cn.rt["registery"] if "registery" in cn.rt else -1
     cn.private["reg"] = registery(reg_id)

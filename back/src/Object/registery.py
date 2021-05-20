@@ -149,7 +149,7 @@ class registery:
         return [True, {"id": self.id}, None]
 
     def add_role(self, roles):
-        res = self.red.get(self.id).run()
+        res = self.data()
         if res is None:
             return [False, "Invalid registry_id", 404]
         date = str(datetime.datetime.utcnow())
@@ -173,11 +173,11 @@ class registery:
         [r.extend(i) for i in [roles[i]["actions"] for i in [i for i in roles]]]
         if not all(isinstance(self.i, str) for self.i in r) or \
            not all(self.i in actions_builtin + actions_custom for self.i in r):
-            return [False, f"Role's action are not valid : {self.i}"]
+            return [False, f"Role's action are not valid : {self.i}", 400]
         if not all(self.i not in roles_custom for self.i in roles):
-            return [False, f"Role {self.i} already exist"]
+            return [False, f"Role {self.i} already exist", 400]
         if not all(self.i not in roles_builtin for self.i in roles):
-            return [False, f"Role {self.i} is a builtin role"]
+            return [False, f"Role {self.i} is a builtin role", 400]
         roles = {
             **res["roles"]["custom"]["main"],
             **roles
@@ -191,6 +191,7 @@ class registery:
             },
             "last_update": date
         }).run()
+        self.data(True)
         return [True, {}, None]
 
     def edit_role(self, role, actions):
@@ -200,7 +201,7 @@ class registery:
             return [False, "Invalid actions type", 400]
         if not all(isinstance(self.i, str) for self.i in actions):
             return [False, f"Invalid action {self.i}", 400]
-        res = self.red.get(self.id).run()
+        res = self.data()
         date = str(datetime.datetime.utcnow())
         roles_builtin = res["roles"]["builtin"]["main"]
         roles_custom = res["roles"]["custom"]["main"]
@@ -221,13 +222,14 @@ class registery:
             },
             "last_update": date
         }).run()
+        self.data(True)
         return [True, {}, False]
 
 
     def delete_role(self, role):
         if not isinstance(role, str):
             return [False, f"Invalid role {role}", 400]
-        res = self.red.get(self.id).run()
+        res = self.data()
         date = str(datetime.datetime.utcnow())
         if role in res["roles"]["builtin"]["main"].keys():
             return [False, f"{role} is not a custom role", 400]
@@ -245,13 +247,14 @@ class registery:
             },
             "last_update": date
         }).run()
+        self.data(True)
         return [True, {}, None]
 
     def get_role(self, role):
         ret = {}
         if not isinstance(role, str):
             return [False, f"Invalid param type", 400]
-        res = self.red.get(self.id).run()
+        res = self.data()
         roles = {
             **res["roles"]["custom"]["main"],
             **res["roles"]["builtin"]["main"]
@@ -262,7 +265,7 @@ class registery:
         return [True, ret, None]
 
     def roles(self, details = False):
-        res = self.red.get(self.id).run()
+        res = self.data()
         roles_builtin = res["roles"]["builtin"]["main"]
         roles_custom = res["roles"]["custom"]["main"]
         if details is False:
@@ -271,7 +274,7 @@ class registery:
         return [True, {"builtin": roles_builtin, "custom": roles_custom}, None]
 
     def actions(self):
-        res = self.red.get(self.id).run()
+        res = self.data()
         actions_builtin = res["actions"]["builtin"]["main"]
         actions_custom = res["actions"]["custom"]["main"]
         return [True, {"builtin": actions_builtin, "custom": actions_custom}, None]
@@ -285,14 +288,14 @@ class registery:
             return [False, f"Invalid action type {self.i}", 400]
         if not all(len(self.i) < 30 for self.i in action):
             return [False, f"Action too long: {self.i}", 400]
-        res = self.red.get(self.id).run()
+        res = self.data()
         date = str(datetime.datetime.utcnow())
         actions_builtin = res["actions"]["builtin"]["main"]
         actions_custom = res["actions"]["custom"]["main"]
         if not all(self.i not in actions_builtin for self.i in action):
-            return [False, f"{self.i} is a builtin action", None]
+            return [False, f"{self.i} is a builtin action", 400]
         if not all(self.i not in actions_builtin for self.i in action):
-            return [False, f"Action already exist: {self.i}", None]
+            return [False, f"Action already exist: {self.i}", 400]
         actions_custom.append(action)
         self.red.get(self.id).update({
             "actions": {
@@ -303,10 +306,11 @@ class registery:
             },
             "last_update": date
         }).run()
+        self.data(True)
         return [True, {}, None]
 
     def delete_action(self, action):
-        if not isinstance(action, list) and not isinstance(action, str):
+        if not isitnstance(action, list) and not isinstance(action, str):
             return [False, "Invalid action type", 400]
         if isinstance(action, str):
             action = [action]
@@ -314,7 +318,7 @@ class registery:
             return [False, f"Invalid action type {self.i}", 400]
         if not all(len(self.i) < 30 for self.i in action):
             return [False, f"Action too long: {self.i}", 401]
-        res = self.red.get(self.id).run()
+        res = self.data()
         date = str(datetime.datetime.utcnow())
         actions_builtin = res["actions"]["builtin"]["main"]
         actions_custom = res["actions"]["custom"]["main"]
@@ -338,6 +342,7 @@ class registery:
             },
             "last_update": date
         }).run()
+        self.data(True)
         return [True, {}, None]
 
     def delete(self):
@@ -348,8 +353,9 @@ class registery:
         return [True, {}, None]
 
     def set_name(self, name):
-        if not isinstance(name, str):
+        if not isinstance(name, str) or not len(name) < 30:
             return [False, "Invalid name", 400]
+        creator = self.data()["name"]["creator"]
         if self.__exist(name, creator):
             return [False, f"Registery {name} already exist"]
         date = str(datetime.datetime.utcnow())
@@ -360,6 +366,21 @@ class registery:
             },
             "last_update": date
         }).run()
+        self.data(True)
+        return [True, {}, None]
+
+    def set_description(self, desc):
+        if not isinstance(desc, str) or not len(desc) < 60:
+            return [False, "Invalid description", 400]
+        date = str(datetime.datetime.utcnow())
+        self.red.get(self.id).update({
+            "name": {
+                "main": name,
+                "last_update": date
+            },
+            "last_update": date
+        }).run()
+        self.data(True)
         return [True, {}, None]
 
     def set_open(self, open = False):
@@ -373,6 +394,7 @@ class registery:
             },
             "last_update": date
         }).run()
+        self.data(True)
         return [True, {}, None]
 
     def __user_has_role(self, role):
