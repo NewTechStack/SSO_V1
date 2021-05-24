@@ -172,10 +172,8 @@ class registery:
         r = []
         [r.extend(i) for i in [roles[i]["actions"] for i in [i for i in roles]]]
         if not all(isinstance(self.i, str) for self.i in r):
-            print(r)
             return [False, f"debug 1 {self.i}", 400]
         if not all(self.i in actions_builtin + actions_custom for self.i in r):
-            print( actions_builtin + actions_custom, r)
             return [False, f"debug 2 {self.i}", 400]
             return [False, f"Role's action are not valid : {self.i}", 400]
         if not all(self.i not in roles_custom for self.i in roles):
@@ -294,8 +292,10 @@ class registery:
             return [False, f"{self.i} is a builtin action", 400]
         if not all(self.i not in actions_builtin for self.i in actions):
             return [False, f"Action already exist: {self.i}", 400]
-        for action in actions:
-            actions_custom.append(action)
+        i = 0
+        while i < len(actions):
+            actions_custom.append(actions[i])
+            i += 1
         self.red.get(self.id).update({
             "actions": {
                 "custom": {
@@ -331,7 +331,7 @@ class registery:
         [r.extend(i) for i in [roles[i]["actions"] for i in [i for i in roles]]]
         if not all(self.i not in r for self.i in action):
             return [False, f"Action '{self.i}' is used in a role", 401]
-        print(action, actions_custom)
+        print(f"'{action}', '{actions_custom}' end_debug ")
         [actions_custom.remove(i) for i in action]
         res["actions"]["custom"]["main"] = actions_custom
         res["actions"]["custom"]["last_update"] = date
