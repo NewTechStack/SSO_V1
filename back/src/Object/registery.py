@@ -281,20 +281,21 @@ class registery:
         if not isinstance(action, list) and not isinstance(action, str):
             return [False, "Invalid action type", 400]
         if isinstance(action, str):
-            action = [action]
-        if not all(isinstance(self.i, str) for self.i in action):
+            actions = [action]
+        if not all(isinstance(self.i, str) for self.i in actions):
             return [False, f"Invalid action type {self.i}", 400]
-        if not all(len(self.i) < 30 for self.i in action):
+        if not all(len(self.i) < 30 for self.i in actions):
             return [False, f"Action too long: {self.i}", 400]
         res = self.data()
         date = str(datetime.datetime.utcnow())
         actions_builtin = res["actions"]["builtin"]["main"]
         actions_custom = res["actions"]["custom"]["main"]
-        if not all(self.i not in actions_builtin for self.i in action):
+        if not all(self.i not in actions_builtin for self.i in actions):
             return [False, f"{self.i} is a builtin action", 400]
-        if not all(self.i not in actions_builtin for self.i in action):
+        if not all(self.i not in actions_builtin for self.i in actions):
             return [False, f"Action already exist: {self.i}", 400]
-        actions_custom.append(action)
+        for action in actions:
+            actions_custom.append(action)
         self.red.get(self.id).update({
             "actions": {
                 "custom": {
