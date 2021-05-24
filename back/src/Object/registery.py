@@ -171,8 +171,12 @@ class registery:
         roles_custom = res["roles"]["custom"]["main"].keys()
         r = []
         [r.extend(i) for i in [roles[i]["actions"] for i in [i for i in roles]]]
-        if not all(isinstance(self.i, str) for self.i in r) or \
-           not all(self.i in actions_builtin + actions_custom for self.i in r):
+        if not all(isinstance(self.i, str) for self.i in r):
+            print(r)
+            return [False, f"debug 1 {self.i}", 400]
+        if not all(self.i in actions_builtin + actions_custom for self.i in r):
+            print( actions_builtin + actions_custom, r)
+            return [False, f"debug 2 {self.i}", 400]
             return [False, f"Role's action are not valid : {self.i}", 400]
         if not all(self.i not in roles_custom for self.i in roles):
             return [False, f"Role {self.i} already exist", 400]
@@ -238,15 +242,9 @@ class registery:
         if self.__user_has_role(role):
             return [False, "Role is used by user(s)", 400]
         del res["roles"]["custom"]["main"][role]
-        self.red.get(self.id).update({
-            "roles": {
-                "custom": {
-                    "main": res["roles"]["custom"]["main"],
-                    "last_update": date
-                }
-            },
-            "last_update": date
-        }).run()
+        res["roles"]["custom"]["last_update"] = date
+        res["last_update"] = date
+        self.red.get(self.id).replace(res).run()
         self.data(True)
         return [True, {}, None]
 
@@ -310,7 +308,7 @@ class registery:
         return [True, {}, None]
 
     def delete_action(self, action):
-        if not isitnstance(action, list) and not isinstance(action, str):
+        if not isinstance(action, list) and not isinstance(action, str):
             return [False, "Invalid action type", 400]
         if isinstance(action, str):
             action = [action]
@@ -333,15 +331,10 @@ class registery:
         if not all(self.i not in r for self.i in action):
             return [False, f"Action '{self.i}' is used in a role", 401]
         [actions_custom.remove(i) for i in action]
-        self.red.get(self.id).update({
-            "actions": {
-                "custom": {
-                    "main": actions_custom,
-                    "last_update": date
-                }
-            },
-            "last_update": date
-        }).run()
+        res["actions"]["custom"]["main"] = actions_custom
+        res["actions"]["custom"]["last_update"] = date
+        res["last_update"] = date
+        self.red.get(self.id).replace(res).run()
         self.data(True)
         return [True, {}, None]
 
