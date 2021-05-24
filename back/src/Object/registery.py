@@ -331,6 +331,7 @@ class registery:
         [r.extend(i) for i in [roles[i]["actions"] for i in [i for i in roles]]]
         if not all(self.i not in r for self.i in action):
             return [False, f"Action '{self.i}' is used in a role", 401]
+        print(action, actions_custom)
         [actions_custom.remove(i) for i in action]
         res["actions"]["custom"]["main"] = actions_custom
         res["actions"]["custom"]["last_update"] = date
