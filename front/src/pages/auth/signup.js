@@ -43,13 +43,30 @@ class signup extends Component {
             SSO_service.register({email:this.state.signup_form.email,pass1:this.state.signup_form.pwd1,pass2:this.state.signup_form.pwd2}).then(registerRes => {
                 console.log(registerRes)
                 if(registerRes.status === 200 && registerRes.succes === true){
-                    localStorage.setItem("email",this.state.signup_form.email)
-                    this.props.enqueueSnackbar("Votre inscription est effectuée avec succès ! Vous pouvez utiliser votre compte pour se connecter",
-                        {variant:"success"})
-                    setTimeout(() => {
-                        this.setState({loading:false})
-                        this.props.history.push("/sso/login")
-                    },1500)
+
+                    SSO_service.getUser(registerRes.data.usrtoken).then(infoRes => {
+                        console.log(infoRes)
+                        if(infoRes.status === 200 && infoRes.succes === true){
+
+                            localStorage.setItem("email",this.state.signup_form.email)
+                            this.props.enqueueSnackbar("Votre inscription est effectuée avec succès ! Vous pouvez utiliser votre compte pour se connecter",
+                                {variant:"success"})
+                            localStorage.setItem("firstname",infoRes.data.first_name.main || "")
+                            localStorage.setItem("lastname",infoRes.data.last_name.main || "")
+                            localStorage.setItem("usrtoken",registerRes.data.usrtoken)
+                            localStorage.setItem("exp",registerRes.data.exp)
+                            setTimeout(() => {
+                                this.setState({loading:false})
+                                this.props.history.push("/main/dash")
+                            },1000)
+
+                        }else{
+
+                        }
+
+                    }).catch(err => {console.log(err)})
+
+
                 }else{
                     this.setState({loading:false})
                     this.props.enqueueSnackbar(registerRes.error, {variant:"error"})

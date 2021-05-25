@@ -56,7 +56,7 @@ class resetRequest extends Component {
                 this.props.enqueueSnackbar("Une erreur est survenue ! Veuillez essayer ultérieurement", { variant:"error" })
                 this.setState({loading:false})
             })
-        },2000)
+        },1000)
 
     }
 

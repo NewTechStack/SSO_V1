@@ -17,6 +17,7 @@ class registery_key:
             "user_id": None,
             "name": None,
             "key": None,
+            "active": None,
             "date": None
         }
 
@@ -37,6 +38,8 @@ class registery_key:
         data["name"] = name
         data["key"] = key
         data["date"] = date
+        data["active"] = True
+        data["authorized_ip"] = []
         res = dict(self.red.insert([data]).run())
         id = res["generated_keys"][0]
         return [True, {"id": id}, None]
@@ -67,5 +70,26 @@ class registery_key:
             ).run())
         return [True, {"keys": ret}, None]
 
-    def check(self, key):
-        return [True, {}, None]
+    def check(self, key, ip):
+        if not isinstance(key, list) or not isinstance(key, str):
+            return [False, "Invalid key format", 400]
+        if isinstance(key, str):
+            key = [key]
+        if not all(isinstance(self.i, str) for self.i in key):
+            return [False, f"Invalid key in keys list: {self.i}", 400]
+        ret = []
+        list_key = key
+        res = list(self.red.filter(
+                lambda key:
+                    (len(key["authorized"]) == 0 or ip in key["authorized"])
+                    and
+                    key["active"] is True
+                    and
+                    key["key"] in list_key
+                ).run())
+        for i in res:
+            ret.append(i["registry_id"])
+            list_key.remove(i["key"])
+        if len(list_key) > 0:
+            return [False, f"Invalid key(s): '{list_key}'", 404]
+        return [True, {'registry': ret}, None]

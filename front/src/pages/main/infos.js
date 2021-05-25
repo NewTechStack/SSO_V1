@@ -33,6 +33,9 @@ import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import Divider from '@material-ui/core/Divider';
 import {IconButton} from "@material-ui/core";
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import MuiButton, { ButtonGroup as MuiButtonGroup } from '@atlaskit/button';
+import CheckIcon from '@material-ui/icons/Check';
+import BlockIcon from '@material-ui/icons/Block';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -85,14 +88,11 @@ export default function Info(props){
     const [expanded, setExpanded] = React.useState(false);
 
     useEffect(() => {
-        setTimeout(() => {
             if(verifSession() === true){
                 getUserInfo()
             }else{
                 props.history.push("/sso/login")
             }
-        },2000)
-
     }, [getUserInfo]);
 
     const verifSession = () => {
@@ -112,6 +112,7 @@ export default function Info(props){
                 }));
                 console.log(roles_array)
                 setRoles(roles_array)
+                console.log(roles_array)
                 setFirstname(infoRes.data.first_name.main || "")
                 setLastname(infoRes.data.last_name.main || "")
                 setSelected_fname_status(infoRes.data.last_name.public === true ? "public" : "private")
@@ -390,36 +391,22 @@ export default function Info(props){
 
                                     </AccordionSummary>
                                     <AccordionDetails>
-                                        <List className={classes.root}>
-                                            {
-                                                roles.map((item,key) => (
-                                                    <>
-                                                    <ListItem button>
-                                                        <ListItemIcon>
-                                                            <ArrowRightIcon />
-                                                        </ListItemIcon>
-                                                        <ListItemText primary={item.role} secondary={moment(item.data.last_update).format("DD-MM-YYYY HH:mm")} />
-                                                        <ListItemSecondaryAction>
-                                                            {/*<Switch
-                                                                edge="end"
-                                                                //onChange={}
-                                                                checked={item.data.active === true}
-                                                                inputProps={{ 'aria-labelledby': 'switch-list-label-bluetooth' }}
-                                                            />*/}
-                                                            <IconButton>
-                                                                <CheckCircleIcon color="secondary"/>
-                                                            </IconButton>
-                                                        </ListItemSecondaryAction>
-                                                    </ListItem>
-                                                        <Divider variant="inset" component="li" />
-                                                    </>
-                                                ))
-                                            }
+                                        <div style={{marginLeft:20,marginTop:-10}}>
+                                            <MuiButtonGroup>
+                                                {
+                                                    roles.map((item, key) => (
+                                                        <MuiButton appearance="primary" isDisabled={item.data.active === false}
+                                                                   iconAfter={item.data.active === true ? <CheckIcon /> : <BlockIcon/>}>
+                                                            {item.role}
+                                                        </MuiButton>
+                                                    ))
+                                                }
 
-                                        </List>
+                                            </MuiButtonGroup>
+                                        </div>
                                     </AccordionDetails>
                                 </Accordion>
-                                <Accordion expanded={expanded === 'panel5'}
+                                {/*<Accordion expanded={expanded === 'panel5'}
                                     //onChange={handleChange('panel4')}
                                 >
                                     <AccordionSummary
@@ -433,7 +420,7 @@ export default function Info(props){
                                                 ••••••••
                                             </Typography>
                                             <Typography className={classes.secondaryHeading}>
-                                                Dernière modification:
+
                                             </Typography>
                                         </div>
 
@@ -441,7 +428,7 @@ export default function Info(props){
                                     <AccordionDetails>
 
                                     </AccordionDetails>
-                                </Accordion>
+                                </Accordion>*/}
                             </div>
 
 

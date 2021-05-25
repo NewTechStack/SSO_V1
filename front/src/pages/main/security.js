@@ -61,14 +61,11 @@ export default function Security(props){
     const [expanded, setExpanded] = React.useState(false);
 
     useEffect(() => {
-        setTimeout(() => {
             if(verifSession() === true){
                 getAccountInfo()
             }else{
                 props.history.push("/sso/login")
             }
-        },2000)
-
     }, [getAccountInfo]);
 
     const verifSession = () => {
@@ -182,7 +179,7 @@ export default function Security(props){
                                            //onChange={handleChange('panel1')}
                                 >
                                     <AccordionSummary
-                                        expandIcon={<AssignmentTurnedInIcon color="secondary" />}
+                                        //expandIcon={<AssignmentTurnedInIcon color="secondary" />}
                                         aria-controls="panel1bh-content"
                                         id="panel1bh-header"
                                     >
@@ -205,7 +202,7 @@ export default function Security(props){
                                     //onChange={handleChange('panel2')}
                                 >
                                     <AccordionSummary
-                                        expandIcon={<ChevronRightIcon />}
+                                        //expandIcon={<ChevronRightIcon />}
                                         aria-controls="panel2bh-content"
                                         id="panel2bh-header"
                                     >
@@ -215,9 +212,9 @@ export default function Security(props){
                                         </Typography>
                                     </AccordionSummary>
                                 </Accordion>
-                                <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
+                                <Accordion expanded={expanded === 'panel3'}>
                                     <AccordionSummary
-                                        expandIcon={<ChevronRightIcon />}
+                                        //expandIcon={<ChevronRightIcon />}
                                         aria-controls="panel3bh-content"
                                         id="panel3bh-header"
                                     >
@@ -236,11 +233,9 @@ export default function Security(props){
                                     <AccordionDetails>
                                     </AccordionDetails>
                                 </Accordion>
-                                <Accordion expanded={expanded === 'panel6'}
-                                    onChange={handleChange('panel6')}
-                                >
+                                <Accordion expanded={expanded === 'panel6'}>
                                     <AccordionSummary
-                                        expandIcon={<ChevronRightIcon />}
+                                        //expandIcon={<ChevronRightIcon />}
                                         aria-controls="panel2bh-content"
                                         id="panel2bh-header"
                                     >
@@ -274,19 +269,6 @@ export default function Security(props){
                                         </Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
-                                        {/*<div className="row mt-2">
-                                            <div className="col-md-12 mt-1">
-                                                <TextField
-                                                    label="Votre mot de passe actuel"
-                                                    variant="outlined"
-                                                    size="small"
-                                                    style={{width:"100%"}}
-                                                    value={currentPwd}
-                                                    type="password"
-                                                    onChange={(e) => {setCurrentPwd(e.target.value)}}
-                                                />
-                                            </div>
-                                        </div>*/}
                                         <div className="row mt-3">
                                             <div className="col-md-12 mt-1">
                                                 <TextField

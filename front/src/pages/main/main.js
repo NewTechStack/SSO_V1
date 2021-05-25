@@ -9,18 +9,14 @@ import RenderIf from 'react-rainbow-components/components/RenderIf';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import Routes from './routes';
 import SectionHeading from '../../components/SectionHeading';
-import {
-    Lock,
-    DashboardIcon,
-    PagesIcon,
-    TwitterIcon
-} from '../../components/icons';
 import { navigateTo } from './history';
 import moment from "moment";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar } from '@fortawesome/free-regular-svg-icons';
-
-
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import ContactPhoneIcon from '@material-ui/icons/ContactPhone';
+import LockIcon from '@material-ui/icons/Lock';
+import StarIcon from '@material-ui/icons/Star';
+import BallotIcon from '@material-ui/icons/Ballot';
 
 
 export default class main extends React.Component{
@@ -78,7 +74,7 @@ export default class main extends React.Component{
                         onSelect={(e,selected) => {this.setState({selectedItem:selected})}}>
                         <SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
-                            icon={<DashboardIcon size={20} />}
+                            icon={<DashboardIcon fontSize="default" style={{color:"#00AEF9"}} />}
                             name="dash"
                             label="Accueil"
                             onClick={() => navigateTo('/main/dash')}
@@ -86,21 +82,21 @@ export default class main extends React.Component{
                         />
                         <SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
-                            icon={<PagesIcon size={18} />}
+                            icon={<ContactPhoneIcon fontSize="default" style={{color:"#00AEF9"}} />}
                             name="infos"
                             label="Informations personnelles"
                             onClick={() => navigateTo('/main/infos')} />
                         <SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
-                            icon={<Lock size={20} />}
+                            icon={<LockIcon fontSize="default" style={{color:"#00AEF9"}} />}
                             name="security"
                             label="Securité"
                             onClick={() => navigateTo('/main/security')} />
                         <SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
-                            icon={<FontAwesomeIcon icon={faStar} size={20} color="orange" />}
-                            name="pro"
-                            label="Pro"
+                            icon={<BallotIcon fontSize="default" style={{color:"#00AEF9"}} />}
+                            name="registres"
+                            label="Registres"
                             onClick={() => navigateTo('/main/pro')} />
                     </Sidebar>
                     <RenderIf isTrue={!isSidebarHidden}>

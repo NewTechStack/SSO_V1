@@ -13,18 +13,22 @@ class user_registery:
             self.reg_id = registery.id
             self.roles = registery.roles
         if registery is not None and user is not None:
-            self.keys = registery_key(self.id)
+            self.keys = registery_key(self.reg.id)
         else:
             self.keys = registery_key()
         self.invite = False
         self.d = None
         self.red = get_conn().db("auth").table('user_registery')
 
-    def all_from_user(self, usr_id):
-        res = list(
-            self.red.filter(
+    def all_from_user(self, usr_id, creator = True):
+        res = self.red.filter(
                 (r.row["id_user"] == usr_id)
-            ).eq_join(
+            )
+        if creator is False:
+            res = res.filter(~r.row.has_fields({"roles": "creator"}))
+        else:
+            res = res.filter(r.row.has_fields({"roles": "creator"}))
+        res = list(res.eq_join(
                 'id_registery',
                 get_conn().db("auth").table('registery')
             ).without(
@@ -139,8 +143,8 @@ class user_registery:
             "roles": {},
             "by": self.usr_id
         }]).run())
-        for i in roles:
-            self.__status(id_user, i)
+        for role in roles:
+            self.__status(id_user, role)
         id = res["generated_keys"][0]
         return [True, {"id": id}, None]
 

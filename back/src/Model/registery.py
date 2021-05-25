@@ -117,7 +117,7 @@ def regi_check_key(cn, nextc):
     err = check.contain(cn.hd, ["apitoken"], "HEAD")
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    err = cn.private["reg_user"].check_key(cn.hd["apitoken"])
+    err = cn.private["reg_user"].check_key(cn.hd["apitoken"], "ip")
     return cn.call_next(nextc, err)
 
 def user_regi(cn, nextc):
@@ -136,7 +136,9 @@ def registry_users(cn, nextc):
     return cn.call_next(nextc, err)
 
 def user_registries(cn, nextc):
-    err = user_registery(None, None).all_from_user(cn.private["user"].id)
+    user_id = cn.rt["user"] if "user" in cn.rt and cn.rt["user"] != 'registery' else cn.private["user"].id
+    creator = cn.get["creator"] if "creator" in cn.get else True
+    err = user_registery(None, None).all_from_user(user_id, creator)
     return cn.call_next(nextc, err)
 
 def user_regi_exist(cn, nextc):

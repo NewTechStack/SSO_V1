@@ -17,7 +17,7 @@ import TextField from "@material-ui/core/TextField";
 
 
 
-const data = [
+/*const data = [
     {
         id:"82a3f9f0-f2bb-4d96-ba6d-a0e1b2dd1696",
         date:moment().format("DD-MM-YYYY"),
@@ -30,7 +30,7 @@ const data = [
         name:'Test02',
         statut:"ouvert"
     }
-]
+]*/
 
 export default function Pro(props){
 
@@ -58,7 +58,7 @@ export default function Pro(props){
         },
         {
             name: 'Nom',
-            selector: 'name',
+            selector: 'registery.name.main',
             sortable: true,
         }
     ];
@@ -75,7 +75,7 @@ export default function Pro(props){
 
 
     useEffect(() => {
-        setTimeout(() => {
+
             if(verifSession() === true){
                 getRegistres()
             }else{
@@ -83,10 +83,8 @@ export default function Pro(props){
                 enqueueSnackbar('Reconnexion en cours...', { variant:"info" })
                 setTimeout(() => {
                     props.history.push("/sso/login")
-                },2000)
+                },1500)
             }
-        },2000)
-
     }, []);
 
     const verifSession = () => {
@@ -112,16 +110,21 @@ export default function Pro(props){
     const addNewRegistre = () => {
         setLoadingBtnAdd(true)
         SSO_service.add_registre({name: newReg_name, actions: [], roles: {}},localStorage.getItem("usrtoken")).then( addRes => {
+            console.log(addRes)
             if(addRes.status === 200 && addRes.succes === true){
-                setLoadingBtnAdd(false)
-                setOpenAddModal(false)
-                enqueueSnackbar("L'ajout du nouveau registre est effectué avec succès", { variant:"success" })
-
+                getRegistres()
+                setTimeout(() => {
+                    setLoadingBtnAdd(false)
+                    setOpenAddModal(false)
+                    enqueueSnackbar("L'ajout du nouveau registre est effectué avec succès", { variant:"success" })
+                },500)
             }else{
+                setLoadingBtnAdd(false)
                 enqueueSnackbar(addRes.error, { variant:"error" })
             }
         }).catch(err => {
             console.log(err)
+            setLoadingBtnAdd(false)
             enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
         })
     }
@@ -181,7 +184,7 @@ export default function Pro(props){
                         noHeader={true}
                         pointerOnHover={true}
                         onRowClicked={(row, e) => {
-                            props.history.push("/main/pro/registre/" + row.id_registery )
+                            props.history.push("/main/pro/registre/" + row.registery.id )
                         }}
                     />
 
@@ -203,8 +206,8 @@ export default function Pro(props){
                     <div>
                         <div className="main_padding-form">
 
-                            <h5 style={{fontSize:"1.25rem"}}>Espace Pro</h5>
-                            <label style={{color:"#5f6368",fontSize:12}}>Votre interface Pro pour gérer vos services</label>
+                            <h5 style={{fontSize:"1.25rem"}}>Mes registres</h5>
+                            <label style={{color:"#5f6368",fontSize:12}}>Votre interface pour gérer vos registres</label>
 
                             <div className="rainbow-flex rainbow-flex_column rainbow_vertical-stretch mt-5">
                                 <Tabset
@@ -221,14 +224,14 @@ export default function Pro(props){
                                         ariaControls="primaryTab"
                                     />
 
-                                    <Tab
+                                    {/*<Tab
                                         label="Mes services"
                                         name="recents"
                                         id="recents"
                                         ariaControls="recentsTab"
-                                    />
+                                    />*/}
 
-                                    <Tab label="Mes abonnements" name="shared" id="shared" ariaControls="sharedTab" />
+                                    <Tab label="Autres" name="shared" id="shared" ariaControls="sharedTab" />
 
                                     <Tab label="" name="locked" id="locked" ariaControls="lockedTab" />
 

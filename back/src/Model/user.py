@@ -40,6 +40,21 @@ def user_get_token(cn, nextc):
     )
     return cn.call_next(nextc, err)
 
+def admin_user_search(cn, nextc):
+    query = cn.get["query"] if "query" in cn.get else None
+    page = cn.get["page"] if "page" in cn.get else 0
+    bypage = cn.get["bypage"] if "bypage" in cn.get else 10
+    invite = cn.get["invite"] if "invite" in cn.get else False
+    err = user().search_user(query, page, bypage, admin=True, invite=invite)
+    return cn.call_next(nextc, err)
+
+def user_search(cn, nextc):
+    query = cn.get["query"] if "query" in cn.get else None
+    page = cn.get["page"] if "page" in cn.get else 0
+    bypage = cn.get["bypage"] if "bypage" in cn.get else 10
+    err = user().search_user(query, page, bypage)
+    return cn.call_next(nextc, err)
+
 def user_verify_token(cn, nextc):
     reenable = True if "reenable" in cn.get else False
     err = check.contain(cn.hd, ["usrtoken"], "HEAD")
@@ -121,10 +136,16 @@ def user_set_role(cn, nextc):
         err = [True, {}, None]
     return cn.call_next(nextc, err)
 
+def admin_user_infos(cn, nextc):
+    id = cn.rt["user"] if "user" in cn.rt else None
+    extended = cn.get["extended"] if "extended" in cn.get else False
+    err = cn.private["user"].get_infos(extended, id, admin=True)
+    return cn.call_next(nextc, err)
+
 def user_infos(cn, nextc):
     id = cn.rt["user"] if "user" in cn.rt else None
     extended = cn.get["extended"] if "extended" in cn.get else False
-    err = cn.private["user"].get_infos(extended, id)
+    err = cn.private["user"].get_infos(extended, id, admin=False)
     return cn.call_next(nextc, err)
 
 def user_password_reset(cn, nextc):

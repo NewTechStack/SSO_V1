@@ -4,8 +4,10 @@
   "private": true,
   "dependencies": {
     "@atlaskit/button": "^15.1.5",
+    "@atlaskit/lozenge": "^10.1.2",
     "@atlaskit/modal-dialog": "^11.2.4",
     "@atlaskit/select": "^13.2.0",
+    "@atlaskit/textfield": "^5.0.1",
     "@date-io/date-fns": "v1",
     "@fortawesome/fontawesome-svg-core": "^1.2.4",
     "@fortawesome/free-brands-svg-icons": "^5.1.0-11",

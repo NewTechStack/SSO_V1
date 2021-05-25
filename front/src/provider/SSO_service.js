@@ -229,7 +229,7 @@ let SSO_service = {
     },
 
     remove_registre_action(id,id_action,usrtoken){
-        return fetch(endpoint + '/registery/' + id + '/role/' + id_action, {
+        return fetch(endpoint + '/registery/' + id + '/action/' + id_action, {
             method: 'DELETE',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {
@@ -252,6 +252,15 @@ let SSO_service = {
             method: 'PUT',
             headers:this.loadHeaders(usrtoken),
             body:JSON.stringify(data)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+    getInfoRole(id_reg,role,usrtoken){
+        return fetch(endpoint + '/registery/' + id_reg + '/role/' + role , {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {
             console.log(error);
         });

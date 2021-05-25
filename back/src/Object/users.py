@@ -345,6 +345,43 @@ class user:
         self.set_role(id, "invite")
         return ret
 
+    def search_user(self, query, page = 0, bypage = 10, admin = False, invite = False):
+        page = int(page)
+        bypage = int(bypage)
+        page = (page if page > 0 else 0)
+        bypage = (bypage if bypage > 5 else 5)
+        start = page * bypage
+        end = (page + 1) * bypage
+        if invite is False:
+            ret = self.red.filter(~r.row.has_fields({"roles": "invite"}))
+        if query is not None:
+            ret = ret.filter(
+                lambda doc:
+                    (
+                        doc['username']['main'].match(f"(?i){query}")
+                        or
+                        (
+                            doc['email']['main'].match(f"(?i){query}")
+                            and
+                            (admin is True or doc['email']['public'] is True)
+                        )
+                        or
+                        (
+                            doc['details']['first_name']['main'].match(f"(?i){query}")
+                            and
+                            (admin is True or doc['details']['first_name']['public'] is True)
+                        )
+                        or
+                        (
+                            doc['details']['last_name']['main'].match(f"(?i){query}")
+                            and
+                            (admin is True or doc['details']['last_name']['public'] is True)
+                        )
+                    )
+            )
+        ret = list(ret.map(lambda res : res['id']).slice(start, end).run())
+        return [True, {"users": ret}, None]
+
 
     def register(self, email, pass1, pass2, role = "user"):
         id = None
@@ -379,8 +416,13 @@ class user:
         if id is not None:
             data["id"] = id
             self.red.get(id).delete().run()
+        creator = False
+        if self.red.is_empty().run():
+            creator = True
         res = dict(self.red.insert([data]).run())
         self.id = res["generated_keys"][0] if id is None else id
+        if creator is True:
+            self.set_role(self.id, "creator")
         self.set_role(self.id, role)
         return [True, {"usr_id": self.id}, None]
 
@@ -419,9 +461,39 @@ class user:
             self.set_role(self.id, "disabled", True)
         return [True, ret, None]
 
-    def updetails(self, phone = {}, fname = {}, lname = {}, account_lang = []):
+    def updetails(self, phone = {}, fname = {}, lname = {}, username = None, email = {}, account_lang = []):
         up = {}
         date = str(datetime.datetime.utcnow())
+
+        if isinstance(username, str):
+            if not len(username) < 30 or not len(username) > 5:
+                 return [False, f"Username must contain more 5 and than less than 30 characters", 400 ]
+            if self.__username_exist(username):
+                return [False, f"Username: {username} aleardy used", 400 ]
+            self.red.get(self.id).update(
+                {
+                    "username": {
+                        "main": username,
+                        "last_update": date
+                    },
+                    "last_update": date
+                }
+            ).run()
+
+        if isinstance(email, dict) and "public" in email:
+            public = self.data()['email']['public']
+            if isinstance(email['public'], bool):
+                public = email['public']
+                self.red.get(self.id).update(
+                    {
+                        "email": {
+                            "public": public,
+                            "last_update": date
+                        },
+                        "last_update": date
+                    }
+                ).run()
+
         if isinstance(phone, dict) and "lang" in phone and "number" in phone and \
             isinstance(phone["lang"], str) and isinstance(phone["number"], str) and \
             len(phone["number"]) >= 10:
@@ -461,6 +533,7 @@ class user:
                 ).run()
                 if "verified" in up['phone']:
                     up["phone"]["verified"] = False
+
 
         if  isinstance(fname, dict) and "first_name" in fname and \
             isinstance(fname["first_name"], str):
@@ -535,7 +608,7 @@ class user:
             return [False, "User not logged", 401]
         return [True, ret, None]
 
-    def get_infos(self, extended = False, id = None):
+    def get_infos(self, extended = False, id = None, admin = False):
         if not isinstance(extended, bool):
             return [False, "Invalid param type", 400]
         id = self.__getid(id, self.id)
@@ -547,7 +620,7 @@ class user:
             "email": res["email"]["main"] if res["email"]["public"] or id == self.id else None,
             "roles": res["roles"]
         }
-        if id != self.id:
+        if id != self.id and admin is False:
             to_delete = []
             for i in ret["roles"]:
                 if not ret["roles"][i]["active"]:
@@ -562,7 +635,7 @@ class user:
                    ret[i] = {
                        "main": res["details"][i]["main"]
                    }
-                   if id == self.id:
+                   if id == self.id or admin is True:
                        ret[i]["last_update"] = res["details"][i]["last_update"]
                        ret[i]["public"] =  res["details"][i]["public"]
             vscore = res["email"]["verified"]["main"] + \
@@ -571,7 +644,7 @@ class user:
                      res["details"]["last_name"]["verified"]["main"] + \
                      res["details"]["age"]["verified"]["main"]
             ret["verified"] = {}
-            if id == self.id:
+            if id == self.id or admin is True:
                 ret["email"] = {
                     "main": res["email"]["main"],
                     "last_update": res["email"]["last_update"],
@@ -935,6 +1008,12 @@ class user:
 
     def __exist(self, email):
         res = list(self.red.filter(r.row["email"]["main"] == email).run())
+        if len(res) > 0:
+            return True
+        return False
+
+    def __username_exist(self, username):
+        res = list(self.red.filter(r.row["username"]["main"] == username).run())
         if len(res) > 0:
             return True
         return False
