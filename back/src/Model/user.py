@@ -141,13 +141,13 @@ def user_set_role(cn, nextc):
 def admin_user_infos(cn, nextc):
     id = cn.rt["user"] if "user" in cn.rt else None
     extended = cn.get["extended"] if "extended" in cn.get else False
-    err = cn.private["user"].get_infos(extended, id, admin=True)
+    err = user(id).get_infos(extended)
     return cn.call_next(nextc, err)
 
 def user_infos(cn, nextc):
     id = cn.rt["user"] if "user" in cn.rt else None
     extended = cn.get["extended"] if "extended" in cn.get else False
-    err = cn.private["user"].get_infos(extended, id, admin=False)
+    err = cn.private["user"].get_infos(extended, id)
     return cn.call_next(nextc, err)
 
 def user_password_reset(cn, nextc):

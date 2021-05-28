@@ -608,11 +608,11 @@ class user:
             return [False, "User not logged", 401]
         return [True, ret, None]
 
-    def get_infos(self, extended = False, id = None, admin = False):
+    def get_infos(self, extended = False, id = None):
         if not isinstance(extended, bool):
             return [False, "Invalid param type", 400]
         id = self.__getid(id, self.id)
-        res = dict(self.red.get(id).run())
+        res = self.data()
         if res is None:
             return [False, f"User {id} does not exist", 401]
         ret = {
@@ -620,7 +620,7 @@ class user:
             "email": res["email"]["main"] if res["email"]["public"] or id == self.id else None,
             "roles": res["roles"]
         }
-        if id != self.id and admin is False:
+        if id != self.id:
             to_delete = []
             for i in ret["roles"]:
                 if not ret["roles"][i]["active"]:
@@ -635,7 +635,7 @@ class user:
                    ret[i] = {
                        "main": res["details"][i]["main"]
                    }
-                   if id == self.id or admin is True:
+                   if id == self.id:
                        ret[i]["last_update"] = res["details"][i]["last_update"]
                        ret[i]["public"] =  res["details"][i]["public"]
             vscore = res["email"]["verified"]["main"] + \
@@ -644,7 +644,7 @@ class user:
                      res["details"]["last_name"]["verified"]["main"] + \
                      res["details"]["age"]["verified"]["main"]
             ret["verified"] = {}
-            if id == self.id or admin is True:
+            if id == self.id:
                 ret["email"] = {
                     "main": res["email"]["main"],
                     "last_update": res["email"]["last_update"],
