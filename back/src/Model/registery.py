@@ -24,6 +24,19 @@ def regi_create(cn, nextc):
         err = [True, {"registry_id": cn.private["reg"].id}, None]
     return cn.call_next(nextc, err)
 
+def regi_invite(cn, nextc):
+    err = check.contain(cn.pr, ["email", "roles"])
+    if not err[0]:
+        return cn.toret.add_error(err[1], err[2])
+    cn.private["reg_user"] = user_registery(
+        cn.private["user"],
+        cn.private["reg"]
+    )
+    err = cn.private["reg_user"].add_user(None, roles = cn.pr["roles"], email = cn.pr["email"])
+    if err[0] is True:
+        err = [True, {"registry_id": cn.private["reg"].id}, None]
+    return cn.call_next(nextc, err)
+
 def regi_delete(cn, nextc):
     err = cn.private["reg"].delete()
     return cn.call_next(nextc, err)
