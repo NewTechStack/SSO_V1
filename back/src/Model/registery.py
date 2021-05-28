@@ -176,6 +176,10 @@ def regi_can_edit(cn, nextc):
 
 def regi_can_invite(cn, nextc):
     err = cn.private["reg_user"].can("invite")
+    if err is True:
+        err = [True, {}, None]
+    else:
+        err = [False, "Invalid rights", 403]
     return cn.call_next(nextc, err)
 
 def regi_can_use(cn, nextc):
