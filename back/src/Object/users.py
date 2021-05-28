@@ -612,7 +612,7 @@ class user:
         if not isinstance(extended, bool):
             return [False, "Invalid param type", 400]
         id = self.__getid(id, self.id)
-        res = self.data()
+        res = dict(self.red.get(id).run())
         if res is None:
             return [False, f"User {id} does not exist", 401]
         ret = {
