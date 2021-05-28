@@ -1,4 +1,5 @@
 import datetime
+from .users import user
 from .rethink import get_conn, r
 from .registery_key import registery_key
 
