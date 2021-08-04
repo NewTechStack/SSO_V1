@@ -59,7 +59,7 @@ let SSO_service = {
     },
 
     getAccountInfo(usrtoken){
-        return fetch(endpoint + '/user/'+ user_id +'?extended=true', {
+        return fetch(endpoint + '/user?extended=true', {
             method: 'GET',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {
@@ -125,10 +125,29 @@ let SSO_service = {
         });
     },
 
-    get_registres(usrtoken){
-        return fetch(endpoint + '/user/registery', {
+    get_created_user_registies(usrtoken){
+        return fetch(endpoint + '/user/registery?creator=true', {
             method: 'GET',
             headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+    get_user_registry(usrtoken){
+        return fetch(endpoint + '/user/registery?creator=false', {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+    add_user_to_reg(id_reg,data,usrtoken){
+        return fetch(endpoint + '/registery/' + id_reg + '/invite', {
+            method: 'POST',
+            headers:this.loadHeaders(usrtoken),
+            body:JSON.stringify(data)
         }).then(response => response.json()).catch(error => {
             console.log(error);
         });
@@ -259,6 +278,43 @@ let SSO_service = {
 
     getInfoRole(id_reg,role,usrtoken){
         return fetch(endpoint + '/registery/' + id_reg + '/role/' + role , {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+
+    getRegistryUsers(id_reg,usrtoken){
+        return fetch(endpoint + '/registery/' + id_reg + '/users' , {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+    admin_users_search(query,usrtoken){
+        return fetch(endpoint + '/admin/users?q=' + query , {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+    get_admin_user_registries(user_id,usrtoken){
+        return fetch(endpoint + '/admin/user/' + user_id + '/registery' , {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+    getAdminUserInfo(user_id,usrtoken){
+        return fetch(endpoint + '/admin/user/' + user_id , {
             method: 'GET',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {

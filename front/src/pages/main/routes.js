@@ -7,7 +7,7 @@ import {
 import history from './history';
 import Dashboard from "./dashboard";
 import Info from "./infos";
-import Security from "./security";
+import Admin from "./admin";
 import Pro from "./pro"
 import RegistreDetails from "./registreDetails";
 
@@ -17,7 +17,7 @@ export default function Routes() {
             <Switch>
                 <Route exact path="/main/dash" component={Dashboard} />
                 <Route exact path="/main/infos" component={Info} />
-                <Route exact path="/main/security" component={Security} />
+                <Route exact path="/main/admin" component={Admin} />
                 <Route exact path="/main/pro" component={Pro} />
                 <Route exact path="/main/pro/registre/:reg" component={RegistreDetails} />
             </Switch>

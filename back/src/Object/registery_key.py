@@ -8,7 +8,7 @@ logging.basicConfig(format='%(asctime)s %(message)s', datefmt='[ %m/%d/%Y-%I:%M:
 
 class registery_key:
     def __init__(self, id = -1):
-        self.id = str(id)
+        self.id = str(id) #registrery id
         self.last_check = None
         self.red = get_conn().db("auth").table('registery_key')
         self.d = None
@@ -18,7 +18,8 @@ class registery_key:
             "name": None,
             "key": None,
             "active": None,
-            "date": None
+            "date": None,
+            "authorized_ip": None
         }
 
     def add(self, name, user_id, registry_id):
@@ -56,17 +57,23 @@ class registery_key:
         return [True, {}, None]
 
     def get(self, shared, user_id, registry_id):
+        """
+            Allow users to retrieve register's keys
+            if `!shared` only get the keys belonging to the current user
+
+            GET /registery/<>/keys
+        """
         if self.id == str(-1):
             return [False, "Invalid registry", 400]
         if shared is False:
             ret = list(self.red.filter(
                 (r.row["user_id"] == user_id)
                 &
-                (r.row["register_id"] == registry_id)
+                (r.row["register_id"] == self.id)
             ).run())
         else:
             ret = list(self.red.filter(
-                (r.row["user_id"] == user_id)
+                (r.row["register_id"] == self.id)
             ).run())
         return [True, {"keys": ret}, None]
 
@@ -77,11 +84,13 @@ class registery_key:
             key = [key]
         if not all(isinstance(self.i, str) for self.i in key):
             return [False, f"Invalid key in keys list: {self.i}", 400]
+        if not isinstance(ip, str):
+            return [False, "Internal forward error", 500]
         ret = []
         list_key = key
         res = list(self.red.filter(
                 lambda key:
-                    (len(key["authorized"]) == 0 or ip in key["authorized"])
+                    (len(key["authorized_ip"]) == 0 or ip in key["authorized_ip"])
                     and
                     key["active"] is True
                     and

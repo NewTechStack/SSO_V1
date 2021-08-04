@@ -1,6 +1,7 @@
 from Controller.basic import check
 from Object.registery import registery
 from Object.user_registery import user_registery
+from Object.registery_signin_key import registery_signin_key
 
 def regi_create(cn, nextc):
     err = check.contain(cn.pr, ["name", "actions", "roles"])
@@ -127,10 +128,78 @@ def regi_keys(cn, nextc):
     return cn.call_next(nextc, err)
 
 def regi_check_key(cn, nextc):
-    err = check.contain(cn.hd, ["apitoken"], "HEAD")
+    err = check.contain(cn.pr, ["apitoken"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    err = cn.private["reg_user"].check_key(cn.hd["apitoken"], "ip")
+    err = user_registery(
+	None,
+	None
+	).check_key(cn.pr["apitoken"], "*")
+    if err[0]:
+        cn.private["signin_reg"] = err[1]["registry"]
+    return cn.call_next(nextc, err)
+
+def regi_get_signin(cn, nextc):
+    """
+        Allow external plateform
+        to get a single usage key
+
+        POST /external/key
+    """
+    err = check.contain(cn.pr, ["valid_until", "apitoken"])
+    if not err[0]:
+        return cn.toret.add_error(err[1], err[2])
+    if not "regi_get_signin" in cn.private:
+        err = [False, "Error", 500]
+        return cn.toret.add_error(err[1], err[2])
+    registery_signin_key().create(
+            registry_list=cn.private["signin_reg"],
+            time=cn.pr["valid_until"],
+            key_list=cn.ppr["apitoken"]
+        )
+    return cn.call_next(nextc, err)
+
+def regi_verify_signin(cn, nextc):
+    """
+        check user appartenance to every registry
+        force subscribe him if it's isn't the case (TODO)
+
+        POST /intern/key/<>/signin
+    """
+    err = [True, None, None]
+    for r in reg:
+        cn.private["reg_user"] = user_registery(
+            cn.private["user"],
+            registery(id=r)
+        )
+        exist = cn.private["reg_user"].exist(end=True)
+        if exist[0] is False:
+            err = exist
+            break
+        can_use =  cn.private["reg_user"].can("use")
+        if can_use[0] is False:
+            err = can_use
+            err[1] = "[" + str(r) + "] " + err[1]
+            break
+    return cn.call_next(nextc, err)
+
+def regi_info_signin(cn, nextc):
+    """
+        Allow user to validate the request
+        from an external plateforme
+
+        POST /external/key
+    """
+    err = check.contain(cn.pr, ["valid_until"])
+    if not err[0]:
+        return cn.toret.add_error(err[1], err[2])
+    if not "regi_get_signin" in cn.private:
+        err = [False, "Error", 500]
+        return cn.toret.add_error(err[1], err[2])
+    registery_signin_key().create(
+            registry_list=cn.private["signin_reg"],
+            time=cn.pr["valid_until"]
+        )
     return cn.call_next(nextc, err)
 
 def user_regi(cn, nextc):

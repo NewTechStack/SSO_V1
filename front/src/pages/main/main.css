@@ -104,8 +104,8 @@
 
 .MuiAccordionDetails-root{
     display: inherit!important;
-    max-width: 500px!important;
-    padding-bottom: 60px!important;
+    /*max-width: 500px!important;*/
+    padding-bottom: 1px!important;
 }
 
 .MuiPaper-rounded{
@@ -151,4 +151,11 @@
 .rainbow-tabset, .rainbow-tabset_inner-container{
     overflow-x: unset!important;
     overflow-y: unset!important;
+}
+.rainbow-sidebar-item--active .rainbow-sidebar-item_icon, .rainbow-sidebar-item_action:hover .rainbow-sidebar-item_icon, .rainbow-sidebar-item_action:active .rainbow-sidebar-item_icon, .rainbow-sidebar-item_action:focus .rainbow-sidebar-item_icon {
+    background-color: unset!important;
+    outline: 0;
+}
+.MuiAccordion-root.Mui-expanded:before{
+    opacity: 1!important;
 }

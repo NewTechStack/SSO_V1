@@ -331,7 +331,6 @@ class registery:
         [r.extend(i) for i in [roles[i]["actions"] for i in [i for i in roles]]]
         if not all(self.i not in r for self.i in action):
             return [False, f"Action '{self.i}' is used in a role", 401]
-        print(f"'{action}', '{actions_custom}' end_debug ")
         [actions_custom.remove(i) for i in action]
         res["actions"]["custom"]["main"] = actions_custom
         res["actions"]["custom"]["last_update"] = date
@@ -352,7 +351,7 @@ class registery:
             return [False, "Invalid name", 400]
         creator = self.data()["name"]["creator"]
         if self.__exist(name, creator):
-            return [False, f"Registery {name} already exist"]
+            return [False, f"Registery {name} already exist", 403]
         date = str(datetime.datetime.utcnow())
         self.red.get(self.id).update({
             "name": {

@@ -9,7 +9,10 @@ import string
 import random
 import uuid
 import logging
-from .rethink import get_conn, r
+try:
+    from .rethink import get_conn, r
+except:
+    pass
 
 secret_path = "./secret/"
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='[ %m/%d/%Y-%I:%M:%S%p ]')
@@ -20,7 +23,10 @@ class user:
         if id is None:
             id = -1
         self.id = str(id)
-        self.red = get_conn().db("auth").table('users')
+        try:
+            self.red = get_conn().db("auth").table('users')
+        except:
+            self.red = None
         email = str(email)
         if email is not None:
             try:
@@ -33,6 +39,44 @@ class user:
         self.scale_verify_phone = {"limit": True, "scale": [0, 0]}
         self.d = None
         self.data()
+        self.askable = {
+         "id":
+         lambda: id,
+         "username":
+         lambda : data["username"]["main"],
+         "email":
+         lambda : data["email"]["main"],
+         "phone":
+         lambda : data["details"]["phone"]["main"],
+         "first_name":
+         lambda : data["details"]["first_name"]["main"],
+         "last_name":
+         lambda : data["details"]["last_name"]["main"],
+         "age":
+         lambda : data["details"]["last_name"]["main"],
+         "is_over_12":
+         lambda : data["details"]["age"]["main"] is not None and \
+                  data["details"]["age"]["main"] >= 12,
+         "is_over_16":
+         lambda : data["details"]["age"]["main"] is not None and \
+                  data["details"]["age"]["main"] >= 16,
+         "is_over_18":
+         lambda : data["details"]["age"]["main"] is not None and \
+                  data["details"]["age"]["main"] >= 18,
+         "is_over_21":
+         lambda : data["details"]["age"]["main"] is not None and \
+                  data["details"]["age"]["main"] >= 21,
+         "is_phone_verified":
+         lambda : data["details"]["phone"]["verified"]["main"],
+         "is_email_verified":
+         lambda : data["email"]["verified"]["main"],
+         "is_age_verified":
+         lambda : data["details"]["age"]["verified"]["main"],
+         "is_first_name_verified":
+         lambda : data["details"]["first_name"]["verified"]["main"],
+         "is_last_name_verified":
+         lambda : data["details"]["last_name"]["verified"]["main"]
+        }
         self.model = {
             "username": {
                 "main" : None,
@@ -136,6 +180,9 @@ class user:
             "signup": None,
         }
 
+    def get_askable(self):
+        return [True, {"askable": self.askable.keys()}, None]
+
     def data(self, update = False):
         if (self.d is None or update is True) and self.id != "-1":
             self.d = self.red.get(self.id).run()
@@ -206,44 +253,7 @@ class user:
         if len(asked) == 0:
             payload["id"] = id
         else:
-            possible = {
-             "id":
-             lambda: id,
-             "username":
-             lambda : data["username"]["main"],
-             "email":
-             lambda : data["email"]["main"],
-             "phone":
-             lambda : data["details"]["phone"]["main"],
-             "first_name":
-             lambda : data["details"]["first_name"]["main"],
-             "last_name":
-             lambda : data["details"]["last_name"]["main"],
-             "age":
-             lambda : data["details"]["last_name"]["main"],
-             "is_over_12":
-             lambda : data["details"]["age"]["main"] is not None and \
-                      data["details"]["age"]["main"] >= 12,
-             "is_over_16":
-             lambda : data["details"]["age"]["main"] is not None and \
-                      data["details"]["age"]["main"] >= 16,
-             "is_over_18":
-             lambda : data["details"]["age"]["main"] is not None and \
-                      data["details"]["age"]["main"] >= 18,
-             "is_over_21":
-             lambda : data["details"]["age"]["main"] is not None and \
-                      data["details"]["age"]["main"] >= 21,
-             "is_phone_verified":
-             lambda : data["details"]["phone"]["verified"]["main"],
-             "is_email_verified":
-             lambda : data["email"]["verified"]["main"],
-             "is_age_verified":
-             lambda : data["details"]["age"]["verified"]["main"],
-             "is_first_name_verified":
-             lambda : data["details"]["first_name"]["verified"]["main"],
-             "is_last_name_verified":
-             lambda : data["details"]["last_name"]["verified"]["main"]
-            }
+            possible = self.askable
             if not all(a in possible for a in asked):
                 return [False, "Invalid information asked", 401]
             data = dict(self.red.get(id).run())
@@ -352,6 +362,7 @@ class user:
         bypage = (bypage if bypage > 5 else 5)
         start = page * bypage
         end = (page + 1) * bypage
+        query = query if len(str(query)) > 0 else None
         if invite is False:
             ret = self.red.filter(~r.row.has_fields({"roles": "invite"}))
         if query is not None:
@@ -616,7 +627,7 @@ class user:
         if res is None:
             return [False, f"User {id} does not exist", 401]
         ret = {
-            "username": res["username"]["main"],
+            "username": res["username"]["main"] if "username" in res and "main" in res["username"] else None,
             "email": res["email"]["main"] if res["email"]["public"] or id == self.id else None,
             "roles": res["roles"]
         }
@@ -695,7 +706,11 @@ class user:
         if role not in self.av_roles:
             return False
         date = str(datetime.datetime.utcnow())
-        roles = self.data()["roles"]
+        roles = self.data()
+        if roles is None:
+            roles = {}
+        else:
+            roles = roles["roles"]
         if role not in roles:
             ret = dict(self.red.get(id).update({
                 "roles": {
@@ -1036,6 +1051,7 @@ def test():
     logging.warning("Starting user's test")
     u = user()
     u2 = user()
+
     email = "eliot1@test.fr"
     email2 = "test1@test.fr"
     password = "T2*eeeee"
@@ -1087,6 +1103,7 @@ def test():
     u = user(None, email2)
     u.delete(True)
     logging.warning("Ending user's test")
+print(user().get_askable())
 try:
     test()
 except:

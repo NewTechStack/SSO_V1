@@ -30,9 +30,15 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import GroupOutlinedIcon from "@material-ui/icons/GroupOutlined";
 import EditIcon from "@material-ui/icons/Edit";
 import {CheckboxSelect as Checkbox} from "@atlaskit/select";
-import { Label } from 'semantic-ui-react'
+import {Label, Popup} from 'semantic-ui-react'
 import Textfield from '@atlaskit/textfield';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import HelpIcon from '@material-ui/icons/Help';
+import MuiButton from "@atlaskit/button";
+import CheckIcon from "@material-ui/icons/Check";
+import BlockIcon from "@material-ui/icons/Block";
+import DeleteIcon from '@material-ui/icons/Delete';
+import verifForms from '../../tools/verifForms'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -76,13 +82,17 @@ const customTableStyle = {
 
 export default function RegistreDetails(props){
 
+    console.log(props)
+
     let role_actions = []
+
+    let new_user_roles = []
 
     const roles_columns = [
         {
             name: '',
-            cell: row => <div>
-                <IconButton onClick={() => {
+            cell: row => row.type === "custom" ? <div style={{justifyContent:"center"}}>
+                <IconButton size="small" onClick={() => {
                     setSelectedRole(row)
                     setNewRole_name(row.name)
                     let actions = [];
@@ -93,18 +103,29 @@ export default function RegistreDetails(props){
                     console.log(actions)
                     setOpenUpdateModal(true)
                 } }>
-                    <Edit />
+                    <EditIcon fontSize="small" color="primary" />
                 </IconButton>
-                <IconButton onClick={() => {
+                <IconButton size="small" onClick={() => {
                     setDeleteMeth("role")
                     setSelectedRole(row)
                     setOpenDeleteModal(true)
-                    //deleteRole(props.match.params.reg,row)
                 }}>
-                    <Trash/>
+                    <DeleteIcon fontSize="small" color="error"/>
                 </IconButton>
-            </div>,
-            grow:0.5
+            </div> :
+                <div style={{justifyContent:"center"}}>
+                    <Popup content={
+                        <h6 style={{fontSize:"0.8rem"}}>C'est un role par défaut: <br/>Vous ne pouvez pas le modifier ou le supprimer !</h6>
+                    }
+                           wide='very'
+                           size={"small"}
+                           trigger={<HelpIcon fontSize="small" color="disabled"/>}
+                    />
+                </div>
+
+            ,
+            grow:0.1,
+            center:true
         },
         {
             name: 'Nom',
@@ -114,6 +135,7 @@ export default function RegistreDetails(props){
                 </Label>
             </div>,
             sortable: true,
+            grow:0.3
         },
         {
             name: 'Actions',
@@ -121,7 +143,7 @@ export default function RegistreDetails(props){
                 {
                     row.actions ?
                         row.actions.map(r => (
-                            <Label as='a' color='blue' size="mini">{r}</Label>
+                            <Label as='a' color='blue' size="mini" style={{marginBottom:4}}>{r}</Label>
                         )) :
                         <CircularProgress color="primary" size={15} />
                 }
@@ -133,17 +155,27 @@ export default function RegistreDetails(props){
     const actions_columns = [
         {
             name: '',
-            cell: row => <div>
+            cell: row => row.type === "custom" ? <div>
                 <IconButton onClick={() => {
                     setDeleteMeth("action")
                     setSelectedAction(row)
                     setOpenDeleteModal(true)
-                    //deleteAction(props.match.params.reg,row)
                 }}>
                     <Trash/>
                 </IconButton>
-            </div>,
-            grow:0.5
+            </div> :
+                <div style={{justifyContent:"center"}}>
+                    <Popup content={
+                        <h6 style={{fontSize:"0.8rem"}}>C'est une action par défaut: <br/>Vous ne pouvez pas la modifier ou la supprimer !</h6>
+                    }
+                           wide='very'
+                           size={"small"}
+                           trigger={<HelpIcon fontSize="small" color="disabled"/>}
+                    />
+                </div>
+            ,
+            grow:0.1,
+            center:true
         },
         {
             name: 'Nom',
@@ -153,6 +185,7 @@ export default function RegistreDetails(props){
                 </Label>
             </div>,
             sortable: true,
+            grow:0.3
         }
     ];
 
@@ -160,22 +193,21 @@ export default function RegistreDetails(props){
         {
             name: 'Action',
             cell: row => <div>
-                <IconButton onClick={() => {
-
-                } }>
-                    <Edit />
-                </IconButton>
-                <IconButton onClick={() => {
-
-                }}>
-                    <Trash/>
-                </IconButton>
+                <div style={{justifyContent:"center"}}>
+                    <Popup content={
+                        <h6 style={{fontSize:"0.8rem"}}>la possibilité de modifier ou de supprimer cet utilisateur de ce registre est désactivé pour le moment !</h6>
+                    }
+                           wide='very'
+                           size={"small"}
+                           trigger={<HelpIcon fontSize="small" color="disabled"/>}
+                    />
+                </div>
             </div>,
             grow:0.5
         },
         {
-            name: 'Nom & Prénom',
-            selector: "fname",
+            name: 'Username',
+            selector: "username",
             sortable: true,
         },
         {
@@ -184,49 +216,18 @@ export default function RegistreDetails(props){
             sortable: true,
         },
         {
-            name: 'Téléphone',
-            selector: "phone",
-            sortable: true,
-        },
-        {
             name: 'roles',
             cell: row => <div style={{paddingBottom:10}}>
-                <Label as='a' basic color='blue' pointing size="mini">
-                    role 1
-                </Label>
-                <Label as='a' basic color='blue' pointing size="mini">
-                    role 2
-                </Label>
-                <Label as='a' basic color='blue' pointing size="mini">
-                    role 3
-                </Label>
-                <Label as='a' basic color='blue' pointing size="mini">
-                    role 4
-                </Label>
-                <Label as='a' basic color='blue' pointing size="mini">
-                    role 5
-                </Label>
+                {
+                    (row.roles || []).map( item => (
+                        <Label as='a' basic color='blue' pointing size="mini">
+                            {item.role}
+                        </Label>
+                    ))
+                }
             </div>,
         }
     ];
-
-    const stat_users = [
-        {
-            fname:"test 1",
-            email:"test1@test.fr",
-            phone:"+33254789654"
-        },
-        {
-            fname:"test 2",
-            email:"test2@test.fr",
-            phone:"+33986574123"
-        },
-        {
-            fname:"test 3",
-            email:"test3@test.fr",
-            phone:"+21625896741"
-        }
-    ]
 
     const classes = useStyles();
     const { enqueueSnackbar } = useSnackbar();
@@ -235,14 +236,15 @@ export default function RegistreDetails(props){
     const [selectedTab, setSelectedTab] = React.useState("details");
     const [regInfo, setRegInfo] = React.useState({});
     const [roles, setRoles] = React.useState(null);
-    const [customRoles, setCustomRoles] = React.useState(null);
     const [actions, setActions] = React.useState([]);
+    const [regUsers, setRegUsers] = React.useState([]);
     const [customActions, setCustomActions] = React.useState([]);
-    const [allActions, setAllActions] = React.useState([]);
     const [newRole_name, setNewRole_name] = React.useState("");
     const [newAction_name, setNewAction_name] = React.useState("");
     const [newRole_actions, setNewRole_actions] = React.useState([]);
     const [openAddModal, setOpenAddModal] = React.useState(false);
+    const [openAddUserModal, setOpenAddUserModal] = React.useState(false);
+    const [newUserReg_email, setNewUserReg_email] = React.useState("");
     const [openUpdateModal, setOpenUpdateModal] = React.useState(false);
     const [openAddActionModal, setOpenAddActionModal] = React.useState(false);
     const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
@@ -255,6 +257,8 @@ export default function RegistreDetails(props){
     const [deleteMeth, setDeleteMeth] = React.useState("");
     const [user_search, setUser_search] = React.useState("");
 
+    const [openDeleteRegModal, setOpenDeleteRegModal] = React.useState(false);
+
 
 
     useEffect(() => {
@@ -263,6 +267,7 @@ export default function RegistreDetails(props){
                 getInforegistre()
                 getRoles()
                 getActions()
+                getRegistryUsers()
             }else{
                 enqueueSnackbar('Session expirée', { variant:"warning" })
                 enqueueSnackbar('Reconnexion en cours...', { variant:"info" })
@@ -272,7 +277,7 @@ export default function RegistreDetails(props){
             }
 
 
-    }, [getInforegistre,getRoles,getActions]);
+    }, [getInforegistre,getRoles,getActions,getRegistryUsers]);
 
     const verifSession = () => {
         return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
@@ -298,19 +303,25 @@ export default function RegistreDetails(props){
     }
 
     const getRoles = () => {
-        console.log("BEGIN GET ROLES")
         SSO_service.get_registre_roles(props.match.params.reg,localStorage.getItem("usrtoken")).then( rolesRes => {
             if(rolesRes.status === 200 && rolesRes.succes === true){
-                let all_roles = (rolesRes.data.builtin || []).concat(rolesRes.data.custom || [])
+                let all_roles = [];
+                let bultin_roles = rolesRes.data.builtin || []
+                bultin_roles.map(item => {
+                    all_roles.push({name:item,type:"builtin"})
+                })
+                let custom_roles = rolesRes.data.custom || []
+                custom_roles.map(item => {
+                    all_roles.push({name:item,type:"custom"})
+                })
                 let all_formated_roles = []
                 all_roles.map((role,k) => {
-                    SSO_service.getInfoRole(props.match.params.reg,role,localStorage.getItem("usrtoken")).then( infoRes => {
+                    SSO_service.getInfoRole(props.match.params.reg,role.name,localStorage.getItem("usrtoken")).then( infoRes => {
                         if(infoRes.status === 200 && infoRes.succes === true){
-                            console.log(infoRes)
-                            all_formated_roles.push({name:role,actions:infoRes.data[role].actions || []})
+                            all_formated_roles.push({name:role.name,type:role.type,actions:infoRes.data[role.name].actions || []})
                         }else{
                             console.log(infoRes.error)
-                            all_formated_roles.push({name:role,actions:[]})
+                            all_formated_roles.push({name:role.name,actions:[]})
                         }
                         setRoles(all_formated_roles)
                     }).catch(err => {
@@ -329,11 +340,19 @@ export default function RegistreDetails(props){
     const getActions = () => {
         SSO_service.get_registre_actions(props.match.params.reg,localStorage.getItem("usrtoken")).then( actionsRes => {
             if(actionsRes.status === 200 && actionsRes.succes === true){
-                let all_actions = (actionsRes.data.builtin || []).concat(actionsRes.data.custom)
+                let all_actions = [];
+                let bultin_actions = actionsRes.data.builtin || []
+                bultin_actions.map(item => {
+                    all_actions.push({name:item,type:"builtin"})
+                })
+                let custom_actions = actionsRes.data.custom || []
+                custom_actions.map(item => {
+                    all_actions.push({name:item,type:"custom"})
+                })
                 console.log(all_actions)
                 let all_formated_actions = []
                 all_actions.map((action,k) => {
-                    all_formated_actions.push({name:Array.isArray(action) === true ? action[0] : action})
+                    all_formated_actions.push({name:Array.isArray(action) === true ? action[0].name : action.name,type:action.type})
                 })
                 setActions(all_formated_actions)
             }else{
@@ -503,6 +522,73 @@ export default function RegistreDetails(props){
         })
     }
 
+    const addNewUserToReg = (email,roles) => {
+        setLoadingBtnAdd(true)
+
+        let formated_roles = [];
+        roles.map( item => {
+            formated_roles.push(item.value)
+        })
+
+        SSO_service.add_user_to_reg(props.match.params.reg,{email:email,roles:formated_roles},localStorage.getItem("usrtoken")).then( addRes => {
+            if(addRes.status === 200 && addRes.succes === true){
+                new_user_roles = [];
+                setNewUserReg_email("");
+                getRegistryUsers();
+                setTimeout(() => {
+                    setOpenAddUserModal(false)
+                    setLoadingBtnAdd(false)
+                    enqueueSnackbar("L'ajout du nouveau utilisateur est effectué avec succès", { variant:"success" })
+                },1500)
+            }else{
+                enqueueSnackbar(addRes.error, { variant:"error" })
+                setLoadingBtnAdd(false)
+            }
+        }).catch( err => {
+            console.log(err)
+            enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
+            setLoadingBtnAdd(false)
+        })
+
+    }
+
+    const getRegistryUsers = () => {
+
+        SSO_service.getRegistryUsers(props.match.params.reg,localStorage.getItem("usrtoken")).then(regUsersRes => {
+            console.log(regUsersRes)
+            if(regUsersRes.status === 200 && regUsersRes.succes === true){
+                let users = [];
+                let users_ids_roles = [];
+                (regUsersRes.data.users).map( item => {
+                    users_ids_roles.push({id:item.user.id,roles:item.user.roles || {}})
+                })
+                users_ids_roles.map( item => {
+                    SSO_service.getAdminUserInfo(item.id,localStorage.getItem("usrtoken")).then( infoRes => {
+                        if(infoRes.status === 200 && infoRes.succes === true){
+                            let roles_object = item.roles || {}
+                            const roles_array = [];
+                            Object.keys(roles_object).forEach(key => roles_array.push({
+                                role: key,
+                                data: roles_object[key]
+                            }));
+                            users.push({  
+                                id:item.id,
+                                email:infoRes.data.email,
+                                username:infoRes.data.username,
+                                roles:roles_array
+                            })
+                            setRegUsers(users)
+                        }
+                    })
+                })
+            }else{
+                enqueueSnackbar(regUsersRes.error, { variant:"error" })
+            }
+        }).catch(err => {
+            console.log(err)
+        })
+    }
+
     const getTabContent = () => {
 
         if(selectedTab === "details"){
@@ -558,11 +644,12 @@ export default function RegistreDetails(props){
                                 </div>
                             </div>
                         </AccordionDetails>
+                        <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
                     </Accordion>
-                    <Accordion>
+                    <Accordion expanded={expanded === 'panel2'}>
                         <AccordionSummary
-                            aria-controls="panel1bh-content"
-                            id="panel1bh-header"
+                            aria-controls="panel2bh-content"
+                            id="panel2bh-header"
                         >
                             <Typography className={classes.heading}>Description</Typography>
                             <div>
@@ -637,6 +724,7 @@ export default function RegistreDetails(props){
                                 </div>
                             </div>
                         </AccordionDetails>
+                        <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
                     </Accordion>
                     <Accordion>
                         <AccordionSummary
@@ -793,13 +881,13 @@ export default function RegistreDetails(props){
                         <AtlButton appearance="default" className="alt-font"
                                    iconBefore={<AddIcon/>}
                                    onClick={() => {
-                                       //setOpenAddActionModal(true)
+                                       setOpenAddUserModal(true)
                                    }}
                         >
                             Ajouter un utilisateur
                         </AtlButton>
                     </div>
-                    <div className="row">
+                    <div className="row mb-3">
                         <div className="col-md-6">
                             <Textfield name="basic" placeholder="Chercher..." style={{maxWidth:350}}
                                        value={user_search} onChange={event => setUser_search(event.target.value)}
@@ -808,7 +896,7 @@ export default function RegistreDetails(props){
                     </div>
                     <DataTable
                         columns={users_columns}
-                        data={stat_users.filter(x => (x.fname.indexOf(user_search) > -1)  || (x.email.indexOf(user_search) > -1) || (x.phone.indexOf(user_search) > -1) || user_search === "" ) }
+                        data={regUsers.filter(x => (x.username.indexOf(user_search) > -1)  || (x.email.indexOf(user_search) > -1) || user_search === "" ) }
                         selectableRows={false}
                         selectableRowsHighlight={true}
                         pagination={true}
@@ -816,7 +904,7 @@ export default function RegistreDetails(props){
                         paginationComponentOptions={paginationOptions}
                         highlightOnHover={false}
                         contextMessage={tableContextMessage}
-                        progressPending={!customActions}
+                        progressPending={!regUsers}
                         progressComponent={<h6>Chargement...</h6>}
                         noDataComponent="Il n'y a aucun utilisateur à afficher"
                         noHeader={true}
@@ -838,6 +926,28 @@ export default function RegistreDetails(props){
     }
 
 
+    const deleteRegistre = (id) => {
+        setLoadingBtnAdd(true)
+        SSO_service.remove_registre(id,localStorage.getItem("usrtoken")).then(delRes => {
+            if(delRes.status === 200 && delRes.succes === true){
+                setOpenDeleteModal(false)
+                setTimeout(() => {
+                    setLoadingBtnAdd(false)
+                    enqueueSnackbar("Registre supprimé avec succès", { variant:"success" })
+                    setTimeout(() => {
+                        props.history.goBack()
+                    },500)
+                },1500)
+            }else{
+                setLoadingBtnAdd(false)
+                enqueueSnackbar(delRes.error, { variant:"error" })
+            }
+        }).catch(err => {
+            console.log(err)
+            setLoadingBtnAdd(false)
+            enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
+        })
+    }
 
 
     return(
@@ -848,9 +958,26 @@ export default function RegistreDetails(props){
                 <div className="info_form">
                     <div>
                         <div className="main_padding-form">
+                            <div align="right" style={{marginTop:-10}}>
+                                <IconButton onClick={() => {
+                                    setOpenDeleteRegModal(true)
+                                }}>
+                                    <Trash/>
+                                </IconButton>
+                            </div>
+                            <h5 style={{fontSize:"1.25rem",marginTop:-33}}>Registre: {!loading && regInfo.name.main}</h5>
+                            <div style={{display:"flex"}}>
+                                <label style={{color:"#5f6368",fontSize:12,marginRight:10,marginTop:2}}>{!loading && regInfo.open.main === true ? "Ouvert":"Privé"}</label>
+                                <Popup content={
+                                    <h6 style={{fontSize:"0.8rem"}}>Statut de votre registre: <br/> Privé: uniquement sur invitation des membre avec l'action <b>invite</b> <br/>Publique: tout le monde peu rejoindre votre registre, il apparait dans la liste des registres </h6>
+                                }
+                                       wide='very'
+                                       size={"small"}
+                                       trigger={<HelpIcon fontSize="small" color="disabled"/>}
+                                />
 
-                            <h5 style={{fontSize:"1.25rem"}}>Registre: {!loading && regInfo.name.main}</h5>
-                            <label style={{color:"#5f6368",fontSize:12}}>{!loading && regInfo.open.main === true ? "Ouvert":"Privé"}</label>
+                            </div>
+
 
                             <div className="rainbow-flex rainbow-flex_column rainbow_vertical-stretch mt-5">
                                 <Tabset
@@ -945,6 +1072,62 @@ export default function RegistreDetails(props){
                 )}
             </ModalTransition>
 
+            <ModalTransition>
+                {openAddUserModal && (
+                    <Modal
+                        width="medium"
+                        actions={[
+                            { text: 'Ajouter', className:"alt-font", onClick: () => {addNewUserToReg(newUserReg_email,new_user_roles)}, isLoading:loadingBtnAdd, isDisabled:newUserReg_email.trim() === "" || verifForms.verif_Email(newUserReg_email) },
+                            { text: 'Annuler', className:"alt-font", onClick: () => {setOpenAddUserModal(false)} },
+                        ]}
+                        onClose={() => {
+                            setOpenAddUserModal(false)
+                        }}
+                        heading="Ajouter un nouveau utilisateur à ce registre"
+                        components={{
+                            Body: () => (
+                                <div style={{padding:"2px 20px 20px 30px"}}>
+                                    <div className="row mt-2">
+                                        <div className="col-md-8 mt-1">
+                                            <TextField
+                                                label="Adresse mail"
+                                                variant="outlined"
+                                                size="small"
+                                                style={{width:"100%"}}
+                                                value={newUserReg_email}
+                                                autoFocus={true}
+                                                onChange={(e) => {setNewUserReg_email(e.target.value)}}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="row mt-2">
+                                        <div className="col-md-8 mt-1">
+                                            <h6 style={{marginTop:10,marginBottom:10}} className="alt-font">Liste des roles</h6>
+                                            <Checkbox
+                                                className="checkbox-select"
+                                                classNamePrefix="select"
+                                                options={
+                                                    (roles || []).map((item) =>
+                                                        ({
+                                                            value: item.name,
+                                                            label:item.name
+                                                        }))
+                                                }
+                                                onChange={value => {
+                                                    new_user_roles = value
+                                                }}
+                                                placeholder="roles"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ),
+                        }}
+                    >
+
+                    </Modal>
+                )}
+            </ModalTransition>
 
             <ModalTransition>
                 {openUpdateModal && (
@@ -1059,6 +1242,25 @@ export default function RegistreDetails(props){
                             setOpenDeleteModal(false)
                         }}
                         heading={deleteMeth === "role" ? "Vous êtes sur le point de supprimer ce role" : "Vous êtes sur le point de supprimer cette action"}
+                        appearance="danger"
+                    >
+                    </Modal>
+                )}
+            </ModalTransition>
+
+            <ModalTransition>
+                {openDeleteRegModal === true && (
+                    <Modal
+                        actions={[
+                            { text: 'Supprimer', onClick: () => {deleteRegistre(props.match.params.reg)}},
+                            { text: 'Annuler', onClick: () => {
+                                    setOpenDeleteRegModal(false)
+                                }},
+                        ]}
+                        onClose={() => {
+                            setOpenDeleteRegModal(false)
+                        }}
+                        heading="Vous êtes sur le point de supprimer ce registre !"
                         appearance="danger"
                     >
                     </Modal>

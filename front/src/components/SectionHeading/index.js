@@ -88,6 +88,7 @@ export default function SectionHeading({ onToogleSidebar }) {
                             localStorage.removeItem("firstname")
                             localStorage.removeItem("lastname")
                             localStorage.removeItem("exp")
+                            localStorage.removeItem("roles")
                             window.location.reload()
                         }}
                     />

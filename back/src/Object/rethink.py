@@ -1,7 +1,16 @@
 import time
 from rethinkdb import RethinkDB
 
-dbs = {"auth": ["users", "user_registery", "registery_signin_key", "registery"]}
+dbs = {
+    "auth":
+       [
+        "users",
+        "user_registery",
+        "registery_key",
+        "registery_signin_key",
+        "registery"
+       ]
+    }
 
 def init():
     red = RethinkDB()

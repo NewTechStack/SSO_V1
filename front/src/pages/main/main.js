@@ -24,7 +24,8 @@ export default class main extends React.Component{
     state={
         selectedItem:"dash",
         session:false,
-        isSidebarHidden:true
+        isSidebarHidden:true,
+        is_have_admin_acces:false
     }
 
     componentDidMount() {
@@ -32,9 +33,12 @@ export default class main extends React.Component{
         const isMobileViewPort = document.body.offsetWidth < 600;
         this.setState({isSidebarHidden:isMobileViewPort})
         if(this.verifSession() === true){
+            this.verif_acces_roles()
             let path_array = this.props.location.pathname.split("/")
+            let menuItems = ["dash","infos","registres","admin"];
             let current = path_array[path_array.length -1]
-            this.setState({selectedItem:current,session:true})
+            console.log(current)
+            this.setState({selectedItem:menuItems.find(x => x === current) ? current : "registres",session:true})
         }else{
             this.props.history.push("/sso/login")
         }
@@ -43,6 +47,14 @@ export default class main extends React.Component{
 
     verifSession(){
         return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
+    }
+
+    verif_acces_roles(){
+        let roles = JSON.parse(localStorage.getItem("roles")) || []
+        console.log(roles)
+        if(roles.find(x => x.role === "admin" || x.role === "creator")){
+            this.setState({is_have_admin_acces:true})
+        }
     }
 
     getSidebarClassNames() {
@@ -88,16 +100,20 @@ export default class main extends React.Component{
                             onClick={() => navigateTo('/main/infos')} />
                         <SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
-                            icon={<LockIcon fontSize="default" style={{color:"#00AEF9"}} />}
-                            name="security"
-                            label="Securité"
-                            onClick={() => navigateTo('/main/security')} />
-                        <SidebarItem
-                            className="react-rainbow-admin-app_sidebar-item"
                             icon={<BallotIcon fontSize="default" style={{color:"#00AEF9"}} />}
                             name="registres"
                             label="Registres"
                             onClick={() => navigateTo('/main/pro')} />
+                        {
+                            this.state.is_have_admin_acces === true &&
+                            <SidebarItem
+                                className="react-rainbow-admin-app_sidebar-item"
+                                icon={<LockIcon fontSize="default" style={{color:"#00AEF9"}} />}
+                                name="admin"
+                                label="Admin"
+                                onClick={() => navigateTo('/main/admin')} />
+                        }
+
                     </Sidebar>
                     <RenderIf isTrue={!isSidebarHidden}>
                         <div className="react-rainbow-admin-app_sidebar-back-button-container">

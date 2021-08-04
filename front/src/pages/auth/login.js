@@ -57,6 +57,14 @@ class login extends Component {
                             localStorage.setItem("lastname",infoRes.data.last_name.main || "")
                             localStorage.setItem("usrtoken",loginRes.data.usrtoken)
                             localStorage.setItem("exp",loginRes.data.exp)
+
+                            let roles_object = infoRes.data.roles || {}
+                            const roles_array = [];
+                            Object.keys(roles_object).forEach(key => roles_array.push({
+                                role: key,
+                                data: roles_object[key]
+                            }));
+                            localStorage.setItem("roles",JSON.stringify(roles_array))
                             this.setState({loading:false})
                             this.props.history.push("/main/dash")
                         }else{

@@ -224,8 +224,8 @@ class user_registery:
         shared = self.reg.data()["dev_settings"]["keys"]["main"]["shared"]
         return self.keys.get(shared, self.usr_id, self.reg_id)
 
-    def check_key(self, key):
-        return self.keys.check(key)
+    def check_key(self, keys):
+        return self.keys.check(keys)
 
     def __status(self, id_user, role, active = True):
         roles = self.reg.roles()[1]

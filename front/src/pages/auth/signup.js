@@ -49,7 +49,7 @@ class signup extends Component {
                         if(infoRes.status === 200 && infoRes.succes === true){
 
                             localStorage.setItem("email",this.state.signup_form.email)
-                            this.props.enqueueSnackbar("Votre inscription est effectuée avec succès ! Vous pouvez utiliser votre compte pour se connecter",
+                            this.props.enqueueSnackbar("Votre inscription est effectuée avec succès !",
                                 {variant:"success"})
                             localStorage.setItem("firstname",infoRes.data.first_name.main || "")
                             localStorage.setItem("lastname",infoRes.data.last_name.main || "")
@@ -97,7 +97,7 @@ class signup extends Component {
                        <div style={{display:"flex"}}>
                            <div className="padding-form">
 
-                               <h5 style={{fontSize:"1.4rem"}}>Créer votre compte</h5>
+                               <h5 style={{fontSize:"1.8rem"}}>Créer votre compte</h5>
 
                                <form id="signup-form" style={{maxWidth:500,alignSelf:"center"}}
                                      onSubmit={(e) => {

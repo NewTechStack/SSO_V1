@@ -10,37 +10,53 @@ import {Divider, IconButton} from "@material-ui/core";
 import DataTable from 'react-data-table-component';
 import {paginationOptions,tableContextMessage} from '../../constants/defaultValues';
 import AddIcon from '@material-ui/icons/Add';
+import SearchIcon from '@material-ui/icons/Search';
 import AtlButton from '@atlaskit/button';
 import {Edit,Trash} from '../../components/icons';
 import Modal, {ModalTransition} from "@atlaskit/modal-dialog";
 import TextField from "@material-ui/core/TextField";
-
-
-
-/*const data = [
-    {
-        id:"82a3f9f0-f2bb-4d96-ba6d-a0e1b2dd1696",
-        date:moment().format("DD-MM-YYYY"),
-        name:'Test01',
-        statut:"privé"
-    },
-    {
-        id:"d1518e63-bc8c-4bcf-968a-bed966645ca2",
-        date:moment().format("DD-MM-YYYY"),
-        name:'Test02',
-        statut:"ouvert"
-    }
-]*/
+import Textfield from "@atlaskit/textfield";
+import {Label, Popup} from "semantic-ui-react";
+import HelpIcon from "@material-ui/icons/Help";
 
 export default function Pro(props){
 
     const columns = [
         {
+            name: 'Nom',
+            selector: 'name',
+            sortable: true,
+        },
+        {
+            name: 'roles',
+            cell: row => <div style={{paddingBottom:10}}>
+                {
+                    (row.roles || []).map( item => (
+                        <Label as='a' basic color='blue' pointing size="mini">
+                            {item.role}
+                        </Label>
+                    ))
+                }
+            </div>,
+        },
+        {
+            name: 'Date de création',
+            selector: 'last_update',
+            cell: row => moment(row.date).format("DD-MM-YYYY HH:mm"),
+            sortable: true,
+        },
+        {
+            name: 'Dernière modification',
+            selector: 'date',
+            cell: row => moment(row.date).format("DD-MM-YYYY HH:mm"),
+            sortable: true,
+        },
+        /*{
             name: 'Action',
             cell: row => <div>
-                {/*<IconButton>
+                {/!*<IconButton>
                     <Edit />
-                </IconButton>*/}
+                </IconButton>*!/}
                 <IconButton onClick={() => {
                     setSelectedRegId(row.id)
                     setOpenDeleteModal(true)
@@ -49,35 +65,90 @@ export default function Pro(props){
                 </IconButton>
             </div>,
             grow:0.5
-        },
+        },*/
+
+
+    ];
+
+    const admin_users_columns = [
+        /*{
+            name: 'Action',
+            cell: row => <div>
+                <IconButton>
+                    <Edit />
+                </IconButton>
+            </div>,
+            grow:0.1
+        },*/
         {
-            name: 'Date de création',
-            selector: 'date',
-            cell: row => moment(row.date).format("DD-MM-YYYY HH:mm"),
+            name: 'Email',
+            selector: 'email',
             sortable: true,
         },
         {
-            name: 'Nom',
-            selector: 'registery.name.main',
+            name: 'Username',
+            selector: 'username',
             sortable: true,
+        },
+        {
+            name: 'roles',
+            cell: row => <div style={{paddingBottom:10}}>
+                {
+                    (row.roles || []).map( item => (
+                        <Label as='a' basic color='blue' pointing size="mini">
+                            {item.role}
+                        </Label>
+                    ))
+                }
+            </div>,
+        },
+        {
+            name: 'Registres',
+            cell: row => <div style={{paddingBottom:10}}>
+                {
+                    (row.registries || []).map( item => (
+                        <Popup content={
+                            <div style={{display:"flex"}}>
+                                <SearchIcon fontSize={"small"} color="primary"/>
+                                <h6 style={{fontSize:"0.7rem",marginLeft:3,marginTop:4}}>Voir détails</h6>
+                            </div>
+                        }
+                               wide='very'
+                               size={"small"}
+                               trigger={
+                                   <Label as='a' basic color='blue' pointing size="mini">
+                                       {item.registery.name.main}
+                                   </Label>
+                               }
+                        />
+                    ))
+                }
+            </div>,
         }
     ];
 
     const { enqueueSnackbar } = useSnackbar();
+    const [is_have_acces_to_search_users, setIs_have_acces_to_search_users] = React.useState(false);
     const [loading, setLoading] = React.useState(false);
     const [loadingBtnAdd, setLoadingBtnAdd] = React.useState(false);
+    const [loadingBtnSearch, setLoadingBtnSearch] = React.useState(false);
     const [selectedTab, setSelectedTab] = React.useState("registries");
     const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
     const [openAddModal, setOpenAddModal] = React.useState(false);
     const [newReg_name, setNewReg_name] = React.useState("");
     const [registres, setRegistres] = React.useState();
+    const [other_registres, setOther_registres] = React.useState();
     const [selectedRegId, setSelectedRegId] = React.useState("");
+    const [user_search_input, setUser_search_input] = React.useState("");
+    const [admin_users, setAdmin_users] = React.useState();
 
 
     useEffect(() => {
 
             if(verifSession() === true){
-                getRegistres()
+                verif_acces_roles()
+                getCurrentUserRegistres()
+                getOtherUserRegistres()
             }else{
                 enqueueSnackbar('Session expirée', { variant:"warning" })
                 enqueueSnackbar('Reconnexion en cours...', { variant:"info" })
@@ -91,13 +162,58 @@ export default function Pro(props){
         return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
     }
 
-    const getRegistres = () => {
+    const verif_acces_roles = () => {
+        let roles = JSON.parse(localStorage.getItem("roles")) || []
+        console.log(roles)
+        if(roles.find(x => x.role === "admin" || x.role === "creator")){
+            setIs_have_acces_to_search_users(true)
+        }
+    }
+
+    const getCurrentUserRegistres = () => {
         setLoading(true)
-        SSO_service.get_registres(localStorage.getItem("usrtoken")).then(res => {
+        SSO_service.get_created_user_registies(localStorage.getItem("usrtoken")).then(res => {
+            console.log(res)
+            if(res.status === 200 && res.succes === true){
+
+                let registries = res.data.registries || [];
+                let formated_regs = []
+                registries.map((reg,key) => {
+
+                    let roles_object = reg.registery.roles || {}
+                    const roles_array = [];
+                    Object.keys(roles_object).forEach(key => roles_array.push({
+                        role: key,
+                        data: roles_object[key]
+                    }));
+
+                    formated_regs.push({
+                        id:reg.registery.id,
+                        name:reg.registery.name.main,
+                        date:reg.date,
+                        last_update:reg.last_update,
+                        roles:roles_array
+                    })
+
+                })
+                setLoading(false)
+                setRegistres(formated_regs)
+            }else{
+                enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
+            }
+        }).catch(err => {
+            console.log(err)
+            enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
+        })
+    }
+
+    const getOtherUserRegistres = () => {
+        setLoading(true)
+        SSO_service.get_user_registry(localStorage.getItem("usrtoken")).then(res => {
             console.log(res)
             if(res.status === 200 && res.succes === true){
                 setLoading(false)
-                setRegistres(res.data.registries || [])
+                setOther_registres(res.data.registries || [])
             }else{
                 enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
             }
@@ -112,7 +228,7 @@ export default function Pro(props){
         SSO_service.add_registre({name: newReg_name, actions: [], roles: {}},localStorage.getItem("usrtoken")).then( addRes => {
             console.log(addRes)
             if(addRes.status === 200 && addRes.succes === true){
-                getRegistres()
+                getCurrentUserRegistres()
                 setTimeout(() => {
                     setLoadingBtnAdd(false)
                     setOpenAddModal(false)
@@ -149,24 +265,63 @@ export default function Pro(props){
         })
     }
 
+    const admin_search_users = (query) => {
+        setLoadingBtnSearch(true)
+        setLoading(true)
+        SSO_service.admin_users_search(query,localStorage.getItem("usrtoken")).then(searchRes => {
+            console.log(searchRes)
+            if(searchRes.status === 200 && searchRes.succes === true){
+                let formated_users = [];
+                (searchRes.data.users || []).map( item => {
+                    SSO_service.getAdminUserInfo(item,localStorage.getItem("usrtoken")).then( infoRes => {
+                        console.log(infoRes)
+                        if(infoRes && infoRes.status === 200 && infoRes.succes === true){
+                            let roles_object = infoRes.data.roles || {}
+                            const roles_array = [];
+                            Object.keys(roles_object).forEach(key => roles_array.push({
+                                role: key,
+                                data: roles_object[key]
+                            }));
+                            SSO_service.get_admin_user_registries(item,localStorage.getItem("usrtoken")).then( regsRes => {
+                                if(regsRes && regsRes.status === 200 && regsRes.succes === true){
+                                    formated_users.push({
+                                        id:item,
+                                        email:infoRes.data.email,
+                                        username:infoRes.data.username,
+                                        roles:roles_array,
+                                        registries:regsRes.data.registries || []
+                                    })
+                                    setAdmin_users(formated_users)
+                                }else{
+                                    console.log(regsRes ? regsRes.error : "500 error")
+                                }
+                            })
+                        }else{
+                            console.log(infoRes ? infoRes.error : "500 error")
+                        }
+                    })
+                })
+                setTimeout(() => {
+                    setLoading(false)
+                    setLoadingBtnSearch(false)
+                },1500)
+            }else{
+                console.log(searchRes.error)
+            }
+        }).catch(err => {
+            console.log(err)
+        })
+    }
+
     const getTabContent = () => {
 
         if (selectedTab === 'registries') {
             return (
                 <div style={{marginLeft:20}}>
-                    <div align="right">
-                        <AtlButton appearance="default" className="alt-font"
-                                   iconBefore={<AddIcon/>}
-                                   onClick={() => {
-                                       setOpenAddModal(true)
-                                   }}
-                        >
-                            Ajouter un registre
-                        </AtlButton>
-                    </div>
+
                     <DataTable
                         columns={columns}
-                        data={registres}
+                        data={other_registres}
                         defaultSortField="name"
                         selectableRows={false}
                         selectableRowsHighlight={true}
@@ -178,16 +333,58 @@ export default function Pro(props){
                         paginationComponentOptions={paginationOptions}
                         highlightOnHover={false}
                         contextMessage={tableContextMessage}
-                        progressPending={registres === null || registres === undefined}
+                        progressPending={other_registres === null || other_registres === undefined}
                         progressComponent={<h6>Chargement...</h6>}
                         noDataComponent="Il n'y a aucun enregistrement à afficher"
                         noHeader={true}
                         pointerOnHover={true}
                         onRowClicked={(row, e) => {
-                            props.history.push("/main/pro/registre/" + row.registery.id )
+                            props.history.push("/main/pro/registre/" + row.id )
                         }}
                     />
 
+                </div>
+            )
+        }
+        if(selectedTab === 'me'){
+            return (
+                <div>
+                    <div style={{marginLeft:20}}>
+                        <div align="right">
+                            <AtlButton appearance="default" className="alt-font"
+                                       iconBefore={<AddIcon/>}
+                                       onClick={() => {
+                                           setOpenAddModal(true)
+                                       }}
+                            >
+                                Ajouter un registre
+                            </AtlButton>
+                        </div>
+                        <DataTable
+                            columns={columns}
+                            data={registres}
+                            defaultSortField="name"
+                            selectableRows={false}
+                            selectableRowsHighlight={true}
+                            /*onSelectedRowsChange={selected => {
+                                console.log(selected)
+                            }}*/
+                            pagination={true}
+                            paginationPerPage={10}
+                            paginationComponentOptions={paginationOptions}
+                            highlightOnHover={false}
+                            contextMessage={tableContextMessage}
+                            progressPending={registres === null || registres === undefined}
+                            progressComponent={<h6>Chargement...</h6>}
+                            noDataComponent="Il n'y a aucun enregistrement à afficher"
+                            noHeader={true}
+                            pointerOnHover={true}
+                            onRowClicked={(row, e) => {
+                                props.history.push("/main/pro/registre/" + row.id )
+                            }}
+                        />
+
+                    </div>
                 </div>
             )
         }
@@ -218,20 +415,17 @@ export default function Pro(props){
                                     className="rainbow-p-horizontal_x-large"
                                 >
                                     <Tab
-                                        label="Mes registres"
+                                        label="Les registres que vous concernent"
                                         name="registries"
                                         id="registries"
                                         ariaControls="primaryTab"
                                     />
+                                    {
+                                        is_have_acces_to_search_users === true &&
+                                        <Tab label="Vos propres registres"
+                                             name="me" id="me" ariaControls="me" />
+                                    }
 
-                                    {/*<Tab
-                                        label="Mes services"
-                                        name="recents"
-                                        id="recents"
-                                        ariaControls="recentsTab"
-                                    />*/}
-
-                                    <Tab label="Autres" name="shared" id="shared" ariaControls="sharedTab" />
 
                                     <Tab label="" name="locked" id="locked" ariaControls="lockedTab" />
 
@@ -245,6 +439,7 @@ export default function Pro(props){
 
                 </div>
             </div>
+
 
             <ModalTransition>
                 {openAddModal && (
