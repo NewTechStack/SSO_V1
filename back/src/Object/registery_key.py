@@ -72,9 +72,12 @@ class registery_key:
                 (r.row["register_id"] == self.id)
             ).run())
         else:
-            ret = list(self.red.filter(
-                (r.row["register_id"] == self.id)
-            ).run())
+            try:
+                ret = list(self.red.filter(
+                    (r.row["register_id"] == self.id)
+                ).run())
+            except:
+                return [False, "error", 500]
         return [True, {"keys": ret}, None]
 
     def check(self, key, ip):

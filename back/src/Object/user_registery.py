@@ -213,8 +213,7 @@ class user_registery:
         return False
 
     def add_key(self, name):
-        shared = self.reg.data()["dev_settings"]["keys"]["main"]["shared"]
-        return self.keys.add(name, shared, self.usr_id, self.reg_id)
+        return self.keys.add(name, self.usr_id, self.reg_id)
 
     def delete_key(self, id):
         shared = self.reg.data()["dev_settings"]["keys"]["main"]["shared"]

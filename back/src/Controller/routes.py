@@ -45,7 +45,7 @@ def setuproute(app, call):
 
     @app.route('/registery/<>/users',           ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, registry_users])) #done
 
-    @app.route('/extern/key',                   ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, regi_get_signin])) #done !! askable to do 
+    @app.route('/extern/key',                   ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, regi_get_signin])) #done !! askable to do
     @app.route('/extern/key/<>/token',          ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_wait_token])) #done
 
     @app.route('/intern/key/<>/signin',         ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, regi_info_signin])) #done manque DB

@@ -51,7 +51,7 @@ services:
     expose:
       - 28015
     volumes:
-      - ./back/rethink/data:/data
+      - ./db/rethink/data:/data
     command: rethinkdb --bind all -d /data
     networks:
       - default
