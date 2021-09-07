@@ -1,13 +1,13 @@
 from Controller.basic import check
-from Object.registery import registery
-from Object.user_registery import user_registery
-from Object.registery_signin_key import registery_signin_key
+from Object.registry import registry
+from Object.user_registry import user_registry
+from Object.registry_signin_key import registry_signin_key
 
 def regi_create(cn, nextc):
     err = check.contain(cn.pr, ["name", "actions", "roles"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    cn.private["reg"] = registery()
+    cn.private["reg"] = registry()
     err = cn.private["reg"].create(
         cn.pr["name"],
         cn.private["user"].id,
@@ -16,7 +16,7 @@ def regi_create(cn, nextc):
     )
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    cn.private["reg_user"] = user_registery(
+    cn.private["reg_user"] = user_registry(
         cn.private["user"],
         cn.private["reg"]
     )
@@ -29,7 +29,7 @@ def regi_invite(cn, nextc):
     err = check.contain(cn.pr, ["email", "roles"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    cn.private["reg_user"] = user_registery(
+    cn.private["reg_user"] = user_registry(
         cn.private["user"],
         cn.private["reg"]
     )
@@ -131,7 +131,7 @@ def regi_check_key(cn, nextc):
     err = check.contain(cn.pr, ["apitoken"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    err = user_registery(
+    err = user_registry(
 	None,
 	None
 	).check_key(cn.pr["apitoken"], "*")
@@ -152,7 +152,7 @@ def regi_get_signin(cn, nextc):
     if not "regi_get_signin" in cn.private:
         err = [False, "Error", 500]
         return cn.toret.add_error(err[1], err[2])
-    registery_signin_key().create(
+    registry_signin_key().create(
             registry_list=cn.private["signin_reg"],
             time=cn.pr["valid_until"],
             key_list=cn.ppr["apitoken"]
@@ -168,9 +168,9 @@ def regi_verify_signin(cn, nextc):
     """
     err = [True, None, None]
     for r in reg:
-        cn.private["reg_user"] = user_registery(
+        cn.private["reg_user"] = user_registry(
             cn.private["user"],
-            registery(id=r)
+            registry(id=r)
         )
         exist = cn.private["reg_user"].exist(end=True)
         if exist[0] is False:
@@ -196,16 +196,16 @@ def regi_info_signin(cn, nextc):
     if not "regi_get_signin" in cn.private:
         err = [False, "Error", 500]
         return cn.toret.add_error(err[1], err[2])
-    registery_signin_key().create(
+    registry_signin_key().create(
             registry_list=cn.private["signin_reg"],
             time=cn.pr["valid_until"]
         )
     return cn.call_next(nextc, err)
 
 def user_regi(cn, nextc):
-    reg_id = cn.rt["registery"] if "registery" in cn.rt else -1
-    cn.private["reg"] = registery(reg_id)
-    cn.private["reg_user"] = user_registery(
+    reg_id = cn.rt["registry"] if "registry" in cn.rt else -1
+    cn.private["reg"] = registry(reg_id)
+    cn.private["reg_user"] = user_registry(
         cn.private["user"],
         cn.private["reg"]
     )
@@ -213,14 +213,14 @@ def user_regi(cn, nextc):
     return cn.call_next(nextc, err)
 
 def registry_users(cn, nextc):
-    reg_id = cn.rt["registery"] if "registery" in cn.rt else -1
-    err = user_registery(None, None).all_user(reg_id)
+    reg_id = cn.rt["registry"] if "registry" in cn.rt else -1
+    err = user_registry(None, None).all_user(reg_id)
     return cn.call_next(nextc, err)
 
 def user_registries(cn, nextc):
-    user_id = cn.rt["user"] if "user" in cn.rt and cn.rt["user"] != 'registery' else cn.private["user"].id
+    user_id = cn.rt["user"] if "user" in cn.rt and cn.rt["user"] != 'registry' else cn.private["user"].id
     creator = cn.get["creator"] if "creator" in cn.get else True
-    err = user_registery(None, None).all_from_user(user_id, creator)
+    err = user_registry(None, None).all_from_user(user_id, creator)
     return cn.call_next(nextc, err)
 
 def user_regi_exist(cn, nextc):

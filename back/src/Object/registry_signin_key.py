@@ -10,7 +10,7 @@ except:
     pass
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='[ %m/%d/%Y-%I:%M:%S%p ]')
 
-class registery_signin_key:
+class registry_signin_key:
     def __init__(self, id = -1):
         self.id = str(id)
         self.last_check = None
@@ -19,7 +19,7 @@ class registery_signin_key:
             "down": 10
         }
         try:
-            self.red = get_conn().db("auth").table('registery_signin_key')
+            self.red = get_conn().db("auth").table('registry_signin_key')
         except:
             self.red = None
         self.d = None
@@ -27,7 +27,7 @@ class registery_signin_key:
             "key": None,
             "secret": None,
             "until": None,
-            "registery_list": None,
+            "registry_list": None,
             "date": None,
             "auth": None
         }
@@ -37,7 +37,7 @@ class registery_signin_key:
             return [False, "Invalid time argument", 400]
         if not isinstance(registry_list, list) \
            and all(isinstance(self.i, str) for i in registry_list):
-	        return [False, "Invalid registery list", 400]
+	        return [False, "Invalid registry list", 400]
         key = str(uuid.uuid4())
         secret = str(hash(uuid.uuid4()))
         while self.__key_exist(key, secret=secret)[0]:
@@ -50,7 +50,7 @@ class registery_signin_key:
         data["key"] = key
         data["secret"] = secret
         data["until"] = until
-        data["registery_list"] = registry_list
+        data["registry_list"] = registry_list
         data["auth"] = auth_hash
         data["date"] = None
         return [True, {"key": key, "secret": secret, "auth": auth_hash}, None]
@@ -97,7 +97,7 @@ class registery_signin_key:
 
 
 if __name__ == "__main__":
-    r = registery_signin_key()
+    r = registry_signin_key()
     res = r.create(
         registry_list = ["id_1", "id_2"],
         time=20,

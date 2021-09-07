@@ -1,25 +1,25 @@
 import datetime
 from .users import user
 from .rethink import get_conn, r
-from .registery_key import registery_key
+from .registry_key import registry_key
 
-class user_registery:
-    def __init__(self, user, registery):
+class user_registry:
+    def __init__(self, user, registry):
         self.user = user
-        self.reg = registery
+        self.reg = registry
         if user is not None:
             self.user.data(True)
             self.usr_id = user.id
-        if registery is not None:
-            self.reg_id = registery.id
-            self.roles = registery.roles
-        if registery is not None and user is not None:
-            self.keys = registery_key(self.reg.id)
+        if registry is not None:
+            self.reg_id = registry.id
+            self.roles = registry.roles
+        if registry is not None and user is not None:
+            self.keys = registry_key(self.reg.id)
         else:
-            self.keys = registery_key()
+            self.keys = registry_key()
         self.invite = False
         self.d = None
-        self.red = get_conn().db("auth").table('user_registery')
+        self.red = get_conn().db("auth").table('user_registry')
 
     def all_from_user(self, usr_id, creator = True):
         res = self.red.filter(
@@ -30,8 +30,8 @@ class user_registery:
         else:
             res = res.filter(r.row.has_fields({"roles": "creator"}))
         res = list(res.eq_join(
-                'id_registery',
-                get_conn().db("auth").table('registery')
+                'id_registry',
+                get_conn().db("auth").table('registry')
             ).without(
                 {'right': ["id"]}
             ).with_fields(
@@ -41,8 +41,8 @@ class user_registery:
                         "by": res['left']['by'],
                         "id": res['left']['id'],
                         "last_update": res['left']['date'],
-                        "registery": {
-                          "id": res['left']['id_registery'],
+                        "registry": {
+                          "id": res['left']['id_registry'],
                           "name": res['right']['name'],
                           "roles": res['left']['roles'],
                         }
@@ -54,7 +54,7 @@ class user_registery:
     def all_user(self, reg_id):
         res = list(
             self.red.filter(
-                (r.row["id_registery"] == reg_id)
+                (r.row["id_registry"] == reg_id)
             ).eq_join('id_user', get_conn().db("auth").table('users')
             ).without(
                 {'right': ["id"]}
@@ -79,7 +79,7 @@ class user_registery:
         id_user = id_user if id_user is not None else self.usr_id
         if id_user is None and self.invite is True:
             return {
-                "id_registery": self.reg_id,
+                "id_registry": self.reg_id,
                 "id_user": -1,
                 "date": 0,
                 "last_update": None,
@@ -96,7 +96,7 @@ class user_registery:
             id_user is None:
             d = self.red.filter(
                 (r.row["id_user"] == id_user)
-                & (r.row["id_registery"] == self.reg_id)
+                & (r.row["id_registry"] == self.reg_id)
             ).run()
             d = list(d)
             if id_user is not None:
@@ -118,7 +118,7 @@ class user_registery:
         if str(self.usr_id) == str("-1"):
             return [False, "Invalid user", 401]
         if str(self.reg_id) == str("-1"):
-            return [False, "Invalid registery", 401]
+            return [False, "Invalid registry", 401]
         base_roles = self.reg.roles()[1]
         base_roles = base_roles["builtin"] + base_roles["custom"]
         if not all(self.i in base_roles for self.i in roles):
@@ -134,10 +134,10 @@ class user_registery:
         if id_user == "-1":
             return [False, "Invalid user", 401]
         if self.exist(id_user):
-            return [False, "User already in registery", 401]
+            return [False, "User already in registry", 401]
         date = str(datetime.datetime.now())
         res = dict(self.red.insert([{
-            "id_registery": self.reg_id,
+            "id_registry": self.reg_id,
             "id_user": id_user,
             "date": date,
             "last_update": None,
@@ -192,7 +192,7 @@ class user_registery:
         if id_user is None:
             if self.d != None:
                 return True
-            res = list(self.red.filter((r.row["id_user"] == self.usr_id) & (r.row["id_registery"] == self.reg_id)).run())
+            res = list(self.red.filter((r.row["id_user"] == self.usr_id) & (r.row["id_registry"] == self.reg_id)).run())
             if len(res) == 1:
                 self.d = res[0]
             if len(res) > 0:
@@ -203,13 +203,13 @@ class user_registery:
                 self.invite = True
                 return [True, {}, None]
         else:
-            res = list(self.red.filter((r.row["id_user"] == id_user) & (r.row["id_registery"] == self.reg_id)).run())
+            res = list(self.red.filter((r.row["id_user"] == id_user) & (r.row["id_registry"] == self.reg_id)).run())
             if len(res) > 0:
                 if end is True:
                     return [True, res[0], None]
                 return True
             if end is True:
-                return [False, "Invalid user for this registery", 404]
+                return [False, "Invalid user for this registry", 404]
         return False
 
     def add_key(self, name):
@@ -234,7 +234,7 @@ class user_registery:
             return False
         date = str(datetime.datetime.now())
         roles = list(self.red.filter(
-            (r.row["id_user"] == id_user) & (r.row["id_registery"] == self.reg_id)
+            (r.row["id_user"] == id_user) & (r.row["id_registry"] == self.reg_id)
         ).run())
         id = roles[0]["id"]
         roles = roles[0]["roles"]

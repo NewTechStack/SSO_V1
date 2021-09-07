@@ -6,11 +6,11 @@ from .rethink import get_conn, r
 
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='[ %m/%d/%Y-%I:%M:%S%p ]')
 
-class registery_key:
+class registry_key:
     def __init__(self, id = -1):
         self.id = str(id) #registrery id
         self.last_check = None
-        self.red = get_conn().db("auth").table('registery_key')
+        self.red = get_conn().db("auth").table('registry_key')
         self.d = None
         self.model = {
             "registry_id": None,
@@ -34,7 +34,7 @@ class registery_key:
         #    key = str(uuid.uuid4()).replace('-', '')
         date = str(datetime.datetime.utcnow())
         data = self.model
-        data["registery_id"] = registry_id
+        data["registry_id"] = registry_id
         data["user_id"] = user_id
         data["name"] = name
         data["key"] = key
@@ -61,7 +61,7 @@ class registery_key:
             Allow users to retrieve register's keys
             if `!shared` only get the keys belonging to the current user
 
-            GET /registery/<>/keys
+            GET /registry/<>/keys
         """
         if self.id == str(-1):
             return [False, "Invalid registry", 400]
@@ -70,12 +70,12 @@ class registery_key:
             ret = list(self.red.filter(
                 (r.row["user_id"] == user_id)
                 &
-                (r.row["registery_id"] == self.id)
+                (r.row["registry_id"] == self.id)
             ).run())
         else:
             try:
                 ret = list(self.red.filter(
-                    (r.row["registery_id"] == self.id)
+                    (r.row["registry_id"] == self.id)
                 ).run())
             except:
                 return [False, "error", 500]

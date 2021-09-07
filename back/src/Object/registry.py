@@ -6,11 +6,11 @@ from .rethink import get_conn, r
 
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='[ %m/%d/%Y-%I:%M:%S%p ]')
 
-class registery:
+class registry:
     def __init__(self, id = -1):
         self.id = str(id)
         self.last_check = None
-        self.red = get_conn().db("auth").table('registery')
+        self.red = get_conn().db("auth").table('registry')
         self.d = None
         self.model = {
             "name": {
@@ -341,7 +341,7 @@ class registery:
 
     def delete(self):
         if self.id != -1:
-            return [False, "Invalid registery", 401]
+            return [False, "Invalid registry", 401]
         if not dict(self.red.get(self.id).delete().run())["skipped"] == 0:
             return [False, "error", 500]
         return [True, {}, None]
@@ -406,8 +406,8 @@ class registery:
 
 def test():
     logging.warning("-")
-    logging.warning("Starting registery's test")
-    r = registery()
+    logging.warning("Starting registry's test")
+    r = registry()
     r.create("test", "user_id", ["test"], {"test": {"actions": []}, "adminn": {"actions": []}})
     r.add_role({"adminnn": {"actions": ["test"]}})
     r.delete_role("adminn")
@@ -415,7 +415,7 @@ def test():
     r.roles(True)
     r.actions()
     r.delete()
-    logging.warning("Ending registery's test")
+    logging.warning("Ending registry's test")
 
 try:
     test()

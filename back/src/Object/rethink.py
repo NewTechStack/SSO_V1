@@ -5,10 +5,10 @@ dbs = {
     "auth":
        [
         "users",
-        "user_registery",
-        "registery_key",
-        "registery_signin_key",
-        "registery"
+        "user_registry",
+        "registry_key",
+        "registry_signin_key",
+        "registry"
        ]
     }
 
