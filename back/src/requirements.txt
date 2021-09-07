@@ -12,3 +12,4 @@ rethinkdb
 pyjwt
 phonenumbers==8.12.12
 Werkzeug
+tqdm

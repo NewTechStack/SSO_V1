@@ -25,16 +25,16 @@ class registery_key:
     def add(self, name, user_id, registry_id):
         if self.id == str(-1):
             return [False, "Invalid registry", 400]
-        if not isinstance(str, name):
+        if not isinstance(name, str):
             return [False, "Invalid type for name", 400]
         if not len(name) < 30:
             return [False, "Name should be less than 30 char", 400]
         key = str(uuid.uuid4()).replace('-', '')
-        while self.__exist(key):
-            key = str(uuid.uuid4()).replace('-', '')
+        #while self.__exist(key):
+        #    key = str(uuid.uuid4()).replace('-', '')
         date = str(datetime.datetime.utcnow())
         data = self.model
-        data["registry_id"] = registry_id
+        data["registery_id"] = registry_id
         data["user_id"] = user_id
         data["name"] = name
         data["key"] = key
@@ -65,16 +65,17 @@ class registery_key:
         """
         if self.id == str(-1):
             return [False, "Invalid registry", 400]
+        print(shared, user_id, self.id, registry_id)
         if shared is False:
             ret = list(self.red.filter(
                 (r.row["user_id"] == user_id)
                 &
-                (r.row["register_id"] == self.id)
+                (r.row["registery_id"] == self.id)
             ).run())
         else:
             try:
                 ret = list(self.red.filter(
-                    (r.row["register_id"] == self.id)
+                    (r.row["registery_id"] == self.id)
                 ).run())
             except:
                 return [False, "error", 500]
