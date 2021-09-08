@@ -189,21 +189,14 @@ def regi_verify_signin(cn, nextc):
 
 def regi_info_signin(cn, nextc):
     """
-        Allow user to validate the request
-        from an external plateforme
-
-        POST /external/key
     """
-    err = check.contain(cn.pr, ["valid_until"])
+    key = cn.rt["key"] if "key" in cn.rt else None
+    if key is None:
+        return cn.toret.add_error("Invalid key", 400)
+    err = check.contain(cn.pr, ["key", "auth"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    if not "regi_get_signin" in cn.private:
-        err = [False, "Error", 500]
-        return cn.toret.add_error(err[1], err[2])
-    registry_signin_key().create(
-            registry_list=cn.private["signin_reg"],
-            time=cn.pr["valid_until"]
-        )
+    registry_signin_key().infos(cn.pr["key"], cn.pr["auth"])
     return cn.call_next(nextc, err)
 
 def user_regi(cn, nextc):
