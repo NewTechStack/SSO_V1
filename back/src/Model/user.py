@@ -41,6 +41,17 @@ def user_get_token(cn, nextc):
     )
     return cn.call_next(nextc, err)
 
+def user_get_askable(cn, nextc):
+    err = user().get_askable()
+    return cn.call_next(nextc, err)
+
+def user_check_asked(cn, nextc):
+    err = check.contain(cn.pr, ["asked"])
+    if not err[0]:
+        return cn.toret.add_error(err[1], err[2])
+    err = user().check_asked(cn.pr['asked'])
+    return cn.call_next(nextc, err)
+
 def admin_user_search(cn, nextc):
     query = cn.get["query"] if "query" in cn.get else None
     page = cn.get["page"] if "page" in cn.get else 0

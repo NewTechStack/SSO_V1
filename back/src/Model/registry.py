@@ -128,6 +128,9 @@ def regi_keys(cn, nextc):
     return cn.call_next(nextc, err)
 
 def regi_check_key(cn, nextc):
+    """
+
+    """
     err = check.contain(cn.pr, ["apitoken"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
@@ -146,7 +149,7 @@ def regi_get_signin(cn, nextc):
 
         POST /external/key
     """
-    err = check.contain(cn.pr, ["valid_until", "apitoken"])
+    err = check.contain(cn.pr, ["valid_until", "apitoken", "asked"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
     if not "regi_get_signin" in cn.private:
@@ -155,7 +158,8 @@ def regi_get_signin(cn, nextc):
     registry_signin_key().create(
             registry_list=cn.private["signin_reg"],
             time=cn.pr["valid_until"],
-            key_list=cn.ppr["apitoken"]
+            key_list=cn.pr["apitoken"],
+            asked=cn.pr["asked"]
         )
     return cn.call_next(nextc, err)
 

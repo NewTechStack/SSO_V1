@@ -183,6 +183,15 @@ class user:
     def get_askable(self):
         return [True, {"askable": self.askable.keys()}, None]
 
+    def check_asked(self, asked):
+        if not isinstance(asked, list) or not all(isinstance(term, str) for term in asked):
+            return [False, "invalid format", 400]
+        askable = self.askable.keys()
+        for term in askable.keys():
+            if term not in askable:
+                return [False, f"Invalid term {term}", 400]
+        return [True, {}, None]
+
     def data(self, update = False):
         if (self.d is None or update is True) and self.id != "-1":
             self.d = self.red.get(self.id).run()
@@ -1103,7 +1112,6 @@ def test():
     u = user(None, email2)
     u.delete(True)
     logging.warning("Ending user's test")
-print(user().get_askable())
 try:
     test()
 except:

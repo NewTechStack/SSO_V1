@@ -32,7 +32,7 @@ class registry_signin_key:
             "auth": None
         }
 
-    def create(self, registry_list, time):
+    def create(self, registry_list, time, asked):
         if not isinstance(time, int) or time < 10 or time > 180:
             return [False, "Invalid time argument", 400]
         if not isinstance(registry_list, list) \
@@ -53,6 +53,8 @@ class registry_signin_key:
         data["registry_list"] = registry_list
         data["auth"] = auth_hash
         data["date"] = None
+        data["asked"] = asked
+        self.red.insert([data]).run()
         return [True, {"key": key, "secret": secret, "auth": auth_hash}, None]
 
     def infos(self, key, auth):
@@ -64,7 +66,6 @@ class registry_signin_key:
         if not res[0]:
             return res
         ret = key_data
-        del ret["auth"]
         del ret["secret"]
         return [True, {"data": ret}, None]
 
@@ -73,21 +74,32 @@ class registry_signin_key:
 
     def verify_time(self, key_data):
         now = datetime.datetime.utcnow()
-        until = datetime.datetime.strptime(k["until"], '%Y-%m-%d %H:%M:%S.%f')
+        until = datetime.datetime.strptime(key_data["until"], '%Y-%m-%d %H:%M:%S.%f')
         if until < now:
             return [False, f"key expired", 401]
         return [True, {}, None]
 
     def __key_exist(self, key, secret = None, auth = None):
         ret =  [False, "Invalid combinaison", 401]
+        if secret is None and auth is None:
+            return [False, "Error", 500]
         if secret is not None:
-            return ret
-            #check if exist using filter key + secret
+            res = list(self.red.filter(
+                (r.row["key"] == key)
+                &
+                (r.row["secret"] == secret)
+            ).run())
+            if len(res) == 0:
+                return ret
         elif auth is not None:
-            pass
-            #check if exist using filter key + auth
-        ret = [True, None, None] # test only
-        return ret
+            res = list(self.red.filter(
+                (r.row["key"] == key)
+                &
+                (r.row["auth"] == auth)
+            ).run())
+            if len(res) == 0:
+                return ret
+        return [True, {"key": res}, None]
 
     def __salt(self, secret):
         salted = hashlib.sha512(
