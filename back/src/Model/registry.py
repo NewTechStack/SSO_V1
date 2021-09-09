@@ -193,10 +193,10 @@ def regi_info_signin(cn, nextc):
     key = cn.rt["key"] if "key" in cn.rt else None
     if key is None:
         return cn.toret.add_error("Invalid key", 400)
-    err = check.contain(cn.pr, ["key", "auth"])
+    err = check.contain(cn.pr, ["auth"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    registry_signin_key().infos(cn.pr["key"], cn.pr["auth"])
+    registry_signin_key().infos(key, cn.pr["auth"])
     return cn.call_next(nextc, err)
 
 def user_regi(cn, nextc):

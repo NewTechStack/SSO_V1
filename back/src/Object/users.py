@@ -181,7 +181,7 @@ class user:
         }
 
     def get_askable(self):
-        return [True, {"askable": self.askable.keys()}, None]
+        return [True, {"askable": list(self.askable.keys())}, None]
 
     def check_asked(self, asked):
         if not isinstance(asked, list) or not all(isinstance(term, str) for term in asked):
