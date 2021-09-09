@@ -187,7 +187,7 @@ class user:
         if not isinstance(asked, list) or not all(isinstance(term, str) for term in asked):
             return [False, "invalid format", 400]
         askable = self.askable.keys()
-        for term in askable.keys():
+        for term in askable:
             if term not in askable:
                 return [False, f"Invalid term {term}", 400]
         return [True, {}, None]

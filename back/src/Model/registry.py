@@ -137,7 +137,7 @@ def regi_check_key(cn, nextc):
     err = user_registry(
 	None,
 	None
-	).check_key(cn.pr["apitoken"], "*")
+	).check_key(cn.pr["apitoken"], '*')
     if err[0]:
         cn.private["signin_reg"] = err[1]["registry"]
     return cn.call_next(nextc, err)
@@ -152,13 +152,12 @@ def regi_get_signin(cn, nextc):
     err = check.contain(cn.pr, ["valid_until", "apitoken", "asked"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    if not "regi_get_signin" in cn.private:
+    if not "signin_reg" in cn.private:
         err = [False, "Error", 500]
         return cn.toret.add_error(err[1], err[2])
-    registry_signin_key().create(
+    err = registry_signin_key().create(
             registry_list=cn.private["signin_reg"],
             time=cn.pr["valid_until"],
-            key_list=cn.pr["apitoken"],
             asked=cn.pr["asked"]
         )
     return cn.call_next(nextc, err)

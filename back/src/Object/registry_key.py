@@ -82,27 +82,29 @@ class registry_key:
         return [True, {"keys": ret}, None]
 
     def check(self, key, ip):
-        if not isinstance(key, list) or not isinstance(key, str):
+        if not isinstance(key, list) and not isinstance(key, str):
             return [False, "Invalid key format", 400]
         if isinstance(key, str):
-            key = [key]
+            keys = [key]
+        else:
+            keys = key
         if not all(isinstance(self.i, str) for self.i in key):
             return [False, f"Invalid key in keys list: {self.i}", 400]
         if not isinstance(ip, str):
             return [False, "Internal forward error", 500]
         ret = []
-        list_key = key
-        res = list(self.red.filter(
-                lambda key:
-                    (len(key["authorized_ip"]) == 0 or ip in key["authorized_ip"])
-                    and
-                    key["active"] is True
-                    and
-                    key["key"] in list_key
-                ).run())
+        res = []
+        for key in keys:
+            res.extend(list(self.red.filter(
+             	lambda k: 
+		  (key == k["key"]) 
+		  &
+		  (k["active"] == True)
+                ).run()))
+        print(res)
         for i in res:
             ret.append(i["registry_id"])
-            list_key.remove(i["key"])
-        if len(list_key) > 0:
-            return [False, f"Invalid key(s): '{list_key}'", 404]
+            keys.remove(i["key"])
+        if len(keys) > 0:
+            return [False, f"Invalid key(s): '{key}'", 404]
         return [True, {'registry': ret}, None]
