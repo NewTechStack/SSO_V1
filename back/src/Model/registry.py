@@ -195,7 +195,7 @@ def regi_info_signin(cn, nextc):
     err = check.contain(cn.pr, ["auth"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    registry_signin_key().infos(key, cn.pr["auth"])
+    err = registry_signin_key().infos(key, cn.pr["auth"])
     return cn.call_next(nextc, err)
 
 def user_regi(cn, nextc):

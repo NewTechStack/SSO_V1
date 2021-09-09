@@ -49,7 +49,7 @@ def setuproute(app, call):
     @app.route('/extern/key',                   ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_check_asked, regi_get_signin])) #done
     @app.route('/extern/key/<>/token',          ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_wait_token])) #done
 
-    @app.route('/intern/key/<>/infos',          ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, regi_info_signin])) #done manque DB
+    @app.route('/intern/key/<>/infos',          ['OPTIONS', 'POST'],        lambda x = None: call([ regi_info_signin])) #done manque DB
     @app.route('/intern/key/<>/signin',         ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, regi_info_signin, regi_verify_signin, user_get_token])) #todo
 
     @app.route('/user/password/reset',          ['OPTIONS', 'POST'],        lambda x = None: call([user_tmp_spoof, user_password_reset])) #done not imp

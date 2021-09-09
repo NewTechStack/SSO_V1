@@ -58,10 +58,13 @@ class registry_signin_key:
         return [True, {"key": key, "secret": secret, "auth": auth_hash}, None]
 
     def infos(self, key, auth):
-        res = self. __key_exist(self, key, auth=auth)
+        res = self.__key_exist(key, secret=None, auth=auth)
         if not res[0]:
             return res
         key_data = res[1]["key"]
+        if len(key_data) > 1:
+            return [False, "Inernal error retry", 500]
+        key_data = key_data[0]
         res = self.verify_time(key_data)
         if not res[0]:
             return res
