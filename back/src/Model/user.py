@@ -26,19 +26,20 @@ def user_external_signin(cn, nextc):
 
 def user_get_token(cn, nextc):
     id = None
-    key = cn.rt["key"] if "key" in cn.rt else None
-    asked = cn.pr["asked"] if cn.pr and "asked" in cn.pr and key is not None else []
-    registeries = []
+    registries = []
+    asked = []
     if "id" in cn.get and cn.private["user"].has_role("creator")[0]:
         id = cn.get["id"]
-    if "signin_reg" in cn.private:
-        registeries = cn.private["signin_reg"]
+    if 'registries' in cn.private and 'asked' in cn.private:
+        registries = cn.private['registries']
+        asked = cn.private['asked']
     err = cn.private["user"].get_token(
             id=id,
-            registeries=registeries,
-            key=key,
+            registeries=registries,
             asked=asked
     )
+    if err[0]:
+        cn.private['usrtoken']=err[1]['usrtoken']
     return cn.call_next(nextc, err)
 
 def user_get_askable(cn, nextc):

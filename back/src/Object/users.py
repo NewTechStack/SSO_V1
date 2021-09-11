@@ -43,39 +43,39 @@ class user:
          "id":
          lambda: id,
          "username":
-         lambda : data["username"]["main"],
+         lambda : self.data()["username"]["main"],
          "email":
-         lambda : data["email"]["main"],
+         lambda : self.data()["email"]["main"],
          "phone":
-         lambda : data["details"]["phone"]["main"],
+         lambda : self.data()["details"]["phone"]["main"],
          "first_name":
-         lambda : data["details"]["first_name"]["main"],
+         lambda : self.data()["details"]["first_name"]["main"],
          "last_name":
-         lambda : data["details"]["last_name"]["main"],
+         lambda : self.data()["details"]["last_name"]["main"],
          "age":
-         lambda : data["details"]["last_name"]["main"],
+         lambda : self.data()["details"]["last_name"]["main"],
          "is_over_12":
-         lambda : data["details"]["age"]["main"] is not None and \
-                  data["details"]["age"]["main"] >= 12,
+         lambda : self.data()["details"]["age"]["main"] is not None and \
+                  self.data()["details"]["age"]["main"] >= 12,
          "is_over_16":
-         lambda : data["details"]["age"]["main"] is not None and \
-                  data["details"]["age"]["main"] >= 16,
+         lambda : self.data()["details"]["age"]["main"] is not None and \
+                  self.data()["details"]["age"]["main"] >= 16,
          "is_over_18":
-         lambda : data["details"]["age"]["main"] is not None and \
-                  data["details"]["age"]["main"] >= 18,
+         lambda : self.data()["details"]["age"]["main"] is not None and \
+                  self.data()["details"]["age"]["main"] >= 18,
          "is_over_21":
-         lambda : data["details"]["age"]["main"] is not None and \
-                  data["details"]["age"]["main"] >= 21,
+         lambda : self.data()["details"]["age"]["main"] is not None and \
+                  self.data()["details"]["age"]["main"] >= 21,
          "is_phone_verified":
-         lambda : data["details"]["phone"]["verified"]["main"],
+         lambda : self.data()["details"]["phone"]["verified"]["main"],
          "is_email_verified":
-         lambda : data["email"]["verified"]["main"],
+         lambda : self.data()["email"]["verified"]["main"],
          "is_age_verified":
-         lambda : data["details"]["age"]["verified"]["main"],
+         lambda : self.data()["details"]["age"]["verified"]["main"],
          "is_first_name_verified":
-         lambda : data["details"]["first_name"]["verified"]["main"],
+         lambda : self.data()["details"]["first_name"]["verified"]["main"],
          "is_last_name_verified":
-         lambda : data["details"]["last_name"]["verified"]["main"]
+         lambda : self.data()["details"]["last_name"]["verified"]["main"]
         }
         self.model = {
             "username": {
@@ -199,19 +199,6 @@ class user:
                 self.d = dict(self.d)
         return self.d
 
-    def get_key(self):
-        key = str(uuid.uuid4())
-        sec = str(hash(uuid.uuid4()))
-        while key in TOKEN_ARR:
-            key = str(uuid.uuid4())
-        exp = datetime.datetime.utcnow() - datetime.timedelta(minutes=4)
-        TOKEN_ARR[key] = {}
-        TOKEN_ARR[key]["token"] = None
-        TOKEN_ARR[key]["exp"] = exp
-        TOKEN_ARR[key]["secret"] = sec
-        TOKEN_ARR[key]["try"] = 0
-        return [True, {"key": key, "secret": sec}, False]
-
     def wait_token(self, key, sec):
         if key not in TOKEN_ARR:
             return [False, "Invalid key", 400]
@@ -244,16 +231,11 @@ class user:
             return [False, "Expiration", None]
         return [False, "Invalid key", None]
 
-    def get_token(self, id = None, registeries = [], delta = 48, key = None, asked = []):
+    def get_token(self, id = None, registeries = [], delta = 48, asked = []):
         if (not isinstance(id, str) and id is not None) or not isinstance(registeries, list) or \
            not all(isinstance(r, str) for r in registeries) or not isinstance(delta, int) or \
-           not (isinstance(key, str) or key is None) or not isinstance(asked, list) or \
-           not all(isinstance(a, str) for a in asked):
+           not isinstance(asked, list) or not all(isinstance(a, str) for a in asked):
            return [False, "Invalid param", 400]
-        if registeries == [] and key is not None:
-            return [False, "Invalid rights", 401]
-        if "auth:back" in registeries:
-            return [False, "invalid rights", 401]
         id = self.__getid(id, self.id)
         if id == "-1":
             return [False, "Invalid id", 403]
@@ -262,18 +244,18 @@ class user:
         if len(asked) == 0:
             payload["id"] = id
         else:
+            data = dict(self.red.get(id).run())
             possible = self.askable
             if not all(a in possible for a in asked):
                 return [False, "Invalid information asked", 401]
-            data = dict(self.red.get(id).run())
             for i in asked:
-                if possible[i] is None:
+                if possible[i]() is None:
                     return [False, f"Information not completed: {i}", 403]
                 payload[i] = possible[i]()
         now = datetime.datetime.utcnow()
         exp = now + datetime.timedelta(hours=delta)
         issuer = "auth:back"
-        audience = ["auth:back"] if len(registeries) == 0 else [f"{r}:sub" for r in registeries]
+        audience = ["auth:back"] if len(registeries) == 0 else [f"auth:{r}" for r in registeries]
         token = jwt.encode({
             'iat': now,
             'exp': exp,
@@ -282,10 +264,6 @@ class user:
             'aud': audience,
             'payload': payload,
         }, private_key, algorithm='RS256')
-        if key is not None:
-            if not key in TOKEN_ARR or TOKEN_ARR[key]["token"] is not None:
-                return [False, "Invalid key", 401]
-            TOKEN_ARR[key]["token"] = token
         ret = [True, {'exp': str(exp), "usrtoken": token}, None, ]
         if registeries == []:
             ret.append({"usrtoken": str(token)})
@@ -1116,4 +1094,3 @@ try:
     test()
 except:
     logging.error("User's test error")
-    exit(1)
