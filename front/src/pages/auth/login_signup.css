@@ -46,3 +46,10 @@ label{
 .custom-sui-input-size{
     height:calc(1.5em + 0.9rem + 2px)!important;
 }
+
+.ui.progress{
+    margin: unset!important;
+}
+.ui.progress:first-child{
+    margin: unset!important;
+}

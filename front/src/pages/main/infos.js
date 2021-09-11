@@ -33,6 +33,7 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ErrorIcon from "@material-ui/icons/Error";
 import AssignmentTurnedInIcon from "@material-ui/icons/AssignmentTurnedIn";
 import HelpIcon from "@material-ui/icons/Help";
+import CloseIcon from '@material-ui/icons/Close';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -261,11 +262,12 @@ export default function Info(props){
 
 
                             <div style={{marginTop:40,padding:15}} className="accordion_form">
-                                <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
+                                <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')} translate="no">
                                     <AccordionSummary
-                                        expandIcon={<EditIcon />}
+                                        expandIcon={expanded === 'panel1' ? <CloseIcon /> : <EditIcon/>}
                                         aria-controls="panel1bh-content"
                                         id="panel1bh-header"
+                                        translate="no"
                                     >
                                         <Typography className={classes.heading}>Nom et Prénom</Typography>
                                         <div>
@@ -350,7 +352,7 @@ export default function Info(props){
                                            //onChange={handleChange('panel2')}
                                 >
                                     <AccordionSummary
-                                        //expandIcon={<ExpandMoreIcon />}
+                                        expandIcon={<ExpandMoreIcon style={{opacity:0,cursor:"unset",color:"#fff"}} />}
                                         aria-controls="panel2bh-content"
                                         id="panel2bh-header"
                                     >
@@ -362,7 +364,7 @@ export default function Info(props){
                                 </Accordion>
                                 <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
                                     <AccordionSummary
-                                        expandIcon={<EditIcon />}
+                                        expandIcon={expanded === 'panel3' ? <CloseIcon /> : <EditIcon/>}
                                         aria-controls="panel3bh-content"
                                         id="panel3bh-header"
                                     >
@@ -501,7 +503,7 @@ export default function Info(props){
                                             </MuiButtonGroup>
                                         </div>
                                     </AccordionDetails>
-                                    <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
+                                    {/*<Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>*/}
                                 </Accordion>
                                 {/*<Accordion expanded={expanded === 'panel5'}
                                     //onChange={handleChange('panel4')}
@@ -650,7 +652,7 @@ export default function Info(props){
 
                                 <Accordion expanded={expanded_sec === 'panel3'}>
                                     <AccordionSummary
-                                        //expandIcon={<ChevronRightIcon />}
+                                        expandIcon={<ChevronRightIcon style={{cursor:"unset",color:"#fff",opacity:0}} />}
                                         aria-controls="panel3bh-content"
                                         id="panel3bh-header"
                                     >

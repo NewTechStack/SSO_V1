@@ -159,3 +159,6 @@
 .MuiAccordion-root.Mui-expanded:before{
     opacity: 1!important;
 }
+.label_margin_left{
+    margin-right: 5px!important;
+}

@@ -39,6 +39,7 @@ import CheckIcon from "@material-ui/icons/Check";
 import BlockIcon from "@material-ui/icons/Block";
 import DeleteIcon from '@material-ui/icons/Delete';
 import verifForms from '../../tools/verifForms'
+import CloseIcon from "@material-ui/icons/Close";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -81,8 +82,6 @@ const customTableStyle = {
 
 
 export default function RegistreDetails(props){
-
-    console.log(props)
 
     let role_actions = []
 
@@ -166,7 +165,7 @@ export default function RegistreDetails(props){
             </div> :
                 <div style={{justifyContent:"center"}}>
                     <Popup content={
-                        <h6 style={{fontSize:"0.8rem"}}>C'est une action par défaut: <br/>Vous ne pouvez pas la modifier ou la supprimer !</h6>
+                        <h6 style={{fontSize:"0.8rem"}}>Ce sont des actions par défaut: <br/>Vous ne pouvez pas les modifier ou les supprimer !</h6>
                     }
                            wide='very'
                            size={"small"}
@@ -179,13 +178,23 @@ export default function RegistreDetails(props){
         },
         {
             name: 'Nom',
-            cell: row => <div>
-                <Label as='a' basic color='blue' size="mini">
-                    {row.name}
-                </Label>
-            </div>,
+            cell: row => Array.isArray(row.name) ?
+
+                (row.name || []).map((item,key) => (
+                    <div style={{marginRight:5}}>
+                        <Label as='a' basic color='blue' size="mini">
+                            {item}
+                        </Label>
+                    </div>
+                ))
+                 :
+                <div>
+                    <Label as='a' basic color='blue' size="mini">
+                        {row.name}
+                    </Label>
+                </div>
+            ,
             sortable: true,
-            grow:0.3
         }
     ];
 
@@ -220,12 +229,49 @@ export default function RegistreDetails(props){
             cell: row => <div style={{paddingBottom:10}}>
                 {
                     (row.roles || []).map( item => (
-                        <Label as='a' basic color='blue' pointing size="mini">
+                        <Label as='a' basic color='blue' size="mini">
                             {item.role}
                         </Label>
                     ))
                 }
             </div>,
+        }
+    ];
+
+    const keys_columns = [
+        {
+            name: 'Action',
+            cell: row => <div>
+                <div style={{justifyContent:"center"}}>
+                    <IconButton size="small" onClick={() => {
+                        setDeleteMeth("key")
+                        setSelectedKey(row)
+                        setOpenDeleteModal(true)
+                    }}>
+                        <DeleteIcon fontSize="small" color="error"/>
+                    </IconButton>
+                </div>
+            </div>,
+            grow:0.2
+        },
+        {
+            name: 'Nom',
+            selector: "name",
+            sortable: true,
+            grow: 0.2
+        },
+        {
+            name: 'Key',
+            selector: "key",
+            cell: row => row.key ? row.key : "---"
+        },
+        {
+            name: 'Statut',
+            cell: row => row.active === true ? "activé" : "désactivé"
+        },
+        {
+            name: 'Date de création',
+            cell: row => row.date ? moment(row.date).format("DD-MM-YYYY HH:mm") : ""
         }
     ];
 
@@ -237,7 +283,10 @@ export default function RegistreDetails(props){
     const [regInfo, setRegInfo] = React.useState({});
     const [roles, setRoles] = React.useState(null);
     const [actions, setActions] = React.useState([]);
+    const [n_format_actions, setN_format_actions] = React.useState([]);
     const [regUsers, setRegUsers] = React.useState([]);
+    const [regKeys, setRegKeys] = React.useState([]);
+    const [newKey, setNewKey] = React.useState("");
     const [customActions, setCustomActions] = React.useState([]);
     const [newRole_name, setNewRole_name] = React.useState("");
     const [newAction_name, setNewAction_name] = React.useState("");
@@ -254,10 +303,12 @@ export default function RegistreDetails(props){
     const [regState, setRegState] = React.useState(false);
     const [selectedRole, setSelectedRole] = React.useState("");
     const [selectedAction, setSelectedAction] = React.useState("");
+    const [selectedKey, setSelectedKey] = React.useState("");
     const [deleteMeth, setDeleteMeth] = React.useState("");
     const [user_search, setUser_search] = React.useState("");
 
     const [openDeleteRegModal, setOpenDeleteRegModal] = React.useState(false);
+    const [openAddKeyModal, setOpenAddKeyModal] = React.useState(false);
 
 
 
@@ -268,6 +319,7 @@ export default function RegistreDetails(props){
                 getRoles()
                 getActions()
                 getRegistryUsers()
+                getRegistryKeys()
             }else{
                 enqueueSnackbar('Session expirée', { variant:"warning" })
                 enqueueSnackbar('Reconnexion en cours...', { variant:"info" })
@@ -277,13 +329,14 @@ export default function RegistreDetails(props){
             }
 
 
-    }, [getInforegistre,getRoles,getActions,getRegistryUsers]);
+    }, [getInforegistre,getRoles,getActions,getRegistryUsers,getRegistryKeys]);
 
     const verifSession = () => {
         return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
     }
 
     const getInforegistre = () => {
+        setLoading(true)
         SSO_service.get_info_registre(props.match.params.reg,localStorage.getItem("usrtoken")).then( infoRes => {
             console.log(infoRes)
             if(infoRes.status === 200 && infoRes.succes === true){
@@ -303,6 +356,7 @@ export default function RegistreDetails(props){
     }
 
     const getRoles = () => {
+        setLoading(true)
         SSO_service.get_registre_roles(props.match.params.reg,localStorage.getItem("usrtoken")).then( rolesRes => {
             if(rolesRes.status === 200 && rolesRes.succes === true){
                 let all_roles = [];
@@ -316,12 +370,15 @@ export default function RegistreDetails(props){
                 })
                 let all_formated_roles = []
                 all_roles.map((role,k) => {
+                    setLoading(true)
                     SSO_service.getInfoRole(props.match.params.reg,role.name,localStorage.getItem("usrtoken")).then( infoRes => {
                         if(infoRes.status === 200 && infoRes.succes === true){
                             all_formated_roles.push({name:role.name,type:role.type,actions:infoRes.data[role.name].actions || []})
+                            setLoading(false)
                         }else{
                             console.log(infoRes.error)
                             all_formated_roles.push({name:role.name,actions:[]})
+                            setLoading(false)
                         }
                         setRoles(all_formated_roles)
                     }).catch(err => {
@@ -338,23 +395,33 @@ export default function RegistreDetails(props){
     }
 
     const getActions = () => {
+        setLoading(true)
         SSO_service.get_registre_actions(props.match.params.reg,localStorage.getItem("usrtoken")).then( actionsRes => {
             if(actionsRes.status === 200 && actionsRes.succes === true){
                 let all_actions = [];
+                let actions_n_format = [];
                 let bultin_actions = actionsRes.data.builtin || []
-                bultin_actions.map(item => {
-                    all_actions.push({name:item,type:"builtin"})
+                bultin_actions.map( item => {
+                    actions_n_format.push({name:item,type:"builtin"})
                 })
+                all_actions.push({name:bultin_actions,type:"builtin"})
+
                 let custom_actions = actionsRes.data.custom || []
                 custom_actions.map(item => {
                     all_actions.push({name:item,type:"custom"})
+                    actions_n_format.push({name:item,type:"custom"})
                 })
-                console.log(all_actions)
+
                 let all_formated_actions = []
+                let actions_n_format_formated = []
                 all_actions.map((action,k) => {
                     all_formated_actions.push({name:Array.isArray(action) === true ? action[0].name : action.name,type:action.type})
                 })
+                actions_n_format.map((action,k) => {
+                    actions_n_format_formated.push({name:Array.isArray(action) === true ? action[0].name : action.name,type:action.type})
+                })
                 setActions(all_formated_actions)
+                setN_format_actions(actions_n_format_formated)
             }else{
                 enqueueSnackbar(actionsRes.error, { variant:"error" })
             }
@@ -386,13 +453,13 @@ export default function RegistreDetails(props){
                     setOpenAddModal(false)
                     enqueueSnackbar("L'ajout du nouveau role est effectué avec succès", { variant:"success" })
                 },1500)
-
-
             }else{
+                setLoading(false)
                 enqueueSnackbar(addRes.error, { variant:"error" })
                 setLoadingBtnAdd(false)
             }
         }).catch(err => {
+            setLoading(false)
             console.log(err)
             enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
             setLoadingBtnAdd(false)
@@ -466,7 +533,7 @@ export default function RegistreDetails(props){
                 setTimeout(() => {
                     setLoading(false)
                     enqueueSnackbar("Modification effectuée avec succès", { variant:"success" })
-                },500)
+                },1500)
 
             }else{
                 setLoading(false)
@@ -488,7 +555,7 @@ export default function RegistreDetails(props){
                 setTimeout(() => {
                     setLoading(false)
                     enqueueSnackbar("Suppression effectuée avec succès", { variant:"success" })
-                },1000)
+                },1500)
 
             }else{
                 setLoading(false)
@@ -522,23 +589,43 @@ export default function RegistreDetails(props){
         })
     }
 
-    const addNewUserToReg = (email,roles) => {
+    const deleteKey = (id_reg,id_key) => {
+        setOpenDeleteModal(false)
+        setLoading(true)
+        SSO_service.remove_registry_key(id_reg,id_key,localStorage.getItem("usrtoken")).then( remRes => {
+            if(remRes.status === 200 && remRes.succes === true){
+                let keys = regKeys || []
+                keys.splice(keys.findIndex(x => x.id === id_key),1)
+                setTimeout(() => {
+                    setLoading(false)
+                    setRegKeys(keys)
+                    enqueueSnackbar("Suppression effectuée avec succès", { variant:"success" })
+                },2000)
+            }else{
+                setLoading(false)
+                enqueueSnackbar(remRes.error, { variant:"error" })
+            }
+        }).catch(err => {
+            console.log(err)
+            setLoading(false)
+            enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
+        })
+    }
+
+    const addNewKeyToReg = (key) => {
         setLoadingBtnAdd(true)
 
-        let formated_roles = [];
-        roles.map( item => {
-            formated_roles.push(item.value)
-        })
-
-        SSO_service.add_user_to_reg(props.match.params.reg,{email:email,roles:formated_roles},localStorage.getItem("usrtoken")).then( addRes => {
+        console.log(key)
+        SSO_service.addRegistryKey(props.match.params.reg,{name:key},localStorage.getItem("usrtoken")).then( addRes => {
             if(addRes.status === 200 && addRes.succes === true){
-                new_user_roles = [];
-                setNewUserReg_email("");
-                getRegistryUsers();
+                let keys = regKeys || [];
+                keys.push({name:newKey,active:true,date:moment().format("YYYY-MM-DD HH:mm:ss")})
+                setRegKeys(keys)
+                setNewKey("");
                 setTimeout(() => {
-                    setOpenAddUserModal(false)
+                    setOpenAddKeyModal(false)
                     setLoadingBtnAdd(false)
-                    enqueueSnackbar("L'ajout du nouveau utilisateur est effectué avec succès", { variant:"success" })
+                    enqueueSnackbar("L'ajout du nouvelle clé est effectuée avec succès", { variant:"success" })
                 },1500)
             }else{
                 enqueueSnackbar(addRes.error, { variant:"error" })
@@ -553,7 +640,6 @@ export default function RegistreDetails(props){
     }
 
     const getRegistryUsers = () => {
-
         SSO_service.getRegistryUsers(props.match.params.reg,localStorage.getItem("usrtoken")).then(regUsersRes => {
             console.log(regUsersRes)
             if(regUsersRes.status === 200 && regUsersRes.succes === true){
@@ -589,6 +675,50 @@ export default function RegistreDetails(props){
         })
     }
 
+    const getRegistryKeys = () => {
+        SSO_service.getRegistryKeys(props.match.params.reg,localStorage.getItem("usrtoken")).then( regkeysRes => {
+            console.log(regkeysRes)
+            if(regkeysRes.status === 200 && regkeysRes.succes === true){
+                setRegKeys(regkeysRes.data.keys || [])
+            }else{
+                enqueueSnackbar(regkeysRes.error, { variant:"error" })
+            }
+        }).catch( err => {
+            console.log(err)
+            enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
+        })
+    }
+
+    const addNewUserToReg = (email,roles) => {
+        setLoadingBtnAdd(true)
+
+        let formated_roles = [];
+        roles.map( item => {
+            formated_roles.push(item.value)
+        })
+
+        SSO_service.add_user_to_reg(props.match.params.reg,{email:email,roles:formated_roles},localStorage.getItem("usrtoken")).then( addRes => {
+            if(addRes.status === 200 && addRes.succes === true){
+                new_user_roles = [];
+                setNewUserReg_email("");
+                getRegistryUsers();
+                setTimeout(() => {
+                    setOpenAddUserModal(false)
+                    setLoadingBtnAdd(false)
+                    enqueueSnackbar("L'ajout du nouveau utilisateur est effectué avec succès", { variant:"success" })
+                },1500)
+            }else{
+                enqueueSnackbar(addRes.error, { variant:"error" })
+                setLoadingBtnAdd(false)
+            }
+        }).catch( err => {
+            console.log(err)
+            enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
+            setLoadingBtnAdd(false)
+        })
+
+    }
+
     const getTabContent = () => {
 
         if(selectedTab === "details"){
@@ -596,7 +726,7 @@ export default function RegistreDetails(props){
                 <div style={{marginTop:50}}>
                     <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')} >
                         <AccordionSummary
-                            expandIcon={<EditIcon />}
+                            expandIcon={expanded === 'panel1' ? <CloseIcon /> : <EditIcon/>}
                             aria-controls="panel1bh-content"
                             id="panel1bh-header"
                         >
@@ -669,7 +799,7 @@ export default function RegistreDetails(props){
                     </Accordion>
                     <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
                         <AccordionSummary
-                            expandIcon={<EditIcon />}
+                            expandIcon={expanded === 'panel3' ? <CloseIcon /> : <EditIcon/>}
                             aria-controls="panel1bh-content"
                             id="panel3bh-header"
                         >
@@ -726,7 +856,7 @@ export default function RegistreDetails(props){
                         </AccordionDetails>
                         <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
                     </Accordion>
-                    <Accordion>
+                    <Accordion expanded={false}>
                         <AccordionSummary
                             aria-controls="panel1bh-content"
                             id="panel1bh-header"
@@ -819,58 +949,6 @@ export default function RegistreDetails(props){
                         />
                     </div>
                 </div>
-                /*<div style={{marginLeft:20,marginTop:15}}>
-                    <div style={{marginTop:20}}>
-                        <h6>Actions par dèfaut:</h6>
-                        <Paper component="ul" className={classes.root}>
-                            {actions.map((role,key) => {
-                                return (
-                                    <li key={key}>
-                                        <Chip
-                                            color="primary"
-                                            icon={<CheckCircleIcon/>}
-                                            label={role}
-                                            className={classes.chip}
-                                        />
-                                    </li>
-                                );
-                            })}
-                        </Paper>
-                    </div>
-                    <div style={{marginTop:20}}>
-                        <h6>Autres actions</h6>
-                        <div align="right">
-                            <AtlButton appearance="default" className="alt-font"
-                                       iconBefore={<AddIcon/>}
-                                       onClick={() => {
-                                           setOpenAddActionModal(true)
-                                       }}
-                            >
-                                Ajouter une action
-                            </AtlButton>
-                        </div>
-                        <DataTable
-                            columns={actions_columns}
-                            data={customActions}
-                            selectableRows={false}
-                            selectableRowsHighlight={true}
-                            pagination={true}
-                            paginationPerPage={10}
-                            paginationComponentOptions={paginationOptions}
-                            highlightOnHover={false}
-                            contextMessage={tableContextMessage}
-                            progressPending={!customActions}
-                            progressComponent={<h6>Chargement...</h6>}
-                            noDataComponent="Il n'y a aucune autre action à afficher"
-                            noHeader={true}
-                            pointerOnHover={true}
-                            onRowClicked={(row, e) => {}}
-                            customStyles={customTableStyle}
-                        />
-                    </div>
-
-
-                </div>*/
             )
         }
 
@@ -884,7 +962,7 @@ export default function RegistreDetails(props){
                                        setOpenAddUserModal(true)
                                    }}
                         >
-                            Ajouter un utilisateur
+                            Inviter un utilisateur
                         </AtlButton>
                     </div>
                     <div className="row mb-3">
@@ -912,6 +990,44 @@ export default function RegistreDetails(props){
                         onRowClicked={(row, e) => {}}
                         customStyles={customTableStyle}
                     />
+                </div>
+            )
+        }
+
+        if(selectedTab === "keys"){
+            return (
+                <div style={{marginLeft:20,marginTop:15}}>
+                    <div style={{marginTop:20}}/>
+                    <div style={{marginTop:20}}>
+                        <div align="right">
+                            <AtlButton appearance="default" className="alt-font"
+                                       iconBefore={<AddIcon/>}
+                                       onClick={() => {
+                                           setOpenAddKeyModal(true)
+                                       }}
+                            >
+                                Ajouter une clé
+                            </AtlButton>
+                        </div>
+                        <DataTable
+                            columns={keys_columns}
+                            data={regKeys}
+                            selectableRows={false}
+                            selectableRowsHighlight={true}
+                            pagination={true}
+                            paginationPerPage={10}
+                            paginationComponentOptions={paginationOptions}
+                            highlightOnHover={false}
+                            contextMessage={tableContextMessage}
+                            progressPending={!actions}
+                            progressComponent={<h6>Chargement...</h6>}
+                            noDataComponent="Il n'y a aucune clé à afficher"
+                            noHeader={true}
+                            pointerOnHover={true}
+                            onRowClicked={(row, e) => {}}
+                            customStyles={customTableStyle}
+                        />
+                    </div>
                 </div>
             )
         }
@@ -1003,6 +1119,7 @@ export default function RegistreDetails(props){
 
                                     <Tab label="Actions" name="actions" id="actions" ariaControls="actions" />
                                     <Tab label="Utilisateurs" name="users" id="users" ariaControls="users" />
+                                    <Tab label="Clés" name="keys" id="keys" ariaControls="keys" />
 
                                 </Tabset>
                                 {/*<Divider style={{marginTop:20,marginBottom:20}}/>*/}
@@ -1050,7 +1167,7 @@ export default function RegistreDetails(props){
                                                 className="checkbox-select"
                                                 classNamePrefix="select"
                                                 options={
-                                                    (actions || []).map((item) =>
+                                                    (n_format_actions || []).map((item) =>
                                                         ({
                                                             value: item.name,
                                                             label:item.name
@@ -1083,7 +1200,7 @@ export default function RegistreDetails(props){
                         onClose={() => {
                             setOpenAddUserModal(false)
                         }}
-                        heading="Ajouter un nouveau utilisateur à ce registre"
+                        heading="Inviter un nouveau utilisateur à ce registre"
                         components={{
                             Body: () => (
                                 <div style={{padding:"2px 20px 20px 30px"}}>
@@ -1166,7 +1283,7 @@ export default function RegistreDetails(props){
                                                 className="checkbox-select"
                                                 classNamePrefix="select"
                                                 options={
-                                                    (actions || []).map((item) =>
+                                                    (n_format_actions || []).map((item) =>
                                                         ({
                                                             value: item.name,
                                                             label:item.name,
@@ -1233,7 +1350,9 @@ export default function RegistreDetails(props){
                         actions={[
                             { text: 'Supprimer', onClick: () => {
                                 deleteMeth === "role" ? deleteRole(props.match.params.reg,selectedRole.name) :
-                                    deleteAction(props.match.params.reg,selectedAction.name)}},
+                                    deleteMeth === "action" ? deleteAction(props.match.params.reg,selectedAction.name) :
+                                        deleteKey(props.match.params.reg,selectedKey.id)
+                            }},
                             { text: 'Annuler', onClick: () => {
                                     setOpenDeleteModal(false)
                                 }},
@@ -1241,7 +1360,7 @@ export default function RegistreDetails(props){
                         onClose={() => {
                             setOpenDeleteModal(false)
                         }}
-                        heading={deleteMeth === "role" ? "Vous êtes sur le point de supprimer ce role" : "Vous êtes sur le point de supprimer cette action"}
+                        heading={deleteMeth === "role" ? "Vous êtes sur le point de supprimer ce role" : deleteMeth === "action" ? "Vous êtes sur le point de supprimer cette action" : "Vous êtes sur le point de supprimer cette clé"}
                         appearance="danger"
                     >
                     </Modal>
@@ -1267,6 +1386,44 @@ export default function RegistreDetails(props){
                 )}
             </ModalTransition>
 
+            <ModalTransition>
+                {openAddKeyModal && (
+                    <Modal
+                        width="medium"
+                        actions={[
+                            { text: 'Ajouter', className:"alt-font", onClick: () =>
+                                {addNewKeyToReg(newKey)}, isLoading:loadingBtnAdd,
+                                isDisabled:newKey.trim() === "" },
+                            { text: 'Annuler', className:"alt-font", onClick: () => {setOpenAddKeyModal(false)} },
+                        ]}
+                        onClose={() => {
+                            setOpenAddUserModal(false)
+                        }}
+                        heading="Ajouter une nouvelle clé"
+                        components={{
+                            Body: () => (
+                                <div style={{padding:"2px 20px 20px 30px"}}>
+                                    <div className="row mt-2">
+                                        <div className="col-md-8 mt-1">
+                                            <TextField
+                                                label="Nom"
+                                                variant="outlined"
+                                                size="small"
+                                                style={{width:"100%"}}
+                                                value={newKey}
+                                                autoFocus={true}
+                                                onChange={(e) => {setNewKey(e.target.value)}}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ),
+                        }}
+                    >
+
+                    </Modal>
+                )}
+            </ModalTransition>
 
         </div>
     )

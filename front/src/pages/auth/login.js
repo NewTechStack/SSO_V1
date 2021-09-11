@@ -96,16 +96,16 @@ class login extends Component {
         return (
             <>
                 <MuiBackdrop open={this.state.loading}  />
-
                 <div className="container container-lg" style={{marginTop:120}}>
 
                     <div className="login_form">
                         {
                             this.state.loading === true ?
                                 <LinearProgress /> :
-                                <Progress active={true} percent={100} size="medium" className="custom-progress-height" color='blue' />
+                                <Progress active={false} percent={100} size="medium" className="custom-progress-height" color='blue' />
                         }
-                        <div style={{display:"flex"}}>
+
+                        <div>
                             <div className="padding-form">
 
                                 <h4 style={{fontSize:"1.4rem",marginBottom:5}}>Connexion</h4>
@@ -178,6 +178,8 @@ class login extends Component {
                         </div>
 
                     </div>
+
+
                 </div>
             </>
         )

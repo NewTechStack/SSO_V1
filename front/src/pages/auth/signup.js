@@ -55,6 +55,15 @@ class signup extends Component {
                             localStorage.setItem("lastname",infoRes.data.last_name.main || "")
                             localStorage.setItem("usrtoken",registerRes.data.usrtoken)
                             localStorage.setItem("exp",registerRes.data.exp)
+
+                            let roles_object = infoRes.data.roles || {}
+                            const roles_array = [];
+                            Object.keys(roles_object).forEach(key => roles_array.push({
+                                role: key,
+                                data: roles_object[key]
+                            }));
+                            localStorage.setItem("roles",JSON.stringify(roles_array))
+
                             setTimeout(() => {
                                 this.setState({loading:false})
                                 this.props.history.push("/main/dash")
@@ -92,7 +101,7 @@ class signup extends Component {
                        {
                            this.state.loading === true ?
                                <LinearProgress /> :
-                               <Progress active={true} percent={100} size="medium" className="custom-progress-height" color='blue' />
+                               <Progress active={false} percent={100} size="medium" className="custom-progress-height" color='blue' />
                        }
                        <div style={{display:"flex"}}>
                            <div className="padding-form">

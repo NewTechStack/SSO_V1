@@ -32,7 +32,7 @@ export default function Pro(props){
             cell: row => <div style={{paddingBottom:10}}>
                 {
                     (row.roles || []).map( item => (
-                        <Label as='a' basic color='blue' pointing size="mini">
+                        <Label as='a' basic color='blue' size="mini">
                             {item.role}
                         </Label>
                     ))
@@ -70,6 +70,38 @@ export default function Pro(props){
 
     ];
 
+    const other_reg_columns = [
+        {
+            name: 'Créateur',
+            selector: '',
+            sortable: true,
+            grow:0.3
+        },
+        {
+            name: 'roles',
+            cell: row => <div style={{paddingBottom:10}}>
+                {
+                    (row.roles || []).map( item => (
+                        <Label as='a' basic color='blue' size="mini">
+                            {item.role}
+                        </Label>
+                    ))
+                }
+            </div>,
+        },
+        {
+            name: 'Nom',
+            selector: 'name',
+            sortable: true,
+        },
+        {
+            name: 'Dernière modification',
+            selector: 'date',
+            cell: row => moment(row.date).format("DD-MM-YYYY HH:mm"),
+            sortable: true,
+        }
+    ];
+
     const admin_users_columns = [
         /*{
             name: 'Action',
@@ -95,7 +127,7 @@ export default function Pro(props){
             cell: row => <div style={{paddingBottom:10}}>
                 {
                     (row.roles || []).map( item => (
-                        <Label as='a' basic color='blue' pointing size="mini">
+                        <Label as='a' basic color='blue' size="mini">
                             {item.role}
                         </Label>
                     ))
@@ -116,7 +148,7 @@ export default function Pro(props){
                                wide='very'
                                size={"small"}
                                trigger={
-                                   <Label as='a' basic color='blue' pointing size="mini">
+                                   <Label as='a' basic color='blue' size="mini">
                                        {item.registery.name.main}
                                    </Label>
                                }
@@ -143,12 +175,16 @@ export default function Pro(props){
     const [admin_users, setAdmin_users] = React.useState();
 
 
-    useEffect(() => {
+    useEffect( () => {
 
             if(verifSession() === true){
-                verif_acces_roles()
-                getCurrentUserRegistres()
+                verif_acces_roles().then( r => {
+                    if(r === true){
+                        getCurrentUserRegistres()
+                    }
+                })
                 getOtherUserRegistres()
+
             }else{
                 enqueueSnackbar('Session expirée', { variant:"warning" })
                 enqueueSnackbar('Reconnexion en cours...', { variant:"info" })
@@ -156,18 +192,23 @@ export default function Pro(props){
                     props.history.push("/sso/login")
                 },1500)
             }
-    }, []);
+    }, [getOtherUserRegistres,getOtherUserRegistres]);
 
     const verifSession = () => {
         return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
     }
 
     const verif_acces_roles = () => {
-        let roles = JSON.parse(localStorage.getItem("roles")) || []
-        console.log(roles)
-        if(roles.find(x => x.role === "admin" || x.role === "creator")){
-            setIs_have_acces_to_search_users(true)
-        }
+        return new Promise(async (resolve, reject) => {
+            let roles = JSON.parse(localStorage.getItem("roles")) || []
+            console.log(roles)
+            if(roles.find(x => x.role === "admin" || x.role === "creator")){
+                setIs_have_acces_to_search_users(true)
+                resolve(true)
+            }else{
+                resolve(false)
+            }
+        })
     }
 
     const getCurrentUserRegistres = () => {
@@ -180,7 +221,7 @@ export default function Pro(props){
                 let formated_regs = []
                 registries.map((reg,key) => {
 
-                    let roles_object = reg.registery.roles || {}
+                    let roles_object = reg.registry.roles || {}
                     const roles_array = [];
                     Object.keys(roles_object).forEach(key => roles_array.push({
                         role: key,
@@ -188,8 +229,8 @@ export default function Pro(props){
                     }));
 
                     formated_regs.push({
-                        id:reg.registery.id,
-                        name:reg.registery.name.main,
+                        id:reg.registry.id,
+                        name:reg.registry.name.main,
                         date:reg.date,
                         last_update:reg.last_update,
                         roles:roles_array
@@ -212,8 +253,30 @@ export default function Pro(props){
         SSO_service.get_user_registry(localStorage.getItem("usrtoken")).then(res => {
             console.log(res)
             if(res.status === 200 && res.succes === true){
+
+                let o_registries = res.data.registries || [];
+                let formated_regs = []
+                o_registries.map((reg,key) => {
+
+                    let roles_object = reg.registry.roles || {}
+                    const roles_array = [];
+                    Object.keys(roles_object).forEach(key => roles_array.push({
+                        role: key,
+                        data: roles_object[key]
+                    }));
+
+                    formated_regs.push({
+                        id:reg.registry.id,
+                        name:reg.registry.name.main,
+                        date:reg.date,
+                        last_update:reg.last_update,
+                        roles:roles_array
+                    })
+
+                })
+
                 setLoading(false)
-                setOther_registres(res.data.registries || [])
+                setOther_registres(formated_regs)
             }else{
                 enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
             }
@@ -320,7 +383,7 @@ export default function Pro(props){
                 <div style={{marginLeft:20}}>
 
                     <DataTable
-                        columns={columns}
+                        columns={other_reg_columns}
                         data={other_registres}
                         defaultSortField="name"
                         selectableRows={false}
@@ -360,29 +423,32 @@ export default function Pro(props){
                                 Ajouter un registre
                             </AtlButton>
                         </div>
-                        <DataTable
-                            columns={columns}
-                            data={registres}
-                            defaultSortField="name"
-                            selectableRows={false}
-                            selectableRowsHighlight={true}
-                            /*onSelectedRowsChange={selected => {
-                                console.log(selected)
-                            }}*/
-                            pagination={true}
-                            paginationPerPage={10}
-                            paginationComponentOptions={paginationOptions}
-                            highlightOnHover={false}
-                            contextMessage={tableContextMessage}
-                            progressPending={registres === null || registres === undefined}
-                            progressComponent={<h6>Chargement...</h6>}
-                            noDataComponent="Il n'y a aucun enregistrement à afficher"
-                            noHeader={true}
-                            pointerOnHover={true}
-                            onRowClicked={(row, e) => {
-                                props.history.push("/main/pro/registre/" + row.id )
-                            }}
-                        />
+                        <div style={{marginTop:20}}>
+                            <DataTable
+                                columns={columns}
+                                data={registres}
+                                defaultSortField="name"
+                                selectableRows={false}
+                                selectableRowsHighlight={true}
+                                /*onSelectedRowsChange={selected => {
+                                    console.log(selected)
+                                }}*/
+                                pagination={true}
+                                paginationPerPage={10}
+                                paginationComponentOptions={paginationOptions}
+                                highlightOnHover={false}
+                                contextMessage={tableContextMessage}
+                                progressPending={registres === null || registres === undefined}
+                                progressComponent={<h6>Chargement...</h6>}
+                                noDataComponent="Il n'y a aucun enregistrement à afficher"
+                                noHeader={true}
+                                pointerOnHover={true}
+                                onRowClicked={(row, e) => {
+                                    props.history.push("/main/pro/registre/" + row.id )
+                                }}
+                            />
+                        </div>
+
 
                     </div>
                 </div>
@@ -425,9 +491,6 @@ export default function Pro(props){
                                         <Tab label="Vos propres registres"
                                              name="me" id="me" ariaControls="me" />
                                     }
-
-
-                                    <Tab label="" name="locked" id="locked" ariaControls="lockedTab" />
 
                                 </Tabset>
                                 <Divider style={{marginTop:20,marginBottom:20}}/>

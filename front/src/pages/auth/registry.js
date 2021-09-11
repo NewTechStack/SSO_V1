@@ -98,7 +98,7 @@ class registry extends Component {
                         {
                             this.state.loading === true ?
                                 <LinearProgress /> :
-                                <Progress active={true} percent={100} size="medium" className="custom-progress-height" color='blue' />
+                                <Progress active={false} percent={100} size="medium" className="custom-progress-height" color='blue' />
                         }
                         <div style={{display:"flex"}}>
                             <div className="padding-form">

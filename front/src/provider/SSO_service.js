@@ -16,7 +16,7 @@ let SSO_service = {
         let headers = new Headers();
         headers.append('Content-Type', 'application/json');
         headers.append("Accept", 'application/json');
-        headers.append("usrtoken",usrtoken);
+        usrtoken && headers.append("usrtoken",usrtoken);
         return headers;
     },
 
@@ -126,7 +126,7 @@ let SSO_service = {
     },
 
     get_created_user_registies(usrtoken){
-        return fetch(endpoint + '/user/registery?creator=true', {
+        return fetch(endpoint + '/user/registry?creator=true', {
             method: 'GET',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {
@@ -135,7 +135,7 @@ let SSO_service = {
     },
 
     get_user_registry(usrtoken){
-        return fetch(endpoint + '/user/registery?creator=false', {
+        return fetch(endpoint + '/user/registry?creator=false', {
             method: 'GET',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {
@@ -144,7 +144,7 @@ let SSO_service = {
     },
 
     add_user_to_reg(id_reg,data,usrtoken){
-        return fetch(endpoint + '/registery/' + id_reg + '/invite', {
+        return fetch(endpoint + '/registry/' + id_reg + '/invite', {
             method: 'POST',
             headers:this.loadHeaders(usrtoken),
             body:JSON.stringify(data)
@@ -154,7 +154,7 @@ let SSO_service = {
     },
 
     add_registre(data,usrtoken){
-        return fetch(endpoint + '/registery', {
+        return fetch(endpoint + '/registry', {
             method: 'POST',
             headers:this.loadHeaders(usrtoken),
             body:JSON.stringify(data)
@@ -164,7 +164,7 @@ let SSO_service = {
     },
 
     get_info_registre(id,usrtoken){
-        return fetch(endpoint + '/registery/' + id, {
+        return fetch(endpoint + '/registry/' + id, {
             method: 'GET',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {
@@ -173,7 +173,7 @@ let SSO_service = {
     },
 
     remove_registre(id,usrtoken){
-        return fetch(endpoint + '/registery/' + id, {
+        return fetch(endpoint + '/registry/' + id, {
             method: 'DELETE',
             headers:this.loadHeaders(usrtoken),
         }).then(response => response.json()).catch(error => {
@@ -182,7 +182,7 @@ let SSO_service = {
     },
 
     get_registre_name(id,usrtoken){
-        return fetch(endpoint + '/registery/' + id + '/name', {
+        return fetch(endpoint + '/registry/' + id + '/name', {
             method: 'GET',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {
@@ -191,7 +191,7 @@ let SSO_service = {
     },
 
     get_registre_roles(id,usrtoken){
-        return fetch(endpoint + '/registery/' + id + '/roles', {
+        return fetch(endpoint + '/registry/' + id + '/roles', {
             method: 'GET',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {
@@ -200,7 +200,7 @@ let SSO_service = {
     },
 
     add_registre_role(id,data,usrtoken){
-        return fetch(endpoint + '/registery/' + id + '/role', {
+        return fetch(endpoint + '/registry/' + id + '/role', {
             method: 'POST',
             headers:this.loadHeaders(usrtoken),
             body:JSON.stringify(data)
@@ -210,7 +210,7 @@ let SSO_service = {
     },
 
     update_registre_role(id,id_role,data,usrtoken){
-        return fetch(endpoint + '/registery/' + id + '/role/' + id_role, {
+        return fetch(endpoint + '/registry/' + id + '/role/' + id_role, {
             method: 'POST',
             headers:this.loadHeaders(usrtoken),
             body:JSON.stringify(data)
@@ -220,7 +220,7 @@ let SSO_service = {
     },
 
     remove_registre_role(id,id_role,usrtoken){
-        return fetch(endpoint + '/registery/' + id + '/role/' + id_role, {
+        return fetch(endpoint + '/registry/' + id + '/role/' + id_role, {
             method: 'DELETE',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {
@@ -229,7 +229,7 @@ let SSO_service = {
     },
 
     get_registre_actions(id,usrtoken){
-        return fetch(endpoint + '/registery/' + id + '/actions', {
+        return fetch(endpoint + '/registry/' + id + '/actions', {
             method: 'GET',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {
@@ -238,7 +238,7 @@ let SSO_service = {
     },
 
     add_registre_action(id,data,usrtoken){
-        return fetch(endpoint + '/registery/' + id + '/action', {
+        return fetch(endpoint + '/registry/' + id + '/action', {
             method: 'POST',
             headers:this.loadHeaders(usrtoken),
             body:JSON.stringify(data)
@@ -248,7 +248,7 @@ let SSO_service = {
     },
 
     remove_registre_action(id,id_action,usrtoken){
-        return fetch(endpoint + '/registery/' + id + '/action/' + id_action, {
+        return fetch(endpoint + '/registry/' + id + '/action/' + id_action, {
             method: 'DELETE',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {
@@ -257,7 +257,7 @@ let SSO_service = {
     },
 
     update_registre_name(id,data,usrtoken){
-        return fetch(endpoint + '/registery/' + id + '/name', {
+        return fetch(endpoint + '/registry/' + id + '/name', {
             method: 'PUT',
             headers:this.loadHeaders(usrtoken),
             body:JSON.stringify(data)
@@ -267,7 +267,7 @@ let SSO_service = {
     },
 
     update_registre_state(id,data,usrtoken){
-        return fetch(endpoint + '/registery/' + id + '/open', {
+        return fetch(endpoint + '/registry/' + id + '/open', {
             method: 'PUT',
             headers:this.loadHeaders(usrtoken),
             body:JSON.stringify(data)
@@ -277,7 +277,7 @@ let SSO_service = {
     },
 
     getInfoRole(id_reg,role,usrtoken){
-        return fetch(endpoint + '/registery/' + id_reg + '/role/' + role , {
+        return fetch(endpoint + '/registry/' + id_reg + '/role/' + role , {
             method: 'GET',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {
@@ -287,7 +287,7 @@ let SSO_service = {
 
 
     getRegistryUsers(id_reg,usrtoken){
-        return fetch(endpoint + '/registery/' + id_reg + '/users' , {
+        return fetch(endpoint + '/registry/' + id_reg + '/users' , {
             method: 'GET',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {
@@ -305,7 +305,7 @@ let SSO_service = {
     },
 
     get_admin_user_registries(user_id,usrtoken){
-        return fetch(endpoint + '/admin/user/' + user_id + '/registery' , {
+        return fetch(endpoint + '/admin/user/' + user_id + '/registry' , {
             method: 'GET',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {
@@ -320,8 +320,66 @@ let SSO_service = {
         }).then(response => response.json()).catch(error => {
             console.log(error);
         });
-    }
+    },
 
+    getRegistryKeys(id_reg,usrtoken){
+        return fetch(endpoint + '/registry/' + id_reg + '/keys' , {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+    addRegistryKey(id_reg,data,usrtoken){
+        console.log(data)
+        return fetch(endpoint + '/registry/' + id_reg + '/key' , {
+            method: 'POST',
+            headers:this.loadHeaders(usrtoken),
+            body:JSON.stringify(data)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+    remove_registry_key(id_reg,key,usrtoken){
+        return fetch(endpoint + '/registry/' + id_reg + '/key/' + key, {
+            method: 'DELETE',
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+    get_askable(usrtoken){
+        return fetch(endpoint + '/extern/askable' , {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+
+    get_extern_info_key(usrtoken,key,data){
+        return fetch(endpoint + '/intern/key/'+key+'/infos' , {
+            method: 'POST',
+            headers:this.loadHeaders(usrtoken),
+            body:JSON.stringify(data)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+    extern_signin(usrtoken,key,data){
+        return fetch(endpoint + '/intern/key/'+key+'/signin' , {
+            method: 'POST',
+            headers:this.loadHeaders(usrtoken),
+            body:JSON.stringify(data)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    }
 
 
 
