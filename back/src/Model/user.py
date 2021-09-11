@@ -12,16 +12,8 @@ def origin_check(cn, nextc):
         return cn.toret.add_error(err[1], err[2])
     return cn.call_next(nextc, err)
 
-def user_wait_token(cn, nextc):
-    key = cn.rt["key"] if "key" in cn.rt else None
-    err = check.contain(cn.pr, ["secret"])
-    if not err[0]:
-        return cn.toret.add_error(err[1], err[2])
-    err = user().wait_token(key, cn.pr["secret"])
-    return cn.call_next(nextc, err)
-
-def user_external_signin(cn, nextc):
-    cn.private["user"].create(cn.private["signin_reg"])
+def user_publickey(cn, nextc):
+    err = user.public_key()
     return cn.call_next(nextc, err)
 
 def user_get_token(cn, nextc):

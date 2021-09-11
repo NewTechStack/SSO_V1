@@ -28,8 +28,10 @@ class registry_signin_key:
             "secret": None,
             "until": None,
             "registry_list": None,
+            "auth": None,
             "date": None,
-            "auth": None
+            "usrtoken": None,
+            "asked": None
         }
 
     def create(self, registry_list, time, asked):
@@ -53,6 +55,7 @@ class registry_signin_key:
         data["registry_list"] = registry_list
         data["auth"] = auth_hash
         data["date"] = None
+        data["usrtoken"] = None
         data["asked"] = asked
         self.red.insert([data]).run()
         return [True, {"key": key, "secret": secret, "auth": auth_hash}, None]
@@ -72,8 +75,32 @@ class registry_signin_key:
         del ret["secret"]
         return [True, {"data": ret}, None]
 
-    def get_wait(self, key, secret, auth):
+    def signin(self, key, auth, usrtoken):
+        if not self.__key_exist(key, auth=auth)[0]:
+            return [False, "Error invalid connection", 404]
+        res = dict(self.red.filter(
+            (r.row["key"] == key)
+            &
+            (r.row["auth"] == auth)
+        ).update({"usrtoken": usrtoken}).run())
+        if res['replaced'] != 1:
+            return [False, "Error", 500]
         return [True, {}, None]
+
+    def wait_token(self, key, secret):
+        query = res = self.red.filter(
+            (r.row["key"] == key)
+            &
+            (r.row["secret"] == secret)
+            &
+            (r.row["usrtoken"] != None)
+        )
+        res = list(query.run())
+        if len(res) == 0:
+            for update in query.changes().run():
+                res = update['new_val']
+                break
+        return [True, {"usrtoken": res['usrtoken']}, None]
 
     def verify_time(self, key_data):
         now = datetime.datetime.utcnow()

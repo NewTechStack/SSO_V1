@@ -19,6 +19,11 @@ logging.basicConfig(format='%(asctime)s %(message)s', datefmt='[ %m/%d/%Y-%I:%M:
 TOKEN_ARR = {}
 
 class user:
+    def public_key():
+        with open(f'{secret_path}jwt-key.pub', 'r', encoding='utf-8') as file:
+            public_key = file.read()
+        return [True, {"public_key": public_key}, None]
+
     def __init__(self, id = -1, email = None):
         if id is None:
             id = -1
@@ -41,7 +46,7 @@ class user:
         self.data()
         self.askable = {
          "id":
-         lambda: id,
+         lambda: self.data()['id'],
          "username":
          lambda : self.data()["username"]["main"],
          "email":
@@ -199,37 +204,8 @@ class user:
                 self.d = dict(self.d)
         return self.d
 
-    def wait_token(self, key, sec):
-        if key not in TOKEN_ARR:
-            return [False, "Invalid key", 400]
-        if TOKEN_ARR[key]["try"] > 3:
-            del TOKEN_ARR[key]
-            return [False, "key acces deleted", None]
-        if TOKEN_ARR[key]["secret"] != sec:
-            TOKEN_ARR[key]["try"] += 1
-            return [False, "Invalid secret", 401]
-        now = datetime.datetime.utcnow()
-        try:
-            exp = TOKEN_ARR[key]["exp"]
-            while now <  exp and \
-                  TOKEN_ARR[key]["token"] != None:
-                time.sleep(0.05)
-                now = datetime.datetime.utcnow()
-            token = TOKEN_ARR[key]["token"]
-            del TOKEN_ARR[key]
-            k = []
-            for i in TOKEN_ARR:
-                if TOKEN_ARR[i]["exp"] < now:
-                    k.append(i)
-            for i in k:
-                del TOKEN_ARR[i]
-            if now < exp:
-                return [False, "User haven't finish", None]
-            elif token != None:
-                return [True, {"token": token}, None]
-        except:
-            return [False, "Expiration", None]
-        return [False, "Invalid key", None]
+    def wait_token(self, key, secret):
+        return [True, {}, None]
 
     def get_token(self, id = None, registeries = [], delta = 48, asked = []):
         if (not isinstance(id, str) and id is not None) or not isinstance(registeries, list) or \

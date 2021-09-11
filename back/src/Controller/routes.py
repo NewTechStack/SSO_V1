@@ -45,9 +45,10 @@ def setuproute(app, call):
 
     @app.route('/registry/<>/users',           ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, registry_users])) #done
 
-    @app.route('/extern/askable',               ['OPTIONS', 'GET'],         lambda x = None: call([user_get_askable]))
+    @app.route('/extern/public',                ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_publickey])) #done
+    @app.route('/extern/askable',               ['OPTIONS', 'POST'],         lambda x = None: call([regi_check_key, user_get_askable])) #for dev only
     @app.route('/extern/key',                   ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_check_asked, regi_get_signin])) #done
-    @app.route('/extern/key/<>/token',          ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_wait_token])) #done
+    @app.route('/extern/key/<>/token',          ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, regi_wait_token])) #done
 
     @app.route('/intern/key/<>/infos',          ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, regi_info_signin])) #done
     @app.route('/intern/key/<>/signin',         ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, regi_info_signin, regi_verify_signin, user_get_token, regi_end_signin])) #todo
