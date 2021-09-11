@@ -65,7 +65,6 @@ class registry_key:
         """
         if self.id == str(-1):
             return [False, "Invalid registry", 400]
-        print(shared, user_id, self.id, registry_id)
         if shared is False:
             ret = list(self.red.filter(
                 (r.row["user_id"] == user_id)
@@ -96,12 +95,11 @@ class registry_key:
         res = []
         for key in keys:
             res.extend(list(self.red.filter(
-             	lambda k: 
-		  (key == k["key"]) 
+             	lambda k:
+		  (key == k["key"])
 		  &
 		  (k["active"] == True)
                 ).run()))
-        print(res)
         for i in res:
             ret.append(i["registry_id"])
             keys.remove(i["key"])
