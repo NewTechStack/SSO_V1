@@ -156,7 +156,7 @@ def regi_get_signin(cn, nextc):
         err = [False, "Error", 500]
         return cn.toret.add_error(err[1], err[2])
     err = registry_signin_key().create(
-            registry_list=cn.private["signin_reg"],
+            registry=cn.private["signin_reg"],
             time=cn.pr["valid_until"],
             asked=cn.pr["asked"],
             redirect_succes=cn.pr["succes_url"],
@@ -172,18 +172,18 @@ def regi_verify_signin(cn, nextc):
         POST /intern/key/<>/signin
     """
     err = [True, None, None]
-    registry = cn.private['registry']
+    reg = cn.private['registry']
     cn.private["reg_user"] = user_registry(
         cn.private["user"],
-        registry(id=r)
+        registry(id=reg)
     )
     exist = cn.private["reg_user"].exist(end=True)
     if exist[0] is False:
-        err = [False, f"User is not part of registry: {r}", 403]
-    else
+        err = [False, f"User is not part of registry: {reg}", 403]
+    else:
         can_use = cn.private["reg_user"].can("use")
         if can_use is False:
-            err = [False, f"User is not allowed to use registry: {r}", 403]
+            err = [False, f"User is not allowed to use registry: {reg}", 403]
     return cn.call_next(nextc, err)
 
 def regi_end_signin(cn, nextc):
@@ -198,7 +198,7 @@ def regi_end_signin(cn, nextc):
     if not 'usrtoken' in cn.private:
        return cn.toret.add_error('Invalid signin', 403)
     registry_signin_key().signin(key, cn.pr["auth"], cn.private['usrtoken'])
-    err = [True, {'registries': cn.private['registries']}, None]
+    err = [True, {'registry': cn.private['registry']}, None]
     return cn.call_next(nextc, err)
 
 def regi_info_signin(cn, nextc):

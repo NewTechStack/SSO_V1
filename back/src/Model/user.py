@@ -22,12 +22,12 @@ def user_get_token(cn, nextc):
     asked = []
     if "id" in cn.get and cn.private["user"].has_role("creator")[0]:
         id = cn.get["id"]
-    if 'registries' in cn.private and 'asked' in cn.private:
-        registries = cn.private['registries']
+    if 'registry' in cn.private and 'asked' in cn.private:
+        reg = cn.private['registry']
         asked = cn.private['asked']
     err = cn.private["user"].get_token(
             id=id,
-            registeries=registries,
+            registeries=reg,
             asked=asked
     )
     if err[0]:
