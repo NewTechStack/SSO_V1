@@ -149,7 +149,7 @@ def regi_get_signin(cn, nextc):
 
         POST /external/key
     """
-    err = check.contain(cn.pr, ["valid_until", "apitoken", "asked"])
+    err = check.contain(cn.pr, ["valid_until", "apitoken", "asked", "succes_url", "fail_url"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
     if not "signin_reg" in cn.private:
@@ -158,7 +158,9 @@ def regi_get_signin(cn, nextc):
     err = registry_signin_key().create(
             registry_list=cn.private["signin_reg"],
             time=cn.pr["valid_until"],
-            asked=cn.pr["asked"]
+            asked=cn.pr["asked"],
+            redirect_succes=cn.pr["succes_url"],
+            redirect_fail=cn.pr["fail_url"]
         )
     return cn.call_next(nextc, err)
 
@@ -170,19 +172,18 @@ def regi_verify_signin(cn, nextc):
         POST /intern/key/<>/signin
     """
     err = [True, None, None]
-    for r in cn.private['registries']:
-        cn.private["reg_user"] = user_registry(
-            cn.private["user"],
-            registry(id=r)
-        )
-        exist = cn.private["reg_user"].exist(end=True)
-        if exist[0] is False:
-            err = [False, f"User is not part of registry: {r}", 403]
-            break
-        can_use =  cn.private["reg_user"].can("use")
+    registry = cn.private['registry']
+    cn.private["reg_user"] = user_registry(
+        cn.private["user"],
+        registry(id=r)
+    )
+    exist = cn.private["reg_user"].exist(end=True)
+    if exist[0] is False:
+        err = [False, f"User is not part of registry: {r}", 403]
+    else
+        can_use = cn.private["reg_user"].can("use")
         if can_use is False:
             err = [False, f"User is not allowed to use registry: {r}", 403]
-            break
     return cn.call_next(nextc, err)
 
 def regi_end_signin(cn, nextc):
@@ -211,7 +212,7 @@ def regi_info_signin(cn, nextc):
         return cn.toret.add_error(err[1], err[2])
     err = registry_signin_key().infos(key, cn.pr["auth"])
     if err[0]:
-        cn.private['registries'] = err[1]['data']['registry_list']
+        cn.private['registry'] = err[1]['data']['registry']
         cn.private['asked'] = err[1]['data']['asked']
     return cn.call_next(nextc, err)
 

@@ -115,6 +115,8 @@ class user_registry:
             return [False, "Invalid roles format", 400]
         if not isinstance(roles, list):
             roles = [roles]
+        if len(roles) == 0:
+            return [False, "Must add at least one role", 400]
         if str(self.usr_id) == str("-1"):
             return [False, "Invalid user", 401]
         if str(self.reg_id) == str("-1"):
@@ -125,6 +127,8 @@ class user_registry:
             return [False, f"Invalid role: {self.i}", 400]
         if not force and not self.can("invite"):
             return [False, "User cannot invite other users", 401]
+        if 'creator' in roles:
+            return [False, "Can't invite creator", 401]
         if email is not None:
             u = user(-1, email)
             if u.id == "-1":
@@ -223,8 +227,8 @@ class user_registry:
         shared = self.reg.data()["dev_settings"]["keys"]["main"]["shared"]
         return self.keys.get(shared, self.usr_id, self.reg_id)
 
-    def check_key(self, keys, ip):
-        return self.keys.check(keys, ip)
+    def check_key(self, key, ip):
+        return self.keys.check(key, ip)
 
     def __status(self, id_user, role, active = True):
         roles = self.reg.roles()[1]

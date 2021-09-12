@@ -26,7 +26,7 @@ class registry:
                 "builtin": {
                     "main": {
                         "creator": {
-                            "actions": ["delete", "use_api", "edit", "invite", "use", "get_infos", ]
+                            "actions": ["delete", "use_api", "edit", "invite", "use", "get_infos" ]
                         },
                         "admin": {
                             "actions": ["edit", "invite", "use", "get_infos"]
@@ -60,6 +60,7 @@ class registry:
             },
             "open": {
                 "main": False,
+                "default_role": ["user"],
                 "last_update": None
             },
             "dev_settings": {
@@ -377,13 +378,26 @@ class registry:
         self.data(True)
         return [True, {}, None]
 
-    def set_open(self, open = False):
+    def set_open(self, open = False, roles = ["user"]):
         if not isinstance(open, bool):
             return [False, "Invalid param", 400]
+        if not isinstance(roles, list) and not all(isinstance(self.i, str) for self.i in roles):
+            return [False, "Invalid roles list", 400]
+        if len(roles) < 1:
+            return [False, "Roles list must contain at least one element", 400]
+        res = self.data()
+        roles_auth = {
+            **res["roles"]["custom"]["main"],
+            **res["roles"]["builtin"]["main"]
+        }
+        roles = list(dict.fromkeys(roles))
+        if not all(self.i in roles_auth for self.i in roles):
+            return [False, f"Invalid role: {self.i}", 404]
         date = str(datetime.datetime.utcnow())
         self.red.get(self.id).update({
             "open": {
                 "main": open,
+                "default_role": roles,
                 "last_update": date
             },
             "last_update": date

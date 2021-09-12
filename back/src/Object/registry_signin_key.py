@@ -27,19 +27,19 @@ class registry_signin_key:
             "key": None,
             "secret": None,
             "until": None,
-            "registry_list": None,
+            "registry": None,
             "auth": None,
             "date": None,
             "usrtoken": None,
+            "redirect": {"succes": None, "fail": None},
             "asked": None
         }
 
-    def create(self, registry_list, time, asked):
+    def create(self, registry, time, asked, redirect_succes, redirect_fail):
         if not isinstance(time, int) or time < 10 or time > 180:
             return [False, "Invalid time argument", 400]
-        if not isinstance(registry_list, list) \
-           and all(isinstance(self.i, str) for i in registry_list):
-	        return [False, "Invalid registry list", 400]
+        if not isinstance(registry, str):
+	        return [False, "Invalid registry", 400]
         key = str(uuid.uuid4())
         secret = str(hash(uuid.uuid4()))
         while self.__key_exist(key, secret=secret)[0]:
@@ -52,10 +52,12 @@ class registry_signin_key:
         data["key"] = key
         data["secret"] = secret
         data["until"] = until
-        data["registry_list"] = registry_list
+        data["registry"] = registry
         data["auth"] = auth_hash
         data["date"] = None
         data["usrtoken"] = None
+        data["redirect"]["succes"] = redirect_succes
+        data["redirect"]["fail"] = redirect_fail
         data["asked"] = asked
         self.red.insert([data]).run()
         return [True, {"key": key, "secret": secret, "auth": auth_hash}, None]
