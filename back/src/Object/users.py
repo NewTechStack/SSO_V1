@@ -288,11 +288,16 @@ class user:
 
     def invite(self, email):
         email = str(email)
+        username = email.split('@')[0]
         ret = [True, {}, None]
         date = str(datetime.datetime.utcnow())
         if self.__exist(email):
             return ret
         data = {
+            "username": {
+                "main" : username,
+                "last_update": None
+            },
             "email": {
                 "main" : email,
                 "public": False,
@@ -308,7 +313,7 @@ class user:
                     },
                     "last_update": None
                  },
-                "last_update": date
+                "last_update": None
             },
             "roles": {},
             "last_update": None,
