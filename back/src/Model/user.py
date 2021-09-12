@@ -27,7 +27,7 @@ def user_get_token(cn, nextc):
         asked = cn.private['asked']
     err = cn.private["user"].get_token(
             id=id,
-            registeries=reg,
+            registry=reg,
             asked=asked
     )
     if err[0]:

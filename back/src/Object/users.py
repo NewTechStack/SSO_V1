@@ -207,10 +207,10 @@ class user:
     def wait_token(self, key, secret):
         return [True, {}, None]
 
-    def get_token(self, id = None, registeries = [], delta = 48, asked = []):
-        if (not isinstance(id, str) and id is not None) or not isinstance(registeries, list) or \
-           not all(isinstance(r, str) for r in registeries) or not isinstance(delta, int) or \
-           not isinstance(asked, list) or not all(isinstance(a, str) for a in asked):
+    def get_token(self, id = None, registry = "", delta = 48, asked = []):
+        if (not isinstance(id, str) and id is not None) or not isinstance(registry, str) or \
+           not isinstance(delta, int) or not isinstance(asked, list) or \
+           not all(isinstance(a, str) for a in asked):
            return [False, "Invalid param", 400]
         id = self.__getid(id, self.id)
         if id == "-1":
@@ -231,7 +231,7 @@ class user:
         now = datetime.datetime.utcnow()
         exp = now + datetime.timedelta(hours=delta)
         issuer = "auth:back"
-        audience = ["auth:back"] if len(registeries) == 0 else [f"auth:{r}" for r in registeries]
+        audience = ["auth:back"] if len(registry) == 0 else f"auth:{registry}"
         token = jwt.encode({
             'iat': now,
             'exp': exp,
@@ -241,7 +241,7 @@ class user:
             'payload': payload,
         }, private_key, algorithm='RS256')
         ret = [True, {'exp': str(exp), "usrtoken": token}, None, ]
-        if registeries == []:
+        if registry == "":
             ret.append({"usrtoken": str(token)})
         return ret
 
