@@ -98,7 +98,9 @@ class registry_signin_key:
             (r.row["usrtoken"] != None)
         )
         res = list(query.run())
-        if len(res) == 0:
+        if len(res) != 0:
+            res = res[0]
+        else:
             for update in query.changes().run():
                 res = update['new_val']
                 break
