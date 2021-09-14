@@ -18,7 +18,7 @@ def user_publickey(cn, nextc):
 
 def user_get_token(cn, nextc):
     id = None
-    registries = []
+    reg = ""
     asked = []
     if "id" in cn.get and cn.private["user"].has_role("creator")[0]:
         id = cn.get["id"]
