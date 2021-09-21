@@ -31,11 +31,10 @@ class registry_signin_key:
             "auth": None,
             "date": None,
             "usrtoken": None,
-            "redirect": {"succes": None, "fail": None},
             "asked": None
         }
 
-    def create(self, registry, time, asked, redirect_succes, redirect_fail):
+    def create(self, registry, time, asked):
         if not isinstance(time, int) or time < 10 or time > 180:
             return [False, "Invalid time argument", 400]
         if not isinstance(registry, str):
@@ -56,8 +55,6 @@ class registry_signin_key:
         data["auth"] = auth_hash
         data["date"] = None
         data["usrtoken"] = None
-        data["redirect"]["succes"] = redirect_succes
-        data["redirect"]["fail"] = redirect_fail
         data["asked"] = asked
         self.red.insert([data]).run()
         return [True, {"key": key, "secret": secret, "auth": auth_hash}, None]

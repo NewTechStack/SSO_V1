@@ -1072,6 +1072,7 @@ def test():
     u.delete(True)
     logging.warning("Ending user's test")
 try:
-    test()
+    #test()
+    print('')
 except:
     logging.error("User's test error")

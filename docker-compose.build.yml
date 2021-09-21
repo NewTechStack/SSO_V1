@@ -1,6 +1,6 @@
 version: '3'
 networks:
-  default:
+  build:
 
 services:
   builder:
@@ -10,7 +10,7 @@ services:
       target: builder
     container_name: build-sso
     networks:
-      - default
+      - build
     volumes:
       - ./front:/app/
     environment:
