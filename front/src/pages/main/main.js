@@ -84,14 +84,14 @@ export default class main extends React.Component{
                         className="react-rainbow-admin-app_sidebar"
                         selectedItem={selectedItem}
                         onSelect={(e,selected) => {this.setState({selectedItem:selected})}}>
-                        <SidebarItem
+                        {/*<SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
                             icon={<DashboardIcon fontSize="default" style={{color:"#00AEF9"}} />}
                             name="dash"
                             label="Accueil"
                             onClick={() => navigateTo('/main/dash')}
 
-                        />
+                        />*/}
                         <SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
                             icon={<ContactPhoneIcon fontSize="default" style={{color:"#00AEF9"}} />}

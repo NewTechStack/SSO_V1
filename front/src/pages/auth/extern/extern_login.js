@@ -116,7 +116,8 @@ class extern_login extends Component {
                         <div>
                             <div className="padding-form">
 
-                                <h4 style={{fontSize:"1.4rem",marginBottom:5}}>Connexion</h4>
+                                {/*<h5 style={{fontSize:"1.03rem",marginBottom:5,color:"grey"}}>Un service externe souhaite avoir accès à votre compte</h5>*/}
+                                <h4 style={{fontSize:"1.4rem",marginBottom:5,marginTop:10}}>Connexion</h4>
                                 <h6>Accéder à votre compte</h6>
 
                                 <form id="login-form" style={{maxWidth:500,alignSelf:"center"}}

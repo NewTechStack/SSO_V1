@@ -73,9 +73,9 @@ export default function Pro(props){
     const other_reg_columns = [
         {
             name: 'Créateur',
-            selector: '',
+            cell: row => <div>{row.creator}</div>,
             sortable: true,
-            grow:0.3
+            grow:0.4
         },
         {
             name: 'roles',
@@ -93,12 +93,14 @@ export default function Pro(props){
             name: 'Nom',
             selector: 'name',
             sortable: true,
+            grow:0.45
         },
         {
             name: 'Dernière modification',
             selector: 'date',
             cell: row => moment(row.date).format("DD-MM-YYYY HH:mm"),
             sortable: true,
+            grow:0.4
         }
     ];
 
@@ -265,18 +267,32 @@ export default function Pro(props){
                         data: roles_object[key]
                     }));
 
-                    formated_regs.push({
-                        id:reg.registry.id,
-                        name:reg.registry.name.main,
-                        date:reg.date,
-                        last_update:reg.last_update,
-                        roles:roles_array
+
+                    SSO_service.getUserInfo(reg.by,localStorage.getItem("usrtoken")).then( infoRes => {
+                        console.log(infoRes)
+                        if (infoRes.status === 200 && infoRes.succes === true) {
+
+                            formated_regs.push({
+                                id:reg.registry.id,
+                                name:reg.registry.name.main,
+                                date:reg.date,
+                                last_update:reg.last_update,
+                                roles:roles_array,
+                                creator:infoRes.data.username
+                            })
+
+                            setLoading(false)
+                            setOther_registres(formated_regs)
+
+                        }else{
+
+                        }
                     })
+
+
 
                 })
 
-                setLoading(false)
-                setOther_registres(formated_regs)
             }else{
                 enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
             }

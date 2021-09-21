@@ -262,6 +262,111 @@ export default function Info(props){
 
 
                             <div style={{marginTop:40,padding:15}} className="accordion_form">
+                                <Accordion expanded={expanded_sec === 'panel-1'}
+                                           onChange={handleChange_sec('panel-1')}
+
+                                >
+                                    <AccordionSummary
+                                        expandIcon={<ChevronRightIcon />}
+                                        aria-controls="panel1bh-content"
+                                        id="panel1bh-header"
+                                    >
+                                        <Typography className={classes.heading}>Email</Typography>
+                                        <div>
+                                            {
+                                                !loading &&
+                                                <Typography className={classes.secondaryHeadingTitle}>
+                                                    {localStorage.getItem("email")}
+                                                </Typography>
+                                            }
+
+                                        </div>
+
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <div className="row mt-3">
+                                            <div className="col-md-12 mt-1">
+                                                <h6>Choisissez qui peut voir votre adresse mail</h6>
+                                                <ButtonGroup color="primary" aria-label="outlined primary button group"
+                                                             tabIndex={0} style={{marginTop:10}}
+                                                >
+                                                    <Button style={{textTransform:"none"}}
+                                                            className={selected_email_status === "private" ? "selectedBtnGroup no-focus" : "no-focus"}
+                                                            startIcon={<LockOutlinedIcon />}
+                                                            onClick={() => {setSelected_email_status("private")}}
+                                                    >Vous uniquement</Button>
+                                                    <Button style={{textTransform:"none"}}
+                                                            className={selected_email_status === "public" ? "selectedBtnGroup no-focus" : "no-focus"}
+                                                            startIcon={<GroupOutlinedIcon />}
+                                                            onClick={() => {setSelected_email_status("public")}}
+                                                    >Tout le monde</Button>
+                                                </ButtonGroup>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-4">
+                                            <div className="col-md-12">
+                                                <div style={{display:"flex",justifyContent:"flex-end"}}>
+                                                    <Button color="primary" style={{textTransform:"none"}}
+                                                            onClick={handleChange_sec('panel-1')}>Annuler</Button>
+                                                    <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
+                                                            onClick={() => {
+                                                                updateUser({email:{public:selected_email_status !== "private"}})
+                                                            }}
+                                                    >
+                                                        Enregistrer
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </AccordionDetails>
+                                    <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
+                                </Accordion>
+                                <Accordion expanded={expanded_sec === 'panel0'}
+                                           onChange={handleChange_sec('panel0')}
+                                >
+                                    <AccordionSummary
+                                        expandIcon={<ChevronRightIcon />}
+                                        aria-controls="panel2bh-content"
+                                        id="panel2bh-header"
+                                    >
+                                        <Typography className={classes.heading}>Username</Typography>
+                                        <Typography className={classes.secondaryHeadingTitle}>
+                                            {infoAccount.username}
+                                        </Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <div className="row mt-2">
+                                            <div className="col-md-12 mt-1">
+                                                <TextField
+                                                    //inputRef={f_username_ref}
+                                                    label="Nom"
+                                                    variant="outlined"
+                                                    size="small"
+                                                    style={{width:"100%"}}
+                                                    value={selected_username}
+                                                    onChange={(e) => {setSelected_username(e.target.value)}}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="row mt-4">
+                                            <div className="col-md-12">
+                                                <div style={{display:"flex",justifyContent:"flex-end"}}>
+                                                    <Button color="primary" style={{textTransform:"none"}}
+                                                            onClick={handleChange_sec('panel0')}>Annuler</Button>
+                                                    <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
+                                                            onClick={() => {
+                                                                updateUser({username:selected_username})
+                                                            }}
+                                                    >
+                                                        Enregistrer
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </AccordionDetails>
+                                    <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
+                                </Accordion>
                                 <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')} translate="no">
                                     <AccordionSummary
                                         expandIcon={expanded === 'panel1' ? <CloseIcon /> : <EditIcon/>}
@@ -348,7 +453,7 @@ export default function Info(props){
                                     </AccordionDetails>
                                     <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
                                 </Accordion>
-                                <Accordion expanded={expanded === 'panel2'}
+                                {/*<Accordion expanded={expanded === 'panel2'}
                                            //onChange={handleChange('panel2')}
                                 >
                                     <AccordionSummary
@@ -361,7 +466,7 @@ export default function Info(props){
                                             {localStorage.getItem("email")}
                                         </Typography>
                                     </AccordionSummary>
-                                </Accordion>
+                                </Accordion>*/}
                                 <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
                                     <AccordionSummary
                                         expandIcon={expanded === 'panel3' ? <CloseIcon /> : <EditIcon/>}
@@ -544,111 +649,6 @@ export default function Info(props){
 
 
                             <div style={{marginTop:40,padding:15}} className="accordion_form">
-                                <Accordion expanded={expanded_sec === 'panel1'}
-                                           onChange={handleChange_sec('panel1')}
-
-                                >
-                                    <AccordionSummary
-                                        expandIcon={<ChevronRightIcon />}
-                                        aria-controls="panel1bh-content"
-                                        id="panel1bh-header"
-                                    >
-                                        <Typography className={classes.heading}>Email</Typography>
-                                        <div>
-                                            {
-                                                !loading &&
-                                                <Typography className={classes.secondaryHeadingTitle}>
-                                                    {localStorage.getItem("email")}
-                                                </Typography>
-                                            }
-
-                                        </div>
-
-                                    </AccordionSummary>
-                                    <AccordionDetails>
-                                        <div className="row mt-3">
-                                            <div className="col-md-12 mt-1">
-                                                <h6>Choisissez qui peut voir votre adresse mail</h6>
-                                                <ButtonGroup color="primary" aria-label="outlined primary button group"
-                                                             tabIndex={0} style={{marginTop:10}}
-                                                >
-                                                    <Button style={{textTransform:"none"}}
-                                                            className={selected_email_status === "private" ? "selectedBtnGroup no-focus" : "no-focus"}
-                                                            startIcon={<LockOutlinedIcon />}
-                                                            onClick={() => {setSelected_email_status("private")}}
-                                                    >Vous uniquement</Button>
-                                                    <Button style={{textTransform:"none"}}
-                                                            className={selected_email_status === "public" ? "selectedBtnGroup no-focus" : "no-focus"}
-                                                            startIcon={<GroupOutlinedIcon />}
-                                                            onClick={() => {setSelected_email_status("public")}}
-                                                    >Tout le monde</Button>
-                                                </ButtonGroup>
-                                            </div>
-                                        </div>
-                                        <div className="row mt-4">
-                                            <div className="col-md-12">
-                                                <div style={{display:"flex",justifyContent:"flex-end"}}>
-                                                    <Button color="primary" style={{textTransform:"none"}}
-                                                            onClick={handleChange_sec('panel1')}>Annuler</Button>
-                                                    <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
-                                                            onClick={() => {
-                                                                updateUser({email:{public:selected_email_status !== "private"}})
-                                                            }}
-                                                    >
-                                                        Enregistrer
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    </AccordionDetails>
-                                    <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
-                                </Accordion>
-                                <Accordion expanded={expanded_sec === 'panel2'}
-                                           onChange={handleChange_sec('panel2')}
-                                >
-                                    <AccordionSummary
-                                        expandIcon={<ChevronRightIcon />}
-                                        aria-controls="panel2bh-content"
-                                        id="panel2bh-header"
-                                    >
-                                        <Typography className={classes.heading}>Username</Typography>
-                                        <Typography className={classes.secondaryHeadingTitle}>
-                                            {infoAccount.username}
-                                        </Typography>
-                                    </AccordionSummary>
-                                    <AccordionDetails>
-                                        <div className="row mt-2">
-                                            <div className="col-md-12 mt-1">
-                                                <TextField
-                                                    //inputRef={f_username_ref}
-                                                    label="Nom"
-                                                    variant="outlined"
-                                                    size="small"
-                                                    style={{width:"100%"}}
-                                                    value={selected_username}
-                                                    onChange={(e) => {setSelected_username(e.target.value)}}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="row mt-4">
-                                            <div className="col-md-12">
-                                                <div style={{display:"flex",justifyContent:"flex-end"}}>
-                                                    <Button color="primary" style={{textTransform:"none"}}
-                                                            onClick={handleChange_sec('panel2')}>Annuler</Button>
-                                                    <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
-                                                            onClick={() => {
-                                                                updateUser({username:selected_username})
-                                                            }}
-                                                    >
-                                                        Enregistrer
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </AccordionDetails>
-                                    <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
-                                </Accordion>
 
                                 <Accordion expanded={expanded_sec === 'panel3'}>
                                     <AccordionSummary

@@ -106,7 +106,7 @@ let SSO_service = {
     },
 
     registry_signin(registries,key,data,usrtoken){
-        return fetch(endpoint + '/registeries/' + registries + '/key/' + key + '/signin', {
+        return fetch(endpoint + '/registries/' + registries + '/key/' + key + '/signin', {
             method: 'POST',
             headers:this.loadHeaders(usrtoken),
             body:JSON.stringify(data)
@@ -315,6 +315,15 @@ let SSO_service = {
 
     getAdminUserInfo(user_id,usrtoken){
         return fetch(endpoint + '/admin/user/' + user_id , {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+    getUserInfo(user_id,usrtoken){
+        return fetch(endpoint + '/user/' + user_id , {
             method: 'GET',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {

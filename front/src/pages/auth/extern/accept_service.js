@@ -9,6 +9,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import '../login_signup.css'
 import { withSnackbar } from 'notistack';
 import SSO_service from "../../../provider/SSO_service";
+import moment from "moment";
 
 
 
@@ -26,29 +27,45 @@ class accept_service extends Component {
         error:false,
 
         asked:[],
+        registry_name:[],
         approuved:false
     };
 
 
+    verifSession(){
+        return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
+    }
+
+
     componentDidMount() {
-        this.setState({loading:true})
-        SSO_service.get_extern_info_key(localStorage.getItem("usrtoken"),this.state.key,{auth:this.state.auth}).then( res => {
-            console.log(res)
-            if(res.status === 200 && res.succes === true){
-                console.log("1111")
-                this.setState({
-                    loading:false,first_loading:false,
-                    asked:res.data.data.asked || []
-                })
-            }else{
+
+
+        if(this.verifSession() === false){
+            this.props.history.push("/sso/extern/"+this.props.match.params.key+ "/" + this.props.match.params.auth)
+        }else{
+
+            this.setState({loading:true})
+            SSO_service.get_extern_info_key(localStorage.getItem("usrtoken"),this.state.key,{auth:this.state.auth}).then( res => {
+                console.log(res)
+                if(res.status === 200 && res.succes === true){
+                    let registries_list = res.data.data.registry_list || [];
+                    let registry = registries_list[0]
+
+                    this.setState({
+                        loading:false,first_loading:false,
+                        asked:res.data.data.asked || [],
+                        registry_name:res.data.data.registry
+                    })
+                }else{
+                    this.setState({error:true,loading:false,first_loading:false})
+                    this.props.enqueueSnackbar('Une erreur est survenue, url invalide ou expiré !', { variant:"error",autoHideDuration:20000 })
+                }
+            }).catch( err => {
+                console.log(err)
                 this.setState({error:true,loading:false,first_loading:false})
-                this.props.enqueueSnackbar('Une erreur est survenue, url invalide ou expiré !', { variant:"error",autoHideDuration:20000 })
-            }
-        }).catch( err => {
-            console.log(err)
-            this.setState({error:true,loading:false,first_loading:false})
-            this.props.enqueueSnackbar('Une erreur est survenue, url invalide ou expiré !', { variant:"error",autoHideDuration:20000  })
-        })
+                this.props.enqueueSnackbar('Une erreur est survenue, url invalide ou expiré !', { variant:"error",autoHideDuration:20000  })
+            })
+        }
     }
 
     translate_asked = (item) => {
@@ -74,6 +91,7 @@ class accept_service extends Component {
         SSO_service.extern_signin(localStorage.getItem("usrtoken"),this.state.key,{auth:this.state.auth}).then( res => {
             console.log(res);
             if(res.status === 200 && res.succes === true){
+
                 this.setState({loading:false,approuved:true})
                 this.props.enqueueSnackbar('Connexion approuvée avec succès !', { variant:"success",autoHideDuration:10000 })
             }else{
@@ -111,7 +129,7 @@ class accept_service extends Component {
                                 <div className="padding-form">
 
                                     <h4 style={{fontSize:"1.4rem",marginBottom:5}}>Demande de connexion</h4>
-                                    <h5 style={{marginTop:15}}>Pour continuer, le service <b>"test_1"</b> devrait avoir accès à ces informations:</h5>
+                                    <h5 style={{marginTop:15}}>Pour continuer, le service <b>{this.state.registry_name}</b> devrait avoir accès à ces informations:</h5>
                                     <ul style={{listStyle:"disc",marginLeft:30,marginTop:15}}>
                                         {
                                             this.state.asked.map( (item,key) => (

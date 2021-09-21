@@ -309,17 +309,27 @@ export default function RegistreDetails(props){
 
     const [openDeleteRegModal, setOpenDeleteRegModal] = React.useState(false);
     const [openAddKeyModal, setOpenAddKeyModal] = React.useState(false);
+    const [current_user_roles, setCurrent_user_roles] = React.useState([]);
+
+
 
 
 
     useEffect(() => {
+
 
             if(verifSession() === true){
                 getInforegistre()
                 getRoles()
                 getActions()
                 getRegistryUsers()
-                getRegistryKeys()
+
+                let user_roles = JSON.parse(localStorage.getItem("roles")) || [];
+                if(user_roles.find( x => x.role === "creator" || x.role === "developper")){
+                    setCurrent_user_roles(user_roles)
+                    getRegistryKeys()
+                }
+
             }else{
                 enqueueSnackbar('Session expirée', { variant:"warning" })
                 enqueueSnackbar('Reconnexion en cours...', { variant:"info" })
@@ -646,10 +656,11 @@ export default function RegistreDetails(props){
                 let users = [];
                 let users_ids_roles = [];
                 (regUsersRes.data.users).map( item => {
-                    users_ids_roles.push({id:item.user.id,roles:item.user.roles || {}})
+                    users_ids_roles.push({id:item.user.id,roles:item.user.roles || {},username:item.user.username})
                 })
                 users_ids_roles.map( item => {
-                    SSO_service.getAdminUserInfo(item.id,localStorage.getItem("usrtoken")).then( infoRes => {
+                    SSO_service.getUserInfo(item.id,localStorage.getItem("usrtoken")).then( infoRes => {
+                        console.log(infoRes)
                         if(infoRes.status === 200 && infoRes.succes === true){
                             let roles_object = item.roles || {}
                             const roles_array = [];
@@ -660,7 +671,7 @@ export default function RegistreDetails(props){
                             users.push({  
                                 id:item.id,
                                 email:infoRes.data.email,
-                                username:infoRes.data.username,
+                                username:item.username.main || "",
                                 roles:roles_array
                             })
                             setRegUsers(users)
@@ -803,12 +814,12 @@ export default function RegistreDetails(props){
                             aria-controls="panel1bh-content"
                             id="panel3bh-header"
                         >
-                            <Typography className={classes.heading}>Statut</Typography>
+                            <Typography className={classes.heading}>Accès</Typography>
                             <div>
                                 {
                                     !loading &&
                                     [
-                                        <Typography className={classes.secondaryHeadingTitle}>{regInfo.open.main === true ? "Ouvert" : "Privé"}</Typography>,
+                                        <Typography className={classes.secondaryHeadingTitle}>{regInfo.open.main === true ? "Tout le monde" : "Les personnes invitées seulement"}</Typography>,
                                         <Typography className={classes.secondaryHeading}>
                                             {
                                                 regInfo.open.last_update ? ("Dernière modification: " + moment(regInfo.open.last_update).format("DD-MM-YYYY HH:mm")) : ""
@@ -821,7 +832,7 @@ export default function RegistreDetails(props){
                         <AccordionDetails>
                             <div className="row mt-3">
                                 <div className="col-md-12 mt-1">
-                                    <h6>Choisissez qui peut voir votre registre</h6>
+                                    <h6>Choissisez qui peut rejoindre votre registre</h6>
                                     <ButtonGroup color="primary" aria-label="outlined primary button group"
                                                  tabIndex={0} style={{marginTop:10}}
                                     >
@@ -829,7 +840,7 @@ export default function RegistreDetails(props){
                                                 className={regState === false ? "selectedBtnGroup no-focus" : "no-focus"}
                                                 startIcon={<LockOutlinedIcon />}
                                                 onClick={() => {setRegState(false)}}
-                                        >Vous uniquement</Button>
+                                        >Les personnes invitee seulement</Button>
                                         <Button style={{textTransform:"none"}}
                                                 className={regState === true ? "selectedBtnGroup no-focus" : "no-focus"}
                                                 startIcon={<GroupOutlinedIcon />}
@@ -1082,6 +1093,7 @@ export default function RegistreDetails(props){
                                 </IconButton>
                             </div>
                             <h5 style={{fontSize:"1.25rem",marginTop:-33}}>Registre: {!loading && regInfo.name.main}</h5>
+                            <p style={{fontSize:"0.65rem",color:"grey"}}>{props.match.params.reg}</p>
                             <div style={{display:"flex"}}>
                                 <label style={{color:"#5f6368",fontSize:12,marginRight:10,marginTop:2}}>{!loading && regInfo.open.main === true ? "Ouvert":"Privé"}</label>
                                 <Popup content={
@@ -1119,7 +1131,11 @@ export default function RegistreDetails(props){
 
                                     <Tab label="Actions" name="actions" id="actions" ariaControls="actions" />
                                     <Tab label="Utilisateurs" name="users" id="users" ariaControls="users" />
-                                    <Tab label="Clés" name="keys" id="keys" ariaControls="keys" />
+                                    {
+                                        current_user_roles.find( x => x.role === "creator" || x.role === "developper") &&
+                                        <Tab label="Clés" name="keys" id="keys" ariaControls="keys" />
+                                    }
+
 
                                 </Tabset>
                                 {/*<Divider style={{marginTop:20,marginBottom:20}}/>*/}
@@ -1224,7 +1240,7 @@ export default function RegistreDetails(props){
                                                 className="checkbox-select"
                                                 classNamePrefix="select"
                                                 options={
-                                                    (roles || []).map((item) =>
+                                                    (roles.filter(x => x.name !== "creator") || []).map((item) =>
                                                         ({
                                                             value: item.name,
                                                             label:item.name

@@ -14,4 +14,4 @@ services:
     volumes:
       - ./front:/app/
     environment:
-      REACT_APP_ENDPOINT: http://localhost:8081
+      REACT_APP_ENDPOINT: http://135.125.203.6:8083
