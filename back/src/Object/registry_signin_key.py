@@ -5,6 +5,7 @@ import uuid
 import hashlib
 from tqdm import tqdm
 try:
+    from .registry import registry
     from .rethink import get_conn, r
 except:
     pass
@@ -71,6 +72,8 @@ class registry_signin_key:
         if not res[0]:
             return res
         ret = key_data
+        if 'registry' in key_data:
+            ret['registry'] = registry(key_data['registry']).data()['name']['main']
         del ret["secret"]
         return [True, {"data": ret}, None]
 
