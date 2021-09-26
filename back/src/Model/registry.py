@@ -210,8 +210,9 @@ def regi_info_signin(cn, nextc):
         return cn.toret.add_error(err[1], err[2])
     err = registry_signin_key().infos(key, cn.pr["auth"])
     if err[0]:
-        cn.private['registry'] = err[1]['data']['registry']
+        cn.private['registry'] = err[1]['data']['registry_id']
         cn.private['asked'] = err[1]['data']['asked']
+        print(err)
     return cn.call_next(nextc, err)
 
 def regi_wait_token(cn, nextc):
