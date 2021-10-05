@@ -58,10 +58,10 @@ def regi_get_name(cn, nextc):
     return cn.call_next(nextc, err)
 
 def regi_set_open(cn, nextc):
-    err = check.contain(cn.pr, ["open"])
+    err = check.contain(cn.pr, ["open", "roles"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    err = cn.private["reg"].set_open(cn.pr["open"])
+    err = cn.private["reg"].set_open(cn.pr["open"], cn.pr["roles"])
     return cn.call_next(nextc, err)
 
 def regi_add_role(cn, nextc):

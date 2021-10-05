@@ -127,6 +127,8 @@ class user_registry:
             return [False, f"Invalid role: {self.i}", 400]
         if not force and not self.can("invite"):
             return [False, "User cannot invite other users", 401]
+        if not force and "creator" in roles:
+            return [False, "Cannot invite a cretor", 401]
         if email is not None:
             u = user(-1, email)
             if u.id == "-1":

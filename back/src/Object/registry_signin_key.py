@@ -74,6 +74,7 @@ class registry_signin_key:
         ret = key_data
         if 'registry' in key_data:
             ret['registry'] = registry(key_data['registry']).data()['name']['main']
+            ret['registry_id'] = key_data['registry']
         del ret["secret"]
         return [True, {"data": ret}, None]
 
