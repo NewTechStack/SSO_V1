@@ -103,6 +103,7 @@ class user_registry:
                 if len(d) == 1:
                     return dict(d[0])
                 else:
+                    print(d)
                     return None
             if len(d) == 1:
                 self.d = dict(d[0])
