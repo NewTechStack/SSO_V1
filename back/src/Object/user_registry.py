@@ -103,7 +103,6 @@ class user_registry:
                 if len(d) == 1:
                     return dict(d[0])
                 else:
-                    print(d)
                     return None
             if len(d) == 1:
                 self.d = dict(d[0])
@@ -112,6 +111,11 @@ class user_registry:
         return self.d
 
     def add_user(self, id_user, roles, email = None, force = False):
+        if roles is None:
+            roles = self.reg.get_defaut_roles()
+            if not roles[0]:
+                return [False, "Error in finding user default role", 500]
+            roles = roles[1]['roles']
         if not (isinstance(roles, list) and all(isinstance(i, str) for i in roles)) and not isinstance(roles, str):
             return [False, "Invalid roles format", 400]
         if not isinstance(roles, list):
@@ -153,6 +157,22 @@ class user_registry:
             self.__status(id_user, role)
         id = res["generated_keys"][0]
         return [True, {"id": id}, None]
+
+    def change_role(self, id_user, roles):
+        """allow to change user roles"""
+        id_user = id_user if id_user is not None else self.usr_id
+        d = self.data(id_user, True)
+        if d is None:
+            return [False, "Invalid user", 404]
+        if not isinstance(roles, list) or not all(isinstance(role, str) for role in roles):
+            return [False, "Invalid roles list", 400]
+        user_roles = list(d["roles"].keys())
+        for role in user_roles:
+            if role not in roles:
+                self.status(id_user, role, False)
+        for role in roles:
+            self.__status(id_user, role, True)
+        return [True, {}, None]
 
     def froles(self, id_user = None, active = None):
         id_user = id_user if id_user is not None else self.usr_id

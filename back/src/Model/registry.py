@@ -26,14 +26,14 @@ def regi_create(cn, nextc):
     return cn.call_next(nextc, err)
 
 def regi_invite(cn, nextc):
-    err = check.contain(cn.pr, ["email", "roles"])
+    err = check.contain(cn.pr, ["email"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
     cn.private["reg_user"] = user_registry(
         cn.private["user"],
         cn.private["reg"]
     )
-    err = cn.private["reg_user"].add_user(None, roles = cn.pr["roles"], email = cn.pr["email"])
+    err = cn.private["reg_user"].add_user(None, role = None, email = cn.pr["email"])
     if err[0] is True:
         err = [True, {"registry_id": cn.private["reg"].id}, None]
     return cn.call_next(nextc, err)
@@ -210,9 +210,8 @@ def regi_info_signin(cn, nextc):
         return cn.toret.add_error(err[1], err[2])
     err = registry_signin_key().infos(key, cn.pr["auth"])
     if err[0]:
-        cn.private['registry'] = err[1]['data']['registry_id']
+        cn.private['registry'] = err[1]['data']['registry']
         cn.private['asked'] = err[1]['data']['asked']
-        print(err)
     return cn.call_next(nextc, err)
 
 def regi_wait_token(cn, nextc):
@@ -242,6 +241,14 @@ def user_registries(cn, nextc):
     user_id = cn.rt["user"] if "user" in cn.rt and cn.rt["user"] != 'registry' else cn.private["user"].id
     creator = cn.get["creator"] if "creator" in cn.get else True
     err = user_registry(None, None).all_from_user(user_id, creator)
+    return cn.call_next(nextc, err)
+
+def user_regi_change_role(cn, nextc):
+    user_id = cn.rt["user"] if "user" in cn.rt else -1
+    err = check.contain(cn.pr, ["roles"])
+    if not err[0]:
+        return cn.toret.add_error(err[1], err[2])
+    cn.private["reg_user"].change_role(user_id, cn.pr["roles"])
     return cn.call_next(nextc, err)
 
 def user_regi_exist(cn, nextc):
@@ -290,6 +297,14 @@ def regi_can_use_api(cn, nextc):
 
 def regi_can_get_infos(cn, nextc):
     err = cn.private["reg_user"].can("get_infos")
+    if err is True:
+        err = [True, {}, None]
+    else:
+        err = [False, "Invalid rights", 403]
+    return cn.call_next(nextc, err)
+
+def regi_can_change_role(cn, nextc):
+    err = cn.private["reg_user"].can("change_role")
     if err is True:
         err = [True, {}, None]
     else:
