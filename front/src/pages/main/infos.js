@@ -98,7 +98,7 @@ export default function Info(props){
             }else{
                 props.history.push("/sso/login")
             }
-    }, [getAccountInfo,getUserInfo]);
+    }, []);
 
     const verifSession = () => {
         return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
@@ -595,7 +595,7 @@ export default function Info(props){
                                             <MuiButtonGroup>
                                                 {
                                                     roles.map((item, key) => (
-                                                        <Popup content={<h6>id: {item.data.by === null ? "system" : item.data.by } <br/>{item.data.last_update !== null && moment(item.data.last_update).format("DD-MM-YYYY HH:mm")   }</h6>}
+                                                        <Popup key={key} content={<h6>id: {item.data.by === null ? "system" : item.data.by } <br/>{item.data.last_update !== null && moment(item.data.last_update).format("DD-MM-YYYY HH:mm")   }</h6>}
                                                                size={"small"}
                                                                trigger={
                                                                    <MuiButton appearance="primary" isDisabled={item.data.active === false}

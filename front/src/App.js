@@ -11,8 +11,8 @@ import Extern_login from "./pages/auth/extern/extern_login";
 import Extern_signup from "./pages/auth/extern/extern_signup";
 import Accept_service from "./pages/auth/extern/accept_service";
 import moment from "moment";
-
-
+import 'moment/locale/fr';
+import history from '././pages/main/history';
 
 
 export default class App extends Component {
@@ -44,16 +44,16 @@ export default class App extends Component {
                         {
                             this.verifSession() === true &&
                                 [
-                                    <Redirect exact from={"/sso/login"} to={"/main/dash"}/>,
-                                    <Redirect exact from={"/sso/signup"} to={"/main/dash"}/>
+                                    <Redirect key={0} exact from={"/sso/login"} to={"/main/infos"}/>,
+                                    <Redirect key={1} exact from={"/sso/signup"} to={"/main/infos"}/>
                                 ]
                         }
-                        <Redirect exact from={"/"} to={this.verifSession() === false ? "/sso/login" : "/main/dash"} />
+                        <Redirect exact from={"/"} to={this.verifSession() === false ? "/sso/login" : "/main/infos"} />
                         {
                             this.verifSession() === false &&
                             [
-                                <Route exact path="/sso/login" component={Login}/>,
-                                <Route exact path="/sso/signup" component={Signup}/>
+                                <Route key={0} exact path="/sso/login" component={Login}/>,
+                                <Route key={1} exact path="/sso/signup" component={Signup}/>
                             ]
                         }
                         <Route exact  path="/sso/login/:redirect" component={Login}/>

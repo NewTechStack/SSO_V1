@@ -339,7 +339,7 @@ export default function RegistreDetails(props){
             }
 
 
-    }, [getInforegistre,getRoles,getActions,getRegistryUsers,getRegistryKeys]);
+    }, []);
 
     const verifSession = () => {
         return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
@@ -1160,6 +1160,7 @@ export default function RegistreDetails(props){
                             setOpenAddModal(false)
                         }}
                         heading="Ajouter un nouveau role"
+                        scrollBehavior={false}
                         components={{
                             Body: () => (
                                 <div style={{padding:"2px 20px 20px 30px"}}>
@@ -1193,6 +1194,7 @@ export default function RegistreDetails(props){
                                                     role_actions = value
                                                 }}
                                                 placeholder="actions"
+                                                menuShouldScrollIntoView={true}
                                             />
                                         </div>
                                     </div>
@@ -1208,6 +1210,7 @@ export default function RegistreDetails(props){
             <ModalTransition>
                 {openAddUserModal && (
                     <Modal
+                        scrollBehavior={false}
                         width="medium"
                         actions={[
                             { text: 'Ajouter', className:"alt-font", onClick: () => {addNewUserToReg(newUserReg_email,new_user_roles)}, isLoading:loadingBtnAdd, isDisabled:newUserReg_email.trim() === "" || verifForms.verif_Email(newUserReg_email) },
@@ -1265,6 +1268,7 @@ export default function RegistreDetails(props){
             <ModalTransition>
                 {openUpdateModal && (
                     <Modal
+                        scrollBehavior={false}
                         width="medium"
                         actions={[
                             { text: 'Modifier', className:"alt-font",
@@ -1326,6 +1330,7 @@ export default function RegistreDetails(props){
             <ModalTransition>
                 {openAddActionModal && (
                     <Modal
+                        scrollBehavior={false}
                         width="medium"
                         actions={[
                             { text: 'Ajouter', className:"alt-font", onClick: () => {addNewAction()}, isLoading:loadingBtnAdd, isDisabled:newAction_name.trim() === "" },

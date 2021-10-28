@@ -27,12 +27,14 @@ import {
 import Notification from './notification';
 import IconNotification from './iconNotification';
 import './styles.css';
+import logo from '../../assets/logos/default.png'
+import avatar_img from '../../assets/images/default_avatar.jpg'
 
 export default function SectionHeading({ onToogleSidebar }) {
     const user_full_name = localStorage.getItem("firstname") + " " + localStorage.getItem("lastname")
     return (
         <header className="react-rainbow-admin_header rainbow-position_fixed rainbow-flex rainbow-align_center rainbow-p-horizontal_large rainbow-background-color_white">
-            <img src={require("../../assets/logos/default.png")} alt="rainbow logo" className="react-rainbow-admin_header-logo" />
+            <img src={logo} alt="rainbow logo" className="react-rainbow-admin_header-logo" />
             <section className="rainbow-flex rainbow-align_center react-rainbow-admin_header-actions">
 
                 {/*<ButtonMenu
@@ -69,7 +71,7 @@ export default function SectionHeading({ onToogleSidebar }) {
                 >
                     <li className="rainbow-p-horizontal_small rainbow-align_center rainbow-flex">
                         <Avatar
-                            src={require("../../assets/images/default_avatar.jpg")}
+                            src={avatar_img}
                             assistiveText={user_full_name}
                             title={user_full_name}
                             size="medium" />

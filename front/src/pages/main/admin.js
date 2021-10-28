@@ -10,20 +10,43 @@ import AtlButton from "@atlaskit/button";
 import SearchIcon from "@material-ui/icons/Search";
 import DataTable from "react-data-table-component";
 import {paginationOptions, tableContextMessage} from "../../constants/defaultValues";
-
+import EditIcon from "@material-ui/icons/Edit";
+import {IconButton} from "@material-ui/core";
+import Modal, {ModalTransition} from "@atlaskit/modal-dialog";
+import TextField from "@material-ui/core/TextField";
+import {CheckboxSelect as Checkbox} from "@atlaskit/select";
+import Toggle from '@atlaskit/toggle';
+import { List } from 'semantic-ui-react'
 
 export default function Admin(props){
 
+
     const admin_users_columns = [
-        /*{
+        {
             name: 'Action',
             cell: row => <div>
-                <IconButton>
-                    <Edit />
+                <IconButton title="Modifier les roles de cet utilisateur" size="small" onClick={() => {
+                    let user_roles = row.roles || [];
+                    let roles = [];
+                    user_roles.map( (item) => {
+                        roles.push({
+                            title:item.role,
+                            active:item.data.active || false,
+                            updated:item.data.last_update || null,
+                        })
+                    });
+                    (["admin","user","disabled"]).map( item => {
+                            !roles.find(x => x.title === item) && roles.push({title:item,active:false,updated:false})
+                    })
+                    setSelectedUserRoles(roles)
+                    setSelectedUser(row)
+                    setOpenUpdateRolesModal(true)
+                } }>
+                    <EditIcon fontSize="small" color="primary" />
                 </IconButton>
             </div>,
             grow:0.1
-        },*/
+        },
         {
             name: 'Email',
             selector: 'email',
@@ -38,7 +61,7 @@ export default function Admin(props){
             name: 'roles',
             cell: row => <div style={{paddingBottom:10}}>
                 {
-                    (row.roles || []).map( item => (
+                    (row.roles || []).filter(x => x.data && x.data.active && x.data.active === true).map( item => (
                         <Label as='a' basic color='blue' pointing size="mini">
                             {item.role}
                         </Label>
@@ -50,9 +73,9 @@ export default function Admin(props){
             name: 'Registres',
             cell: row => <div style={{paddingBottom:10}}>
                 {
-                    (row.registries || []).map( item => (
+                    (row.registries || []).map( (item,key) => (
                         <Popup content={
-                            <div style={{display:"flex"}}>
+                            <div key={key} style={{display:"flex"}}>
                                 <SearchIcon fontSize={"small"} color="primary"/>
                                 <h6 style={{fontSize:"0.7rem",marginLeft:3,marginTop:4}}>Voir détails</h6>
                             </div>
@@ -78,6 +101,10 @@ export default function Admin(props){
     const [user_search_input, setUser_search_input] = React.useState("");
     const [admin_users, setAdmin_users] = React.useState();
     const [loadingBtnSearch, setLoadingBtnSearch] = React.useState(false);
+    const [openUpdateRolesModal, setOpenUpdateRolesModal] = React.useState(false);
+    const [selectedUser, setSelectedUser] = React.useState(false);
+    const [selectedUserRoles, setSelectedUserRoles] = React.useState([]);
+    const [loadingBtn, setLoadingBtn] = React.useState(false);
 
     useEffect(() => {
             if(verifSession() === true){
@@ -85,7 +112,7 @@ export default function Admin(props){
             }else{
                 props.history.push("/sso/login")
             }
-    }, [verif_acces_roles]);
+    }, []);
 
     const verifSession = () => {
         return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
@@ -117,6 +144,7 @@ export default function Admin(props){
                                 data: roles_object[key]
                             }));
                             SSO_service.get_admin_user_registries(item,localStorage.getItem("usrtoken")).then( regsRes => {
+                                console.log(regsRes)
                                 if(regsRes && regsRes.status === 200 && regsRes.succes === true){
                                     formated_users.push({
                                         id:item,
@@ -144,6 +172,24 @@ export default function Admin(props){
             }
         }).catch(err => {
             console.log(err)
+        })
+    }
+
+    const update_admin_user_roles = (role,state) => {
+        setLoading(true)
+
+        SSO_service.updateAdminUserRoles(selectedUser.id,{role:role,active:state},localStorage.getItem("usrtoken")).then( updateRes => {
+            if(updateRes.status === 200 && updateRes.succes === true){
+                setLoading(false)
+                enqueueSnackbar("Modification effectuée avec succès", { variant:"success" })
+            }else{
+                setLoading(false)
+                enqueueSnackbar("Une erreur est survenue ! " + updateRes.error, { variant:"error" })
+            }
+        }).catch( err => {
+            console.log(err)
+            setLoading(false)
+            enqueueSnackbar("Une erreur est survenue ! ", { variant:"error" })
         })
     }
 
@@ -212,6 +258,100 @@ export default function Admin(props){
                     </div>
                 </div>
             }
+
+
+            <ModalTransition>
+                {openUpdateRolesModal && (
+                    <Modal
+                        width="medium"
+                        actions={[
+                            { text: 'Fermer', className:"alt-font", onClick: () => {setOpenUpdateRolesModal(false)} },
+                        ]}
+                        onClose={() => {
+                            setOpenUpdateRolesModal(false)
+                        }}
+                        heading="Modifier"
+                        scrollBehavior={false}
+                        components={{
+                            Body: () => (
+                                <div style={{padding:"2px 20px 20px 30px"}}>
+                                    <div className="row mt-2">
+                                        <div className="col-md-8 mt-1">
+                                            <TextField
+                                                label="Utilisateur"
+                                                variant="outlined"
+                                                size="small"
+                                                style={{width:"100%"}}
+                                                value={selectedUser.username}
+                                                //autoFocus={true}
+                                                disabled={true}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="row mt-2">
+                                        <div className="col-md-8 mt-1">
+                                            <h6 style={{marginTop:10,marginBottom:10}} className="alt-font">Liste des roles</h6>
+                                            <div style={{marginTop:25}}>
+
+                                                <List divided relaxed>
+                                                    {
+                                                        (selectedUserRoles || []).map((item,key) => (
+                                                            <List.Item>
+                                                                <List.Icon size='large' verticalAlign='middle' >
+                                                                    <Toggle id="toggle-l" size="large" defaultChecked={item.active}
+                                                                            isChecked={item.active}
+                                                                            onChange={() => {
+                                                                                item.active = !item.active;
+                                                                                let users = admin_users;
+                                                                                let find_selected_user = users.find(x => x.id === selectedUser.id);
+                                                                                let find_selected_user_index = users.findIndex(x => x.id === selectedUser.id);
+                                                                                console.log(find_selected_user)
+                                                                                if(find_selected_user){
+                                                                                    let find_role = find_selected_user.roles.find(x => x.role === item.title)
+                                                                                    console.log(find_role)
+                                                                                    let find_role_index = find_selected_user.roles.findIndex(x => x.role === item.title)
+                                                                                    if(find_role){
+                                                                                        find_role.data.active = item.active;
+                                                                                        find_selected_user.roles[find_role_index] = find_role
+                                                                                    }else{
+                                                                                        find_selected_user.roles.push({
+                                                                                            role:item.title,
+                                                                                            data:{
+                                                                                                active:item.active,
+                                                                                            }
+                                                                                        })
+                                                                                    }
+
+                                                                                }
+                                                                                users[find_selected_user_index] = find_selected_user;
+                                                                                setAdmin_users(users)
+                                                                                update_admin_user_roles(item.title,item.active)
+
+                                                                            }}
+                                                                    />
+                                                                </List.Icon>
+                                                                <List.Content>
+                                                                    <List.Header as='a'>{item.title}</List.Header>
+                                                                    <List.Description as='a'>{item.updated === false ? "----" : ("modifié " + moment(item.updated).fromNow(false))} </List.Description>
+                                                                </List.Content>
+                                                            </List.Item>
+                                                            )
+                                                        )
+                                                    }
+                                                </List>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ),
+                        }}
+                    >
+
+                    </Modal>
+                )}
+            </ModalTransition>
+
         </div>
     )
 

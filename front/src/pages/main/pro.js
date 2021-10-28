@@ -140,9 +140,9 @@ export default function Pro(props){
             name: 'Registres',
             cell: row => <div style={{paddingBottom:10}}>
                 {
-                    (row.registries || []).map( item => (
+                    (row.registries || []).map( (item,key) => (
                         <Popup content={
-                            <div style={{display:"flex"}}>
+                            <div key={key} style={{display:"flex"}}>
                                 <SearchIcon fontSize={"small"} color="primary"/>
                                 <h6 style={{fontSize:"0.7rem",marginLeft:3,marginTop:4}}>Voir détails</h6>
                             </div>
@@ -194,7 +194,7 @@ export default function Pro(props){
                     props.history.push("/sso/login")
                 },1500)
             }
-    }, [getOtherUserRegistres,getOtherUserRegistres]);
+    }, []);
 
     const verifSession = () => {
         return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
@@ -256,43 +256,44 @@ export default function Pro(props){
             console.log(res)
             if(res.status === 200 && res.succes === true){
 
-                let o_registries = res.data.registries || [];
-                let formated_regs = []
-                o_registries.map((reg,key) => {
+                if(res.data.registries && res.data.registries.length === 0){
+                    setLoading(false)
+                    setOther_registres([])
+                }else{
+                    let o_registries = res.data.registries || [];
+                    let formated_regs = []
+                    o_registries.map((reg,key) => {
 
-                    let roles_object = reg.registry.roles || {}
-                    const roles_array = [];
-                    Object.keys(roles_object).forEach(key => roles_array.push({
-                        role: key,
-                        data: roles_object[key]
-                    }));
+                        let roles_object = reg.registry.roles || {}
+                        const roles_array = [];
+                        Object.keys(roles_object).forEach(key => roles_array.push({
+                            role: key,
+                            data: roles_object[key]
+                        }));
 
+                        SSO_service.getUserInfo(reg.by,localStorage.getItem("usrtoken")).then( infoRes => {
+                            console.log(infoRes)
+                            if (infoRes.status === 200 && infoRes.succes === true) {
 
-                    SSO_service.getUserInfo(reg.by,localStorage.getItem("usrtoken")).then( infoRes => {
-                        console.log(infoRes)
-                        if (infoRes.status === 200 && infoRes.succes === true) {
+                                formated_regs.push({
+                                    id:reg.registry.id,
+                                    name:reg.registry.name.main,
+                                    date:reg.date,
+                                    last_update:reg.last_update,
+                                    roles:roles_array,
+                                    creator:infoRes.data.username
+                                })
 
-                            formated_regs.push({
-                                id:reg.registry.id,
-                                name:reg.registry.name.main,
-                                date:reg.date,
-                                last_update:reg.last_update,
-                                roles:roles_array,
-                                creator:infoRes.data.username
-                            })
+                                setLoading(false)
+                                setOther_registres(formated_regs)
 
-                            setLoading(false)
-                            setOther_registres(formated_regs)
+                            }else{
 
-                        }else{
+                            }
+                        })
 
-                        }
                     })
-
-
-
-                })
-
+                }
             }else{
                 enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
             }
@@ -523,6 +524,7 @@ export default function Pro(props){
             <ModalTransition>
                 {openAddModal && (
                     <Modal
+                        scrollBehavior={false}
                         width="medium"
                         actions={[
                             { text: 'Ajouter', className:"alt-font", onClick: () => {addNewRegistre()}, isLoading:loadingBtnAdd },

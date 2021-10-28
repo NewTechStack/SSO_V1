@@ -2,7 +2,7 @@ import React from 'react';
 import {
     Router,
     Switch,
-    Route,
+    Route, Redirect,
 } from 'react-router-dom';
 import history from './history';
 import Dashboard from "./dashboard";
@@ -15,7 +15,8 @@ export default function Routes() {
     return (
         <Router history={history}>
             <Switch>
-                <Route exact path="/main/dash" component={Dashboard} />
+                {/*<Route exact path="/main/dash" component={Dashboard} />*/}
+                <Redirect exact from={"/main"} to={"/main/infos"} />
                 <Route exact path="/main/infos" component={Info} />
                 <Route exact path="/main/admin" component={Admin} />
                 <Route exact path="/main/pro" component={Pro} />

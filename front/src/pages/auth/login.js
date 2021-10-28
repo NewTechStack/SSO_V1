@@ -66,7 +66,7 @@ class login extends Component {
                             }));
                             localStorage.setItem("roles",JSON.stringify(roles_array))
                             this.setState({loading:false})
-                            this.props.history.push("/main/dash")
+                            this.props.history.push("/main")
                         }else{
                             this.props.enqueueSnackbar('Une erreur est survenue lors de la récuperation de vos informations !', { variant:"error" })
                             this.setState({loading:false})

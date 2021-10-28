@@ -9,6 +9,7 @@ import './login_signup.css'
 import LinearProgress from "@material-ui/core/LinearProgress";
 import SSO_service from "../../provider/SSO_service";
 import { withSnackbar } from 'notistack';
+import signup_img from "../../assets/images/signup2.jpg"
 
 class signup extends Component {
 
@@ -66,7 +67,7 @@ class signup extends Component {
 
                             setTimeout(() => {
                                 this.setState({loading:false})
-                                this.props.history.push("/main/dash")
+                                this.props.history.push("/main/infos")
                             },1000)
 
                         }else{
@@ -213,7 +214,7 @@ class signup extends Component {
                                    </div>
                                </form>
                            </div>
-                           <img alt="" src={require("../../assets/images/signup2.jpg")} className="signup_img"/>
+                           <img alt="" src={signup_img} className="signup_img"/>
                        </div>
 
                    </div>
