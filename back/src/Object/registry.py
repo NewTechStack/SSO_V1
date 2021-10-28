@@ -26,10 +26,10 @@ class registry:
                 "builtin": {
                     "main": {
                         "creator": {
-                            "actions": ["delete", "use_api", "edit", "invite", "use", "get_infos" ]
+                            "actions": ["delete", "use_api", "edit", "invite", "use", "get_infos", "change_role" ]
                         },
                         "admin": {
-                            "actions": ["edit", "invite", "use", "get_infos"]
+                            "actions": ["edit", "invite", "use", "get_infos", "change_role"]
                         },
                         "developper": {
                             "actions": ["use_api", "use", "get_infos"]
@@ -50,7 +50,7 @@ class registry:
             },
             "actions": {
                 "builtin": {
-                    "main": ["delete", "edit", "invite", "use", "get_infos", "use_api"],
+                    "main": ["change_role", "delete", "edit", "invite", "use", "get_infos", "use_api"],
                     "last_update": None
                 },
                 "custom": {
@@ -60,15 +60,15 @@ class registry:
             },
             "open": {
                 "main": False,
-                "default_role": ["user"],
+                "default_roles": ["user"],
                 "last_update": None
             },
             "dev_settings": {
                 "keys": {
                     "main": {
                         "shared": False,
-                        "key_number": 0,
-                        "key_per_dev": 0
+                        "key_number": -1,
+                        "key_per_dev": -1
                     },
                     "last_update": None
                 },
@@ -100,6 +100,20 @@ class registry:
         "date": d["date"]
         }
         return [True, ret, None]
+
+    def get_defaut_roles(self):
+        try:
+            roles = self.data()['open']['default_roles']
+        except:
+            return [False, "Error", 500]
+        return [True, {'roles': roles}, 200]
+
+    def is_open(self, end = False):
+        if end is True:
+            return self.data()['open']['main'] == True
+        if self.data()['open']['main'] == True:
+            return [True, {}, None]:
+        return [False, "Repository is closed to external connection", 401]
 
     def create(self, name, creator, actions, roles, open = False):
         if not isinstance(name, str) or not isinstance(creator, str) or \
@@ -390,7 +404,7 @@ class registry:
             "last_update": date
         }
         if open == True:
-            if not isinstance(roles, list) and not all(isinstance(self.i, str) for self.i in roles):
+            if not isinstance(roles, list) and not all(isinstance(self.i, str) for self.i in roles) and roles is not None:
                 return [False, "Invalid roles list", 400]
             if len(roles) < 1:
                 return [False, "Roles list must contain at least one element", 400]
@@ -402,7 +416,8 @@ class registry:
             roles = list(dict.fromkeys(roles))
             if not all(self.i in roles_auth for self.i in roles):
                 return [False, f"Invalid role: {self.i}", 404]
-            data["open"]["default_role"] = roles
+            if roles is not None:
+                data["open"]["default_roles"] = roles
         self.red.get(self.id).update(
             data
         ).run()

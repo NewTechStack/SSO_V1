@@ -5,6 +5,7 @@ LABEL maintainermail="eliot.courtel@wanadoo.fr"
 WORKDIR /app
 
 ENTRYPOINT rm -rf .env && env > .env && \
+          yarn add material-ui-slider && \
          yarn install && yarn build && \
          rm .env && mkdir -p ./prod && \
          rm -rf /app/prod/* && cp -R ./build/* /app/prod/ &&\

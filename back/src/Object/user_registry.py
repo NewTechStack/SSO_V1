@@ -103,7 +103,6 @@ class user_registry:
                 if len(d) == 1:
                     return dict(d[0])
                 else:
-                    print(d)
                     return None
             if len(d) == 1:
                 self.d = dict(d[0])
@@ -111,7 +110,22 @@ class user_registry:
                 self.d = None
         return self.d
 
+    def user_join(self, id_user):
+        roles = self.reg.get_default_roles()
+        if not roles[0]:
+            return [False, "Error in finding user default role", 500]
+        roles = roles[1]['roles']
+        open =  self.reg.is_open():
+        if not open[0]:
+            return open
+        return self.add_user(id_user, roles)
+
     def add_user(self, id_user, roles, email = None, force = False):
+        if roles is None:
+            roles = self.reg.get_defaut_roles()
+            if not roles[0]:
+                return [False, "Error in finding user default role", 500]
+            roles = roles[1]['roles']
         if not (isinstance(roles, list) and all(isinstance(i, str) for i in roles)) and not isinstance(roles, str):
             return [False, "Invalid roles format", 400]
         if not isinstance(roles, list):
@@ -154,6 +168,22 @@ class user_registry:
         id = res["generated_keys"][0]
         return [True, {"id": id}, None]
 
+    def change_role(self, id_user, roles):
+        """allow to change user roles"""
+        id_user = id_user if id_user is not None else self.usr_id
+        d = self.data(id_user, True)
+        if d is None:
+            return [False, "Invalid user", 404]
+        if not isinstance(roles, list) or not all(isinstance(role, str) for role in roles):
+            return [False, "Invalid roles list", 400]
+        user_roles = list(d["roles"].keys())
+        for role in user_roles:
+            if role not in roles:
+                self.status(id_user, role, False)
+        for role in roles:
+            self.__status(id_user, role, True)
+        return [True, {}, None]
+
     def froles(self, id_user = None, active = None):
         id_user = id_user if id_user is not None else self.usr_id
         d = self.data(id_user)
@@ -193,7 +223,10 @@ class user_registry:
         a = self.actions(id_user)
         return action in a[1]["actions"] if a[0] else False
 
-    def exist(self, id_user = None, end = False):
+    def exist(self, id_user = None, end = False, create = False):
+        if create is True:
+            self.user_join(id_user = id_user if id_user is not None else self.usr_id)
+            return self.exist(id_user = id_user, end = end, create = False)
         if id_user is None:
             if self.d != None:
                 return True
