@@ -110,6 +110,16 @@ class user_registry:
                 self.d = None
         return self.d
 
+    def user_join(self, id_user):
+        roles = self.reg.get_default_roles()
+        if not roles[0]:
+            return [False, "Error in finding user default role", 500]
+        roles = roles[1]['roles']
+        open =  self.reg.is_open():
+        if not open[0]:
+            return open
+        return self.add_user(id_user, roles)
+
     def add_user(self, id_user, roles, email = None, force = False):
         if roles is None:
             roles = self.reg.get_defaut_roles()
@@ -213,7 +223,10 @@ class user_registry:
         a = self.actions(id_user)
         return action in a[1]["actions"] if a[0] else False
 
-    def exist(self, id_user = None, end = False):
+    def exist(self, id_user = None, end = False, create = False):
+        if create is True:
+            self.user_join(id_user = id_user if id_user is not None else self.usr_id)
+            return self.exist(id_user = id_user, end = end, create = False)
         if id_user is None:
             if self.d != None:
                 return True

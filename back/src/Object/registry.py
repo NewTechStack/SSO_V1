@@ -108,6 +108,13 @@ class registry:
             return [False, "Error", 500]
         return [True, {'roles': roles}, 200]
 
+    def is_open(self, end = False):
+        if end is True:
+            return self.data()['open']['main'] == True
+        if self.data()['open']['main'] == True:
+            return [True, {}, None]:
+        return [False, "Repository is closed to external connection", 401]
+
     def create(self, name, creator, actions, roles, open = False):
         if not isinstance(name, str) or not isinstance(creator, str) or \
            not len(name) < 30:

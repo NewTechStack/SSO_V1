@@ -175,7 +175,7 @@ def regi_verify_signin(cn, nextc):
         cn.private["user"],
         registry(id=reg)
     )
-    exist = cn.private["reg_user"].exist(end=True)
+    exist = cn.private["reg_user"].exist(end=True, create=True)
     if exist[0] is False:
         err = [False, f"User is not part of registry: {reg}", 403]
     else:
