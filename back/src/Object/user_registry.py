@@ -115,7 +115,7 @@ class user_registry:
         if not roles[0]:
             return [False, "Error in finding user default role", 500]
         roles = roles[1]['roles']
-        open =  self.reg.is_open():
+        open =  self.reg.is_open()
         if not open[0]:
             return open
         return self.add_user(id_user, roles)
