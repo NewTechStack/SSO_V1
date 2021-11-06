@@ -122,7 +122,7 @@ class user_registry:
 
     def add_user(self, id_user, roles, email = None, force = False):
         if roles is None:
-            roles = self.reg.get_defaut_roles()
+            roles = self.reg.get_default_roles()
             if not roles[0]:
                 return [False, "Error in finding user default role", 500]
             roles = roles[1]['roles']
