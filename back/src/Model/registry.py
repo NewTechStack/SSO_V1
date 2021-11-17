@@ -243,12 +243,19 @@ def user_registries(cn, nextc):
     err = user_registry(None, None).all_from_user(user_id, creator)
     return cn.call_next(nextc, err)
 
+def user_regi_role(cn, nextc):
+    user_id = cn.rt["user"] if "user" in cn.rt else -1
+    if not err[0]:
+        return cn.toret.add_error(err[1], err[2])
+    cn.private["reg_user"].get_role(user_id)
+    return cn.call_next(nextc, err)
+
 def user_regi_change_role(cn, nextc):
     user_id = cn.rt["user"] if "user" in cn.rt else -1
     err = check.contain(cn.pr, ["roles"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    cn.private["reg_user"].change_role(user_id, cn.pr["roles"])
+    err = cn.private["reg_user"].change_role(user_id, cn.pr["roles"])
     return cn.call_next(nextc, err)
 
 def user_regi_exist(cn, nextc):

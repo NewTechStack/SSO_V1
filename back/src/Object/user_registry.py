@@ -49,12 +49,36 @@ class user_registry:
                     }
             ).run()
         )
-        return [True, {"registries": res}, None]
+        return [True, {"d": res}, None]
 
     def all_user(self, reg_id):
         res = list(
             self.red.filter(
                 (r.row["id_registry"] == reg_id)
+            ).eq_join('id_user', get_conn().db("auth").table('users')
+            ).without(
+                {'right': ["id"]}
+            ).with_fields(
+                'left', {"right": 'username'}
+            ).map( lambda res : {
+                    "date": res['left']['date'],
+                    "by": res['left']['by'],
+                    "id": res['left']['id'],
+                    "last_update": res['left']['date'],
+                    "user": {
+                      "id": res['left']['id_user'],
+                      "username": res['right']['username'],
+                      "roles": res['left']['roles'],
+                    }
+                }
+            ).run()
+        )
+        return [True, {"users": res}, None]
+
+    def get_role(self, user_id):
+        res = list(
+            self.red.filter(
+                (r.row["id_registry"] == self.reg_id) & r.row["id_user"] == user_id)
             ).eq_join('id_user', get_conn().db("auth").table('users')
             ).without(
                 {'right': ["id"]}
