@@ -1,4 +1,4 @@
-FROM node:12.18.2 as builder
+FROM node:14.18.0 as builder
 
 LABEL maintainer="Courtel Eliot"
 LABEL maintainermail="eliot.courtel@wanadoo.fr"
@@ -8,8 +8,8 @@ ENTRYPOINT rm -rf .env && env > .env && \
           yarn add material-ui-slider && \
          yarn install && yarn build && \
          rm .env && mkdir -p ./prod && \
-         rm -rf ./prod/* && mv ./build/* ./prod/ &&\
-         exit 0
+         rm -rf /app/prod/* && cp -R ./build/* /app/prod/ &&\
+         bash
 
 
 FROM mhart/alpine-node as prod

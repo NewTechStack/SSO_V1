@@ -8,3 +8,5 @@ build
 prod
 react_sso
 db
+jwt-key
+jwt-key.pub

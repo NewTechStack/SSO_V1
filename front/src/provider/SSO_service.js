@@ -322,6 +322,16 @@ let SSO_service = {
         });
     },
 
+    updateAdminUserRoles(user_id,data,usrtoken){
+        return fetch(endpoint + '/admin/user/' + user_id + '/role' , {
+            method: 'POST',
+            body:JSON.stringify(data),
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
     getUserInfo(user_id,usrtoken){
         return fetch(endpoint + '/user/' + user_id , {
             method: 'GET',

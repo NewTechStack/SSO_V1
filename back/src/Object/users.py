@@ -591,9 +591,10 @@ class user:
         if not isinstance(extended, bool):
             return [False, "Invalid param type", 400]
         id = self.__getid(id, self.id)
-        res = self.data()
+        res = self.red.get(id).run()
         if res is None:
             return [False, f"User {id} does not exist", 401]
+        res = dict(res)
         ret = {
             "username": res["username"]["main"] if "username" in res and "main" in res["username"] else None,
             "email": res["email"]["main"] if res["email"]["public"] or id == self.id else None,

@@ -33,7 +33,7 @@ def regi_invite(cn, nextc):
         cn.private["user"],
         cn.private["reg"]
     )
-    err = cn.private["reg_user"].add_user(None, role = None, email = cn.pr["email"])
+    err = cn.private["reg_user"].add_user(None, roles = None, email = cn.pr["email"])
     if err[0] is True:
         err = [True, {"registry_id": cn.private["reg"].id}, None]
     return cn.call_next(nextc, err)
@@ -210,7 +210,7 @@ def regi_info_signin(cn, nextc):
         return cn.toret.add_error(err[1], err[2])
     err = registry_signin_key().infos(key, cn.pr["auth"])
     if err[0]:
-        cn.private['registry'] = err[1]['data']['registry']
+        cn.private['registry'] = err[1]['data']['registry_id']
         cn.private['asked'] = err[1]['data']['asked']
     return cn.call_next(nextc, err)
 

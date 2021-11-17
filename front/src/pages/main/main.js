@@ -35,10 +35,10 @@ export default class main extends React.Component{
         if(this.verifSession() === true){
             this.verif_acces_roles()
             let path_array = this.props.location.pathname.split("/")
-            let menuItems = ["dash","infos","registres","admin"];
+            let menuItems = ["infos","registres","admin"];
             let current = path_array[path_array.length -1]
             console.log(current)
-            this.setState({selectedItem:menuItems.find(x => x === current) ? current : "registres",session:true})
+            this.setState({selectedItem:menuItems.find(x => x === current) ? current : "infos",session:true})
         }else{
             this.props.history.push("/sso/login")
         }
@@ -86,7 +86,7 @@ export default class main extends React.Component{
                         onSelect={(e,selected) => {this.setState({selectedItem:selected})}}>
                         {/*<SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
-                            icon={<DashboardIcon fontSize="default" style={{color:"#00AEF9"}} />}
+                            icon={<DashboardIcon fontSize="medium" style={{color:"#00AEF9"}} />}
                             name="dash"
                             label="Accueil"
                             onClick={() => navigateTo('/main/dash')}
@@ -94,13 +94,13 @@ export default class main extends React.Component{
                         />*/}
                         <SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
-                            icon={<ContactPhoneIcon fontSize="default" style={{color:"#00AEF9"}} />}
+                            icon={<ContactPhoneIcon fontSize="medium" style={{color:"#00AEF9"}} />}
                             name="infos"
                             label="Informations personnelles"
                             onClick={() => navigateTo('/main/infos')} />
                         <SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
-                            icon={<BallotIcon fontSize="default" style={{color:"#00AEF9"}} />}
+                            icon={<BallotIcon fontSize="medium" style={{color:"#00AEF9"}} />}
                             name="registres"
                             label="Registres"
                             onClick={() => navigateTo('/main/pro')} />
@@ -108,7 +108,7 @@ export default class main extends React.Component{
                             this.state.is_have_admin_acces === true &&
                             <SidebarItem
                                 className="react-rainbow-admin-app_sidebar-item"
-                                icon={<LockIcon fontSize="default" style={{color:"#00AEF9"}} />}
+                                icon={<LockIcon fontSize="medium" style={{color:"#00AEF9"}} />}
                                 name="admin"
                                 label="Admin"
                                 onClick={() => navigateTo('/main/admin')} />

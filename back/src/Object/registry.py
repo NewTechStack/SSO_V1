@@ -101,7 +101,7 @@ class registry:
         }
         return [True, ret, None]
 
-    def get_defaut_roles(self):
+    def get_default_roles(self):
         try:
             roles = self.data()['open']['default_roles']
         except:
@@ -112,7 +112,7 @@ class registry:
         if end is True:
             return self.data()['open']['main'] == True
         if self.data()['open']['main'] == True:
-            return [True, {}, None]:
+            return [True, {}, None]
         return [False, "Repository is closed to external connection", 401]
 
     def create(self, name, creator, actions, roles, open = False):
