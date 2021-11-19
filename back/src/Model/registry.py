@@ -245,9 +245,12 @@ def user_registries(cn, nextc):
 
 def user_regi_role(cn, nextc):
     user_id = cn.rt["user"] if "user" in cn.rt else -1
-    if not err[0]:
-        return cn.toret.add_error(err[1], err[2])
     cn.private["reg_user"].get_role(user_id)
+    return cn.call_next(nextc, err)
+
+def user_regi_actions(cn, nextc):
+    user_id = cn.rt["user"] if "user" in cn.rt else -1
+    cn.private["reg_user"].actions(user_id)
     return cn.call_next(nextc, err)
 
 def user_regi_change_role(cn, nextc):
@@ -262,6 +265,14 @@ def user_regi_exist(cn, nextc):
     err = cn.private["reg_user"].exist(end=True)
     return cn.call_next(nextc, err)
 
+def regi_can_get_infos(cn, nextc):
+    err = cn.private["reg_user"].can("get_infos")
+    if err is True:
+        err = [True, {}, None]
+    else:
+        err = [False, "Invalid rights", 403]
+    return cn.call_next(nextc, err)
+
 def regi_can_delete(cn, nextc):
     err = cn.private["reg_user"].can("delete")
     if err is True:
@@ -270,8 +281,40 @@ def regi_can_delete(cn, nextc):
         err = [False, "Invalid rights", 403]
     return cn.call_next(nextc, err)
 
-def regi_can_edit(cn, nextc):
-    err = cn.private["reg_user"].can("edit")
+def regi_can_change_name(cn, nextc):
+    err = cn.private["reg_user"].can("change_name")
+    if err is True:
+        err = [True, {}, None]
+    else:
+        err = [False, "Invalid rights", 403]
+    return cn.call_next(nextc, err)
+
+def regi_can_change_open(cn, nextc):
+    err = cn.private["reg_user"].can("change_open")
+    if err is True:
+        err = [True, {}, None]
+    else:
+        err = [False, "Invalid rights", 403]
+    return cn.call_next(nextc, err)
+
+def regi_can_edit_role(cn, nextc):
+    err = cn.private["reg_user"].can("edit_roles")
+    if err is True:
+        err = [True, {}, None]
+    else:
+        err = [False, "Invalid rights", 403]
+    return cn.call_next(nextc, err)
+
+def regi_can_edit_action(cn, nextc):
+    err = cn.private["reg_user"].can("edit_actions")
+    if err is True:
+        err = [True, {}, None]
+    else:
+        err = [False, "Invalid rights", 403]
+    return cn.call_next(nextc, err)
+
+def regi_can_change_role(cn, nextc):
+    err = cn.private["reg_user"].can("change_roles")
     if err is True:
         err = [True, {}, None]
     else:
@@ -286,32 +329,8 @@ def regi_can_invite(cn, nextc):
         err = [False, "Invalid rights", 403]
     return cn.call_next(nextc, err)
 
-def regi_can_use(cn, nextc):
-    err = cn.private["reg_user"].can("use")
-    if err is True:
-        err = [True, {}, None]
-    else:
-        err = [False, "Invalid rights", 403]
-    return cn.call_next(nextc, err)
-
 def regi_can_use_api(cn, nextc):
     err = cn.private["reg_user"].can("use_api")
-    if err is True:
-        err = [True, {}, None]
-    else:
-        err = [False, "Invalid rights", 403]
-    return cn.call_next(nextc, err)
-
-def regi_can_get_infos(cn, nextc):
-    err = cn.private["reg_user"].can("get_infos")
-    if err is True:
-        err = [True, {}, None]
-    else:
-        err = [False, "Invalid rights", 403]
-    return cn.call_next(nextc, err)
-
-def regi_can_change_role(cn, nextc):
-    err = cn.private["reg_user"].can("change_role")
     if err is True:
         err = [True, {}, None]
     else:

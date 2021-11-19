@@ -24,20 +24,21 @@ def setuproute(app, call):
     @app.route('/registry/<>',                 ['OPTIONS', 'DELETE'],      lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_delete, regi_delete])) #done
 
     @app.route('/registry/<>/name',            ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, regi_get_name])) #done
-    @app.route('/registry/<>/name',            ['OPTIONS', 'PUT'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit, regi_set_name])) #done
-    @app.route('/registry/<>/open',            ['OPTIONS', 'PUT'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit, regi_set_open])) #done
+    @app.route('/registry/<>/name',            ['OPTIONS', 'PUT'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_change_name, regi_set_name])) #done
+    @app.route('/registry/<>/open',            ['OPTIONS', 'PUT'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_change_open, regi_set_open])) #done
 
     @app.route('/registry/<>/roles',           ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, regi_roles])) #done
-    @app.route('/registry/<>/role',            ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit, regi_add_role])) #done
+    @app.route('/registry/<>/role',            ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit_role, regi_add_role])) #done
     @app.route('/registry/<>/role/<>',         ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, regi_role])) #done
-    @app.route('/registry/<>/role/<>',         ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit, regi_edit_role])) #done
-    @app.route('/registry/<>/role/<>',         ['OPTIONS', 'DELETE'],      lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit, regi_delete_role])) #done
+    @app.route('/registry/<>/role/<>',         ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit_role, regi_edit_role])) #done
+    @app.route('/registry/<>/role/<>',         ['OPTIONS', 'DELETE'],      lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit_role, regi_delete_role])) #done
     @app.route('/registry/<>/user/<>',         ['OPTIONS', 'PUT'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_change_role, user_regi_change_role])) #done
-    @app.route('/registry/<>/user/<>',         ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, user_regi_role])) #done
+    @app.route('/registry/<>/user/<>/roles',   ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, user_regi_role])) #done
+    @app.route('/registry/<>/user/<>/actions', ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, user_regi_actions])) #done
 
     @app.route('/registry/<>/actions',         ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, regi_actions])) #done
-    @app.route('/registry/<>/action',          ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit, regi_add_action])) #done
-    @app.route('/registry/<>/action/<>',       ['OPTIONS', 'DELETE'],      lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit, regi_delete_action])) #done
+    @app.route('/registry/<>/action',          ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit_action, regi_add_action])) #done
+    @app.route('/registry/<>/action/<>',       ['OPTIONS', 'DELETE'],      lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit_action, regi_delete_action])) #done
 
     @app.route('/registry/<>/invite',          ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_invite, regi_invite])) #done
 

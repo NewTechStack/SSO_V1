@@ -26,19 +26,41 @@ class registry:
                 "builtin": {
                     "main": {
                         "creator": {
-                            "actions": ["delete", "use_api", "edit", "invite", "use", "get_infos", "change_role" ]
+                            "actions":
+                                [
+                                    "delete",
+                                    "change_name",
+                                    "change_open",
+                                    "edit_roles",
+                                    "edit_actions",
+                                    "change_roles",
+                                    "invite",
+                                    "use_api",
+                                    "get_infos"
+                                ]
                         },
                         "admin": {
-                            "actions": ["edit", "invite", "use", "get_infos", "change_role"]
+                            "actions":
+                                [
+                                    "edit_roles",
+                                    "edit_actions",
+                                    "change_roles",
+                                    "invite",
+                                    "get_infos"
+                                ]
                         },
                         "developper": {
-                            "actions": ["use_api", "use", "get_infos"]
+                            "actions":
+                                [
+                                    "use_api",
+                                    "get_infos"
+                                ]
                         },
                         "user": {
-                            "actions": ["use", "get_infos"]
-                        },
-                        "others": {
-                            "actions": ["get_infos"]
+                            "actions":
+                                [
+                                    "get_infos"
+                                ]
                         }
                     },
                     "last_update": None
@@ -50,7 +72,17 @@ class registry:
             },
             "actions": {
                 "builtin": {
-                    "main": ["change_role", "delete", "edit", "invite", "use", "get_infos", "use_api"],
+                    "main": [
+                        "delete",
+                        "change_name",
+                        "change_open",
+                        "edit_roles",
+                        "edit_actions",
+                        "change_roles",
+                        "invite",
+                        "use_api",
+                        "get_infos"
+                    ],
                     "last_update": None
                 },
                 "custom": {
