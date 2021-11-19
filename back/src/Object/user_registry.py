@@ -78,7 +78,7 @@ class user_registry:
     def get_role(self, user_id):
         res = list(
             self.red.filter(
-                (r.row["id_registry"] == self.reg_id) & r.row["id_user"] == user_)
+                (r.row["id_registry"] == self.reg_id) & (r.row["id_user"] == user_id)
             ).eq_join('id_user', get_conn().db("auth").table('users')
             ).without(
                 {'right': ["id"]}
@@ -97,7 +97,11 @@ class user_registry:
                 }
             ).run()
         )
-        return [True, {"d": res}, None]
+        if len(res) > 0:
+            res = res[0]
+        else:
+            res = {}
+        return [True, res, None]
 
     def data(self, id_user = None,update = False):
         id_user = id_user if id_user is not None else self.usr_id
@@ -139,7 +143,7 @@ class user_registry:
         if not roles[0]:
             return [False, "Error in finding user default role", 500]
         roles = roles[1]['roles']
-        open =  self.reg.is_open():
+        open =  self.reg.is_open()
         if not open[0]:
             return open
         return self.add_user(id_user, roles)
