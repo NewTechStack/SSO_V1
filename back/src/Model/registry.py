@@ -245,12 +245,12 @@ def user_registries(cn, nextc):
 
 def user_regi_role(cn, nextc):
     user_id = cn.rt["user"] if "user" in cn.rt else -1
-    cn.private["reg_user"].get_role(user_id)
+    err = cn.private["reg_user"].get_role(user_id)
     return cn.call_next(nextc, err)
 
 def user_regi_actions(cn, nextc):
     user_id = cn.rt["user"] if "user" in cn.rt else -1
-    cn.private["reg_user"].actions(user_id)
+    err = cn.private["reg_user"].actions(user_id)
     return cn.call_next(nextc, err)
 
 def user_regi_change_role(cn, nextc):
