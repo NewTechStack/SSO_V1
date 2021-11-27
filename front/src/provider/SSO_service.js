@@ -153,6 +153,16 @@ let SSO_service = {
         });
     },
 
+    update_registry_user_roles(ig_reg,id_user,data,usrtoken){
+        return fetch(endpoint + '/registry/' + ig_reg + '/user/' + id_user , {
+            method: 'PUT',
+            headers:this.loadHeaders(usrtoken),
+            body:JSON.stringify(data)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
     add_registre(data,usrtoken){
         return fetch(endpoint + '/registry', {
             method: 'POST',
@@ -288,6 +298,24 @@ let SSO_service = {
 
     getRegistryUsers(id_reg,usrtoken){
         return fetch(endpoint + '/registry/' + id_reg + '/users' , {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+    getRegistryUserRoles(id_reg,id_user,usrtoken){
+        return fetch(endpoint + '/registry/' + id_reg + '/user/' + id_user + '/roles' , {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+    getRegistryUserActions(id_reg,id_user,usrtoken){
+        return fetch(endpoint + '/registry/' + id_reg + '/user/' + id_user + '/actions' , {
             method: 'GET',
             headers:this.loadHeaders(usrtoken)
         }).then(response => response.json()).catch(error => {

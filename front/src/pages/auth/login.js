@@ -9,7 +9,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import './login_signup.css'
 import SSO_service from "../../provider/SSO_service";
 import { withSnackbar } from 'notistack';
-
+import jwt_decode from "jwt-decode";
 
 
 
@@ -52,6 +52,9 @@ class login extends Component {
                     SSO_service.getUser(loginRes.data.usrtoken).then(infoRes => {
                         console.log(infoRes)
                         if(infoRes.status === 200 && infoRes.succes === true){
+
+                            var decoded = jwt_decode(loginRes.data.usrtoken);
+                            localStorage.setItem("id",decoded.payload.id)
                             localStorage.setItem("email",this.state.login_form.email)
                             localStorage.setItem("firstname",infoRes.data.first_name.main || "")
                             localStorage.setItem("lastname",infoRes.data.last_name.main || "")

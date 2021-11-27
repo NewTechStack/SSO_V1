@@ -29,12 +29,12 @@ export default class main extends React.Component{
     }
 
     componentDidMount() {
-        console.log(localStorage)
         const isMobileViewPort = document.body.offsetWidth < 600;
         this.setState({isSidebarHidden:isMobileViewPort})
         if(this.verifSession() === true){
             this.verif_acces_roles()
             let path_array = this.props.location.pathname.split("/")
+            console.log(path_array)
             let menuItems = ["infos","registres","admin"];
             let current = path_array[path_array.length -1]
             console.log(current)
@@ -103,7 +103,7 @@ export default class main extends React.Component{
                             icon={<BallotIcon fontSize="medium" style={{color:"#00AEF9"}} />}
                             name="registres"
                             label="Registres"
-                            onClick={() => navigateTo('/main/pro')} />
+                            onClick={() => navigateTo('/main/registres')} />
                         {
                             this.state.is_have_admin_acces === true &&
                             <SidebarItem
