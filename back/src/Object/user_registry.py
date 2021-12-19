@@ -206,7 +206,7 @@ class user_registry:
             return [False, "Invalid roles list", 400]
         user_roles = list(d["roles"].keys())
         for role in user_roles:
-            if role not in roles:
+            if role not in roles and role != "creator":
                 self.status(id_user, role, False)
         for role in roles:
             self.__status(id_user, role, True)
