@@ -207,16 +207,19 @@ class user:
     def wait_token(self, key, secret):
         return [True, {}, None]
 
-    def get_token(self, id = None, registry = "", delta = 48, asked = []):
+    def get_token(self, id = None, registry = "", delta = 48, asked = [], roles = []):
         if (not isinstance(id, str) and id is not None) or not isinstance(registry, str) or \
            not isinstance(delta, int) or not isinstance(asked, list) or \
-           not all(isinstance(a, str) for a in asked):
+           not all(isinstance(a, str) for a in asked) or not isinstance(roles, list) or \
+           not all(isinstance(a, str) for a in roles):
            return [False, "Invalid param", 400]
         id = self.__getid(id, self.id)
         if id == "-1":
             return [False, "Invalid id", 403]
         private_key = open(f'{secret_path}jwt-key').read()
         payload = {}
+        if len(roles) != 0:
+            payload["roles"] = roles
         if len(asked) == 0:
             payload["id"] = id
         else:
