@@ -57,6 +57,21 @@ let utilFunctions = {
         let hourFormated = parseInt(hourValue) || 0
         let minuteFormated = parseInt(minuteValue) || 0
         return hourFormated + (minuteFormated / 60)
+    },
+
+    alphaSort(item1,item2,by){
+        const a = item1[by].toLowerCase();
+        const b = item2[by].toLowerCase();
+
+        if (a > b) {
+            return 1;
+        }
+
+        if (b > a) {
+            return -1;
+        }
+
+        return 0;
     }
 
 

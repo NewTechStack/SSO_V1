@@ -32,6 +32,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import verifForms from '../../tools/verifForms'
 import CloseIcon from "@material-ui/icons/Close";
 import StopIcon from '@material-ui/icons/Stop';
+import PQueue from "p-queue/dist";
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -104,7 +106,7 @@ export default function RegistreDetails(props) {
                         </IconButton>
                     }
                     {
-                        reg_user_actions.includes("delete") === true &&
+                        ((reg_user_actions.includes("delete") === true) || (reg_user_actions.includes("edit_roles") === true)) &&
                         <IconButton size="small" onClick={() => {
                             setDeleteMeth("role")
                             setSelectedRole(row)
@@ -137,7 +139,8 @@ export default function RegistreDetails(props) {
                 </Label>
             </div>,
             sortable: true,
-            grow: 0.3
+            grow: 0.3,
+            /*sortFunction: (rowA,rowB) => {utilFunctions.alphaSort(rowA,rowB,'name')}*/
         },
         {
             name: 'Actions',
@@ -159,7 +162,7 @@ export default function RegistreDetails(props) {
             name: '',
             cell: row => row.type === "custom" ? <div>
                     {
-                        reg_user_actions.includes("delete") === true &&
+                        ((reg_user_actions.includes("delete") === true) || (reg_user_actions.includes("edit_actions") === true)) &&
                         <IconButton onClick={() => {
                             setDeleteMeth("action")
                             setSelectedAction(row)
@@ -230,7 +233,6 @@ export default function RegistreDetails(props) {
                             })
                             setOpenUpdateUserRolesModal(true)
                             setSelectedUserRoles(formated_roles)
-                            console.log(row)
                             setSelectedUsername(row.username || "")
                             setSelectedUserId(row.id)
                         }}>
@@ -244,7 +246,7 @@ export default function RegistreDetails(props) {
             grow: 0.5
         },
         {
-            name: 'Username',
+            name: 'Pseudo',
             selector: "username",
             sortable: true,
         },
@@ -272,14 +274,12 @@ export default function RegistreDetails(props) {
                                    wide='very'
                                    size={"small"}
                             /> :
-                            <Popup content={<h6 style={{fontSize: "0.8rem"}}>Modifié
-                                par: {item.data.by === null ? "system" : item.data.by}
-                                <br/>{item.data.last_update !== null && moment(item.data.last_update).format("DD-MM-YYYY HH:mm")}
+                            <Popup content={<h6 style={{fontSize: "0.8rem"}}>Rôle désactivé
                             </h6>}
                                    trigger={
                                        <Label as='a' size="mini" style={{marginBottom: 2, marginTop: 5}}>
-                                           {item.role}&nbsp;&nbsp;
-                                           <Icon name='lock'/>
+                                           {item.role}
+                                           {/*<Icon name='lock'/>*/}
                                        </Label>
                                    }
                                    wide='very'
@@ -340,7 +340,7 @@ export default function RegistreDetails(props) {
     const [loadingBtnAdd, setLoadingBtnAdd] = React.useState(false);
     const [selectedTab, setSelectedTab] = React.useState("details");
     const [regInfo, setRegInfo] = React.useState();
-    const [roles, setRoles] = React.useState(null);
+    const [roles, setRoles] = React.useState();
     const [actions, setActions] = React.useState([]);
     const [n_format_actions, setN_format_actions] = React.useState([]);
     const [regUsers, setRegUsers] = React.useState([]);
@@ -380,6 +380,7 @@ export default function RegistreDetails(props) {
 
     useEffect(() => {
 
+        console.log(props)
 
         if (verifSession() === true) {
             getInforegistre()
@@ -410,7 +411,7 @@ export default function RegistreDetails(props) {
             console.log(reguserActionsRes)
             if (reguserActionsRes.status === 200 && reguserActionsRes.succes === true) {
                 setReg_user_actions(reguserActionsRes.data.actions || [])
-                if((reguserActionsRes.data.actions || []).includes("use_api") === true){
+                if ((reguserActionsRes.data.actions || []).includes("use_api") === true) {
                     getRegistryKeys()
                 }
 
@@ -447,37 +448,46 @@ export default function RegistreDetails(props) {
     const getRoles = () => {
         setLoading(true)
         SSO_service.get_registre_roles(props.match.params.reg, localStorage.getItem("usrtoken")).then(rolesRes => {
-            console.log(rolesRes)
+
             if (rolesRes.status === 200 && rolesRes.succes === true) {
                 let all_roles = [];
                 let bultin_roles = rolesRes.data.builtin || []
+                bultin_roles.sort((a, b) => a.localeCompare(b))
                 bultin_roles.map(item => {
                     all_roles.push({name: item, type: "builtin"})
                 })
                 let custom_roles = rolesRes.data.custom || []
+                custom_roles.sort((a, b) => a.localeCompare(b))
                 custom_roles.map(item => {
                     all_roles.push({name: item, type: "custom"})
                 })
                 let all_formated_roles = []
 
-                Promise.allSettled(all_roles.map(role =>
+                let queue = new PQueue({concurrency: 1});
+                let calls = [];
+                all_roles.map((role, k) => {
+                    calls.push(
+                        () => SSO_service.getInfoRole(props.match.params.reg, role.name, localStorage.getItem("usrtoken")).then(infoRes => {
+                            console.log(k)
+                            if (infoRes.status === 200 && infoRes.succes === true) {
+                                all_formated_roles.push({
+                                    name: role.name,
+                                    type: role.type,
+                                    actions: infoRes.data[role.name].actions || []
+                                })
+                            } else {
+                                console.log(infoRes.error)
+                                all_formated_roles.push({name: role.name, actions: []})
+                            }
 
-                    SSO_service.getInfoRole(props.match.params.reg, role.name, localStorage.getItem("usrtoken")).then(infoRes => {
-                        if (infoRes.status === 200 && infoRes.succes === true) {
-                            all_formated_roles.push({
-                                name: role.name,
-                                type: role.type,
-                                actions: infoRes.data[role.name].actions || []
-                            })
-                        } else {
-                            console.log(infoRes.error)
-                            all_formated_roles.push({name: role.name, actions: []})
-                        }
+                        }).catch(err => {
+                            console.log(err)
+                        })
+                    )
+                })
 
-                    }).catch(err => {
-                        console.log(err)
-                    })
-                )).then(finalRes => {
+                queue.addAll(calls).then(final => {
+                    console.log(final)
                     setRoles(all_formated_roles)
                     setLoading(false)
                 }).catch(err => {
@@ -732,7 +742,12 @@ export default function RegistreDetails(props) {
             console.log(addRes)
             if (addRes.status === 200 && addRes.succes === true) {
                 let keys = regKeys || [];
-                keys.push({name: newKey, active: true, date: moment().format("YYYY-MM-DD HH:mm:ss"),id:addRes.data.id})
+                keys.push({
+                    name: newKey,
+                    active: true,
+                    date: moment().format("YYYY-MM-DD HH:mm:ss"),
+                    id: addRes.data.id
+                })
                 setRegKeys(keys)
                 setNewKey("");
                 setTimeout(() => {
@@ -862,12 +877,14 @@ export default function RegistreDetails(props) {
         setLoadingBtnAdd(true)
         SSO_service.update_registry_user_roles(props.match.params.reg, id_user, data, localStorage.getItem("usrtoken")).then(res => {
             if (res.status === 200 && res.succes === true) {
+
+                getRegistryUserActions()
                 setTimeout(() => {
                     getRegistryUsers()
                     setOpenUpdateUserRolesModal(false)
                     setLoadingBtnAdd(false)
                     enqueueSnackbar("Modification effectué avec succès", {variant: "success"})
-                }, 1000)
+                },1000)
             } else {
                 enqueueSnackbar(res.error, {variant: "error"})
                 setLoadingBtnAdd(false)
@@ -900,7 +917,7 @@ export default function RegistreDetails(props) {
                             <Typography className={classes.heading}>Nom du registre</Typography>
                             <div>
                                 {
-                                    !loading &&
+                                    !loading && regInfo && regInfo.name &&
                                     [
                                         <Typography
                                             className={classes.secondaryHeadingTitle}>{regInfo.name.main}</Typography>,
@@ -956,7 +973,7 @@ export default function RegistreDetails(props) {
                             <Typography className={classes.heading}>Description</Typography>
                             <div>
                                 {
-                                    !loading &&
+                                    !loading && regInfo && regInfo.description &&
                                     [
                                         <Typography style={{marginLeft: -13}}
                                                     className={classes.secondaryHeadingTitle}>{regInfo.description.main || "Aucune description"}</Typography>,
@@ -983,7 +1000,7 @@ export default function RegistreDetails(props) {
                             <Typography className={classes.heading}>Accès</Typography>
                             <div>
                                 {
-                                    !loading &&
+                                    !loading && regInfo && regInfo.open &&
                                     [
                                         <Typography
                                             className={classes.secondaryHeadingTitle}>{regInfo.open.main === true ? "Tout le monde" : "Les personnes invitées seulement"}</Typography>,
@@ -1080,15 +1097,61 @@ export default function RegistreDetails(props) {
                             <Typography className={classes.heading}>Date de création</Typography>
                             <div>
                                 {
-                                    !loading &&
+                                    !loading && regInfo &&
                                     <Typography style={{marginLeft: -13}}
                                                 className={classes.secondaryHeadingTitle}>{moment(regInfo.date).format("DD-MM-YYYY HH:mm")}</Typography>
                                 }
                             </div>
                         </AccordionSummary>
                     </Accordion>
-                </div>
+                    <Divider/>
+                    <h3 style={{marginTop: 35, fontWeight: 700, fontSize: "1.02rem"}}>Utilisateurs</h3>
+                    <div style={{marginLeft: 20, marginTop: 10}}>
+                        {
+                            reg_user_actions.includes("invite") === true &&
+                            <div align="right" style={{marginBottom: 15}}>
+                                <AtlButton appearance="default" className="alt-font"
+                                           iconBefore={<AddIcon/>}
+                                           onClick={() => {
+                                               setOpenAddUserModal(true)
+                                           }}
+                                >
+                                    Inviter un utilisateur
+                                </AtlButton>
+                            </div>
+                        }
 
+
+                        <div className="row mb-3">
+                            <div className="col-md-6">
+                                <Textfield name="basic" placeholder="Chercher..." style={{maxWidth: 350}}
+                                           value={user_search} onChange={event => {
+                                    setUser_search(event.target.value)
+                                }}
+                                />
+                            </div>
+                        </div>
+                        <DataTable
+                            columns={users_columns}
+                            data={regUsers.filter(x => ((x.username.indexOf(user_search) > -1) || (x.email && x.email.indexOf(user_search) > -1) || user_search === ""))}
+                            selectableRows={false}
+                            selectableRowsHighlight={true}
+                            pagination={true}
+                            paginationPerPage={10}
+                            paginationComponentOptions={paginationOptions}
+                            highlightOnHover={false}
+                            contextMessage={tableContextMessage}
+                            progressPending={!regUsers}
+                            progressComponent={<h6>Chargement...</h6>}
+                            noDataComponent="Il n'y a aucun utilisateur à afficher"
+                            noHeader={true}
+                            pointerOnHover={true}
+                            onRowClicked={(row, e) => {
+                            }}
+                            customStyles={customTableStyle}
+                        />
+                    </div>
+                </div>
             )
         }
 
@@ -1114,7 +1177,6 @@ export default function RegistreDetails(props) {
                         <DataTable
                             columns={roles_columns}
                             data={roles}
-                            defaultSortField={"name"}
                             selectableRows={false}
                             selectableRowsHighlight={true}
                             pagination={true}
@@ -1175,56 +1237,6 @@ export default function RegistreDetails(props) {
                             customStyles={customTableStyle}
                         />
                     </div>
-                </div>
-            )
-        }
-
-        if (selectedTab === "users") {
-            return (
-                <div style={{marginLeft: 20, marginTop: 35}}>
-                    {
-                        reg_user_actions.includes("invite") === true &&
-                        <div align="right" style={{marginBottom: 30}}>
-                            <AtlButton appearance="default" className="alt-font"
-                                       iconBefore={<AddIcon/>}
-                                       onClick={() => {
-                                           setOpenAddUserModal(true)
-                                       }}
-                            >
-                                Inviter un utilisateur
-                            </AtlButton>
-                        </div>
-                    }
-
-
-                    <div className="row mb-3">
-                        <div className="col-md-6">
-                            <Textfield name="basic" placeholder="Chercher..." style={{maxWidth: 350}}
-                                       value={user_search} onChange={event => {
-                                setUser_search(event.target.value)
-                            }}
-                            />
-                        </div>
-                    </div>
-                    <DataTable
-                        columns={users_columns}
-                        data={regUsers.filter(x => ((x.username.indexOf(user_search) > -1) || (x.email  && x.email.indexOf(user_search) > -1) || user_search === ""))}
-                        selectableRows={false}
-                        selectableRowsHighlight={true}
-                        pagination={true}
-                        paginationPerPage={10}
-                        paginationComponentOptions={paginationOptions}
-                        highlightOnHover={false}
-                        contextMessage={tableContextMessage}
-                        progressPending={!regUsers}
-                        progressComponent={<h6>Chargement...</h6>}
-                        noDataComponent="Il n'y a aucun utilisateur à afficher"
-                        noHeader={true}
-                        pointerOnHover={true}
-                        onRowClicked={(row, e) => {
-                        }}
-                        customStyles={customTableStyle}
-                    />
                 </div>
             )
         }
@@ -1311,7 +1323,12 @@ export default function RegistreDetails(props) {
                     <div>
                         <div className="main_padding-form">
 
-                            <div align="right" style={{marginTop: -10}}>
+                            <div style={{display: "flex", justifyContent: "space-between",marginTop:-18}}>
+                                <IconButton onClick={() => {
+                                    props.history.goBack()
+                                }}>
+                                    <ArrowBackIcon/>
+                                </IconButton>
                                 {
                                     reg_user_actions.includes("delete") === true ?
                                         <IconButton onClick={() => {
@@ -1322,67 +1339,77 @@ export default function RegistreDetails(props) {
                                         <IconButton disabled={true}>
                                             <StopIcon style={{color: "#fff"}}/>
                                         </IconButton>
-
                                 }
-
                             </div>
-                            <h5 style={{
-                                fontSize: "1.25rem",
-                                marginTop: -33
-                            }}>Registre: {!loading && regInfo.name.main}</h5>
-                            <p style={{fontSize: "0.65rem", color: "grey"}}>{props.match.params.reg}</p>
-                            <div style={{display: "flex"}}>
-                                <label style={{
-                                    color: "#5f6368",
-                                    fontSize: 12,
-                                    marginRight: 10,
-                                    marginTop: 2
-                                }}>{!loading && regInfo.open.main === true ? "Ouvert" : "Privé"}</label>
-                                <Popup content={
-                                    <h6 style={{fontSize: "0.8rem"}}>Statut de votre registre: <br/> Privé: uniquement
-                                        sur invitation des membre avec l'action <b>invite</b> <br/>Publique: tout le
-                                        monde peu rejoindre votre registre, il apparait dans la liste des registres
-                                    </h6>
-                                }
-                                       wide='very'
-                                       size={"small"}
-                                       trigger={<HelpIcon fontSize="small" color="disabled"/>}
-                                />
-
-                            </div>
-
-
-                            <div className="rainbow-flex rainbow-flex_column rainbow_vertical-stretch mt-5">
-                                <Tabset
-                                    fullWidth
-                                    id="tabset-1"
-                                    onSelect={handleChangedTab}
-                                    activeTabName={selectedTab}
-                                    className="rainbow-p-horizontal_x-large"
-                                >
-                                    <Tab
-                                        label="Détails"
-                                        name="details"
-                                        id="details"
-                                        ariaControls="details"
-                                    />
-
-                                    <Tab
-                                        label="Roles"
-                                        name="roles"
-                                        id="roles"
-                                        ariaControls="roles"
-                                    />
-
-                                    <Tab label="Actions" name="actions" id="actions" ariaControls="actions"/>
-                                    <Tab label="Utilisateurs" name="users" id="users" ariaControls="users"/>
-                                    {
-                                        reg_user_actions.includes("use_api") &&
-                                        <Tab label="Clés" name="keys" id="keys" ariaControls="keys"/>
+                            <div>
+                                <h5 style={{
+                                    fontSize: "1.25rem"
+                                }}>Registre: {!loading && regInfo && regInfo.name && regInfo.name.main}</h5>
+                                <p style={{fontSize: "0.65rem", color: "grey"}}>{props.match.params.reg}</p>
+                                <div style={{display: "flex"}}>
+                                    <label style={{
+                                        color: "#5f6368",
+                                        fontSize: 12,
+                                        marginRight: 10,
+                                        marginTop: 2
+                                    }}>{!loading && regInfo && regInfo.open && regInfo.open.main === true ? "Ouvert" : "Privé"}</label>
+                                    <Popup content={
+                                        <h6 style={{fontSize: "0.8rem"}}>Statut de votre registre: <br/> Privé:
+                                            uniquement
+                                            sur invitation des membre avec l'action <b>invite</b> <br/>Publique:
+                                            tout le
+                                            monde peu rejoindre votre registre, il apparait dans la liste des
+                                            registres
+                                        </h6>
                                     }
+                                           wide='very'
+                                           size={"small"}
+                                           trigger={<HelpIcon fontSize="small" color="disabled"/>}
+                                    />
+
+                                </div>
+                            </div>
+
+                            <div className="rainbow-flex rainbow-flex_column rainbow_vertical-stretch mt-2">
+                                {
+                                    ((reg_user_actions.includes("edit_role") || reg_user_actions.includes("change_roles") || reg_user_actions.includes("use_api")) &&
+                                        (reg_user_actions.includes("edit_actions") || reg_user_actions.includes("change_roles") || reg_user_actions.includes("use_api"))) ?
+                                        <Tabset
+                                            fullWidth
+                                            id="tabset-1"
+                                            onSelect={handleChangedTab}
+                                            activeTabName={selectedTab}
+                                            className="rainbow-p-horizontal_x-large"
+                                        >
+                                            <Tab
+                                                label="Informations"
+                                                name="details"
+                                                id="details"
+                                                ariaControls="details"
+
+                                            />
+
+                                            {
+                                                (reg_user_actions.includes("edit_role") || reg_user_actions.includes("change_roles") || reg_user_actions.includes("use_api")) &&
+                                                <Tab
+                                                    label="Roles"
+                                                    name="roles"
+                                                    id="roles"
+                                                    ariaControls="roles"
+                                                />
+                                            }
+
+                                            {
+                                                (reg_user_actions.includes("edit_actions") || reg_user_actions.includes("change_roles") || reg_user_actions.includes("use_api")) &&
+                                                <Tab label="Actions" name="actions" id="actions"
+                                                     ariaControls="actions"/>
+                                            }
 
 
-                                </Tabset>
+                                        </Tabset> : null
+
+                                }
+
                                 {/*<Divider style={{marginTop:20,marginBottom:20}}/>*/}
                                 {getTabContent()}
                             </div>

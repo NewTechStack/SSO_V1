@@ -30,7 +30,8 @@ def user_get_token(cn, nextc):
     err = cn.private["user"].get_token(
             id=id,
             registry=reg,
-            asked=asked
+            asked=asked,
+            roles=roles
     )
     if err[0]:
         cn.private['usrtoken']=err[1]['usrtoken']

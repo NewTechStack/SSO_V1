@@ -32,9 +32,31 @@ export default function Pro(props){
             cell: row => <div style={{paddingBottom:10}}>
                 {
                     (row.roles || []).map( item => (
-                        <Label as='a' basic color='blue' size="mini">
-                            {item.role}
-                        </Label>
+                        item.data.active === true ?
+                            <Popup content={<h6 style={{fontSize: "0.8rem"}}>Modifié
+                                par: {item.data.by === null ? "system" : item.data.by}
+                                <br/>{item.data.last_update !== null && moment(item.data.last_update).format("DD-MM-YYYY HH:mm")}
+                            </h6>}
+                                   trigger={
+                                       <Label as='a' basic color="blue" size="mini"
+                                              style={{marginBottom: 2, marginTop: 5}}>
+                                           {item.role}
+                                       </Label>
+                                   }
+                                   wide='very'
+                                   size={"small"}
+                            /> :
+                            <Popup content={<h6 style={{fontSize: "0.8rem"}}>Rôle désactivé
+                            </h6>}
+                                   trigger={
+                                       <Label as='a' size="mini" style={{marginBottom: 2, marginTop: 5}}>
+                                           {item.role}
+                                           {/*<Icon name='lock'/>*/}
+                                       </Label>
+                                   }
+                                   wide='very'
+                                   size={"small"}
+                            />
                     ))
                 }
             </div>,
@@ -120,7 +142,7 @@ export default function Pro(props){
             sortable: true,
         },
         {
-            name: 'Username',
+            name: 'Pseudo',
             selector: 'username',
             sortable: true,
         },

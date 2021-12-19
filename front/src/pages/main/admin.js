@@ -53,7 +53,7 @@ export default function Admin(props){
             sortable: true,
         },
         {
-            name: 'Username',
+            name: 'Pseudo',
             selector: 'username',
             sortable: true,
         },

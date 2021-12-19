@@ -9,13 +9,10 @@ import RenderIf from 'react-rainbow-components/components/RenderIf';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import Routes from './routes';
 import SectionHeading from '../../components/SectionHeading';
-import { navigateTo } from './history';
 import moment from "moment";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import DashboardIcon from '@material-ui/icons/Dashboard';
 import ContactPhoneIcon from '@material-ui/icons/ContactPhone';
 import LockIcon from '@material-ui/icons/Lock';
-import StarIcon from '@material-ui/icons/Star';
 import BallotIcon from '@material-ui/icons/Ballot';
 
 
@@ -29,6 +26,7 @@ export default class main extends React.Component{
     }
 
     componentDidMount() {
+        console.log(this.props)
         const isMobileViewPort = document.body.offsetWidth < 600;
         this.setState({isSidebarHidden:isMobileViewPort})
         if(this.verifSession() === true){
@@ -38,7 +36,7 @@ export default class main extends React.Component{
             let menuItems = ["infos","registres","admin"];
             let current = path_array[path_array.length -1]
             console.log(current)
-            this.setState({selectedItem:menuItems.find(x => x === current) ? current : "infos",session:true})
+            this.setState({selectedItem:menuItems.find(x => x === current) ? current : path_array[path_array.length -2] === "registre" ? "registres" : "infos",session:true})
         }else{
             this.props.history.push("/sso/login")
         }
@@ -84,26 +82,18 @@ export default class main extends React.Component{
                         className="react-rainbow-admin-app_sidebar"
                         selectedItem={selectedItem}
                         onSelect={(e,selected) => {this.setState({selectedItem:selected})}}>
-                        {/*<SidebarItem
-                            className="react-rainbow-admin-app_sidebar-item"
-                            icon={<DashboardIcon fontSize="medium" style={{color:"#00AEF9"}} />}
-                            name="dash"
-                            label="Accueil"
-                            onClick={() => navigateTo('/main/dash')}
-
-                        />*/}
                         <SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
                             icon={<ContactPhoneIcon fontSize="medium" style={{color:"#00AEF9"}} />}
                             name="infos"
                             label="Informations personnelles"
-                            onClick={() => navigateTo('/main/infos')} />
+                            onClick={() => this.props.history.push('/main/infos')} />
                         <SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
                             icon={<BallotIcon fontSize="medium" style={{color:"#00AEF9"}} />}
                             name="registres"
                             label="Registres"
-                            onClick={() => navigateTo('/main/registres')} />
+                            onClick={() => this.props.history.push('/main/registres')} />
                         {
                             this.state.is_have_admin_acces === true &&
                             <SidebarItem
@@ -111,7 +101,7 @@ export default class main extends React.Component{
                                 icon={<LockIcon fontSize="medium" style={{color:"#00AEF9"}} />}
                                 name="admin"
                                 label="Admin"
-                                onClick={() => navigateTo('/main/admin')} />
+                                onClick={() => this.props.history.push('/main/admin')} />
                         }
 
                     </Sidebar>

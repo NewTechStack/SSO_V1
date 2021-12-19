@@ -119,7 +119,7 @@ class signup extends Component {
                                          }
                                      }}
                                >
-                                   <div className="row mt-4">
+                                   {/*<div className="row mt-4">
                                        <div className="col-md-6 mt-2">
                                            <TextField
                                                label="Nom"
@@ -142,8 +142,8 @@ class signup extends Component {
                                                onChange={this.handleObjectChange('signup_form','lastname')}
                                            />
                                        </div>
-                                   </div>
-                                   <div className="row mt-2">
+                                   </div>*/}
+                                   <div className="row mt-4">
                                        <div className="col-md-12 mt-2">
                                            <TextField
                                                label="Email"

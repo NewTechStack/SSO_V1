@@ -10,12 +10,6 @@ import Accordion from '@material-ui/core/Accordion';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import Typography from '@material-ui/core/Typography';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import {
-    MuiPickersUtilsProvider,
-    KeyboardDatePicker,
-} from '@material-ui/pickers';
-import DateFnsUtils from '@date-io/date-fns';
 import moment from "moment";
 import Button from "@material-ui/core/Button";
 import { useSnackbar } from 'notistack';
@@ -25,7 +19,6 @@ import GroupOutlinedIcon from '@material-ui/icons/GroupOutlined';
 import MuiButton, { ButtonGroup as MuiButtonGroup } from '@atlaskit/button';
 import CheckIcon from '@material-ui/icons/Check';
 import BlockIcon from '@material-ui/icons/Block';
-import Tooltip from '@atlaskit/tooltip';
 import { Popup } from 'semantic-ui-react'
 import Divider from "@material-ui/core/Divider";
 import Modal, {ModalTransition} from "@atlaskit/modal-dialog";
@@ -330,7 +323,7 @@ export default function Info(props){
                                         aria-controls="panel2bh-content"
                                         id="panel2bh-header"
                                     >
-                                        <Typography className={classes.heading}>Username</Typography>
+                                        <Typography className={classes.heading}>Pseudo</Typography>
                                         <Typography className={classes.secondaryHeadingTitle}>
                                             {infoAccount.username}
                                         </Typography>
@@ -656,7 +649,7 @@ export default function Info(props){
                                         aria-controls="panel3bh-content"
                                         id="panel3bh-header"
                                     >
-                                        <Typography className={classes.heading}>Dernier modification</Typography>
+                                        <Typography className={classes.heading}>Dernière modification</Typography>
                                         <div>
                                             {
                                                 !loading &&

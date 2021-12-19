@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {BrowserRouter as Router, Route, Switch, Redirect} from "react-router-dom";
+import {BrowserRouter as Router, Route, Switch, Redirect,withRouter} from "react-router-dom";
 import MuiBackdrop from "./components/Loading/MuiBackdrop";
 import Login from "./pages/auth/login";
 import Signup from "./pages/auth/signup";
@@ -12,8 +12,6 @@ import Extern_signup from "./pages/auth/extern/extern_signup";
 import Accept_service from "./pages/auth/extern/accept_service";
 import moment from "moment";
 import 'moment/locale/fr';
-import history from '././pages/main/history';
-
 
 export default class App extends Component {
 
@@ -61,7 +59,7 @@ export default class App extends Component {
                         <Route exact  path="/sso/reset/:email/:key" component={Reset}/>
                         <Route exact  path="/sso/reset/:email" component={Reset}/>
                         <Route exact  path="/registries/:registries/key/:key/:infos" component={Registry}/>
-                        <Route path="/main" component={Main}/>
+                        <Route path="/main" component={withRouter(Main)}/>
 
                         <Route exact  path="/sso/extern/:key/:auth" component={Extern_login}/>
                         <Route exact  path="/sso/extern/:key/:auth/signup" component={Extern_signup}/>
