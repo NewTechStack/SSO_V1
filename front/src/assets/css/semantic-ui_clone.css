@@ -12703,8 +12703,8 @@ a.ui.active.label:hover, a.ui.labels .active.label:hover {
 }
 
 .ui.blue.label, .ui.blue.labels .label {
-    background-color: #2185d0 !important;
-    border-color: #2185d0 !important;
+    background-color: #1c94fe !important;
+    border-color: #1c94fe !important;
     color: #fff !important
 }
 
@@ -12724,14 +12724,14 @@ a.ui.active.label:hover, a.ui.labels .active.label:hover {
 
 .ui.basic.blue.label {
     background: none #fff !important;
-    color: #2185d0 !important;
-    border-color: #2185d0 !important
+    color: #1c94fe !important;
+    border-color: #1c94fe !important
 }
 
 .ui.basic.blue.labels a.label:hover, a.ui.basic.blue.label:hover {
     background-color: #fff !important;
-    color: #1678c2 !important;
-    border-color: #1678c2 !important
+    color: #1c94fe !important;
+    border-color: #1c94fe !important
 }
 
 .ui.violet.label, .ui.violet.labels .label {
@@ -27796,7 +27796,7 @@ a.ui.nag {
 }
 
 .ui.blue.progress .bar {
-    background-color: #2185d0
+    background-color: #1c94fe
 }
 
 .ui.blue.inverted.progress .bar {

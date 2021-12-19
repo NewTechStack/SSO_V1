@@ -36,6 +36,7 @@ export default function SectionHeading({ onToogleSidebar }) {
                             src={avatar_img}
                             assistiveText={user_full_name}
                             title={user_full_name}
+                            style={{backgroundColor:"#1c94fe"}}
                             size="medium" />
                         <div className="rainbow-m-left_x-small">
                             <p className="rainbow-font-size-text_medium rainbow-color_dark-1">{user_full_name}</p>

@@ -11,13 +11,13 @@ import './assets/css/semantic-ui_clone.css'
 const theme = createTheme({
     palette: {
         primary: {
-            main: '#1a73e8',
+            main: '#1c94fe',
         },
         secondary: {
             main: '#11cb5f',
         },
         custom: {
-            main: '#00AEF9'
+            main: '#1c94fe'
         }
 
     },

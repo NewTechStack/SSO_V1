@@ -84,13 +84,13 @@ export default class main extends React.Component{
                         onSelect={(e,selected) => {this.setState({selectedItem:selected})}}>
                         <SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
-                            icon={<ContactPhoneIcon fontSize="medium" style={{color:"#00AEF9"}} />}
+                            icon={<ContactPhoneIcon fontSize="medium" style={{color:"#1c94fe"}} />}
                             name="infos"
                             label="Informations personnelles"
                             onClick={() => this.props.history.push('/main/infos')} />
                         <SidebarItem
                             className="react-rainbow-admin-app_sidebar-item"
-                            icon={<BallotIcon fontSize="medium" style={{color:"#00AEF9"}} />}
+                            icon={<BallotIcon fontSize="medium" style={{color:"#1c94fe"}} />}
                             name="registres"
                             label="Registres"
                             onClick={() => this.props.history.push('/main/registres')} />
@@ -98,7 +98,7 @@ export default class main extends React.Component{
                             this.state.is_have_admin_acces === true &&
                             <SidebarItem
                                 className="react-rainbow-admin-app_sidebar-item"
-                                icon={<LockIcon fontSize="medium" style={{color:"#00AEF9"}} />}
+                                icon={<LockIcon fontSize="medium" style={{color:"#1c94fe"}} />}
                                 name="admin"
                                 label="Admin"
                                 onClick={() => this.props.history.push('/main/admin')} />

@@ -592,6 +592,7 @@ export default function Info(props){
                                                                size={"small"}
                                                                trigger={
                                                                    <MuiButton appearance="primary" isDisabled={item.data.active === false}
+                                                                              style={{backgroundColor:"#1c94fe"}}
                                                                                    iconAfter={item.data.active === true ? <CheckIcon /> : <BlockIcon/>}>
                                                                    {item.role}
                                                                    </MuiButton>}

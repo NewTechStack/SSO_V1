@@ -549,7 +549,7 @@ export default function Pro(props){
                         scrollBehavior={false}
                         width="medium"
                         actions={[
-                            { text: 'Ajouter', className:"alt-font", onClick: () => {addNewRegistre()}, isLoading:loadingBtnAdd },
+                            { text: 'Ajouter', className:"alt-font", onClick: () => {addNewRegistre()}, isLoading:loadingBtnAdd, style:{backgroundColor:"#1c94fe"} },
                             { text: 'Annuler', className:"alt-font", onClick: () => {setOpenAddModal(false)} },
                         ]}
                         onClose={() => {

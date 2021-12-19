@@ -132,7 +132,7 @@
 }
 
 .selectedBtnGroup{
-    border: 2px solid #1a73e8!important;
+    border: 2px solid #1c94fe!important;
     background-color: rgba(26, 115, 232, 0.08) !important;
 }
 
@@ -161,4 +161,23 @@
 }
 .label_margin_left{
     margin-right: 5px!important;
+}
+.rainbow-sidebar-item--active::before{
+    background-color: #1c94fe!important;
+}
+.rainbow-avatar_initials{
+    background-color: #1c94fe!important;
+}
+.react-rainbow-admin-app_sidebar-container{
+    padding: 0 0 0 5px!important;
+}
+.react-rainbow-admin-app_sidebar{
+    width: 93px!important;
+}
+.react-rainbow-admin-app_sidebar-item{
+    border-radius: unset!important;
+    margin-bottom: unset!important;
+}
+.react-rainbow-admin-app_sidebar-item::before{
+    border-radius: unset!important;
 }

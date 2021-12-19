@@ -1405,6 +1405,12 @@ export default function RegistreDetails(props) {
                                                      ariaControls="actions"/>
                                             }
 
+                                            {
+                                                (reg_user_actions.includes("use_api")) &&
+                                                <Tab label="Keys" name="keys" id="keys"
+                                                     ariaControls="keys"/>
+                                            }
+
 
                                         </Tabset> : null
 
@@ -1426,7 +1432,7 @@ export default function RegistreDetails(props) {
                         width="medium"
                         actions={[
                             {
-                                text: 'Ajouter', className: "alt-font", onClick: () => {
+                                text: 'Ajouter', className: "alt-font",style:{backgroundColor:"#1c94fe"}, onClick: () => {
                                     addNewRole()
                                 }, isLoading: loadingBtnAdd, isDisabled: newRole_name.trim() === ""
                             },
@@ -1497,7 +1503,7 @@ export default function RegistreDetails(props) {
                         width="medium"
                         actions={[
                             {
-                                text: 'Ajouter',
+                                text: 'Ajouter',style:{backgroundColor: "#1c94fe"},
                                 className: "alt-font",
                                 onClick: () => {
                                     addNewUserToReg(newUserReg_email, new_user_roles)
@@ -1573,7 +1579,7 @@ export default function RegistreDetails(props) {
                         width="medium"
                         actions={[
                             {
-                                text: 'Modifier',
+                                text: 'Modifier',style:{backgroundColor:"#1c94fe"},
                                 className: "alt-font",
                                 onClick: () => {
                                     let formated_roles = []
@@ -1642,7 +1648,7 @@ export default function RegistreDetails(props) {
                         width="medium"
                         actions={[
                             {
-                                text: 'Modifier', className: "alt-font",
+                                text: 'Modifier', className: "alt-font",style:{backgroundColor:"#1c94fe"},
                                 onClick: () => {
                                     updateRegRole(selectedRole.name, {
                                         name: newRole_name,
@@ -1716,7 +1722,7 @@ export default function RegistreDetails(props) {
                         width="medium"
                         actions={[
                             {
-                                text: 'Ajouter', className: "alt-font", onClick: () => {
+                                text: 'Ajouter', className: "alt-font",style:{backgroundColor:newAction_name.trim() === "" ? "#f0f0f0" : "#1c94fe"}, onClick: () => {
                                     addNewAction()
                                 }, isLoading: loadingBtnAdd, isDisabled: newAction_name.trim() === ""
                             },
@@ -1815,7 +1821,7 @@ export default function RegistreDetails(props) {
                         width="medium"
                         actions={[
                             {
-                                text: 'Ajouter', className: "alt-font", onClick: () => {
+                                text: 'Ajouter', className: "alt-font",style:{backgroundColor:newKey.trim() === "" ? "#f0f0f0" : "#1c94fe"}, onClick: () => {
                                     addNewKeyToReg(newKey)
                                 }, isLoading: loadingBtnAdd,
                                 isDisabled: newKey.trim() === ""

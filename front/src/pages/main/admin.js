@@ -220,6 +220,7 @@ export default function Admin(props){
                                                    onClick={() => {
                                                        admin_search_users(user_search_input)
                                                    }}
+                                                   style={{backgroundColor:"#1c94fe"}}
                                         >
                                             Chercher
                                         </AtlButton>
@@ -265,7 +266,7 @@ export default function Admin(props){
                     <Modal
                         width="medium"
                         actions={[
-                            { text: 'Fermer', className:"alt-font", onClick: () => {setOpenUpdateRolesModal(false)} },
+                            { text: 'Fermer', className:"alt-font", onClick: () => {setOpenUpdateRolesModal(false)},style:{backgroundColor:"#1c94fe"} },
                         ]}
                         onClose={() => {
                             setOpenUpdateRolesModal(false)

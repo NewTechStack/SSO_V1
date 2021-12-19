@@ -3,6 +3,7 @@ label{
 }
 .custom-progress-height{
     height: 0.3rem!important;
+    color:#1c94fe!important;
 }
 .login_form{
     margin: 0 auto;
