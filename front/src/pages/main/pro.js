@@ -18,6 +18,8 @@ import TextField from "@material-ui/core/TextField";
 import Textfield from "@atlaskit/textfield";
 import {Label, Popup} from "semantic-ui-react";
 import HelpIcon from "@material-ui/icons/Help";
+import jwt_decode from "jwt-decode";
+import utilFunctions from "../../tools/functions";
 
 export default function Pro(props){
 
@@ -201,7 +203,7 @@ export default function Pro(props){
 
     useEffect( () => {
 
-            if(verifSession() === true){
+            if(utilFunctions.verif_session() === true){
                 verif_acces_roles().then( r => {
                     if(r === true){
                         getCurrentUserRegistres()
@@ -217,10 +219,6 @@ export default function Pro(props){
                 },1500)
             }
     }, []);
-
-    const verifSession = () => {
-        return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
-    }
 
     const verif_acces_roles = () => {
         return new Promise(async (resolve, reject) => {

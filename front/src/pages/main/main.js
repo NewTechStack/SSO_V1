@@ -14,6 +14,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ContactPhoneIcon from '@material-ui/icons/ContactPhone';
 import LockIcon from '@material-ui/icons/Lock';
 import BallotIcon from '@material-ui/icons/Ballot';
+import jwt_decode from "jwt-decode";
+import utilFunctions from "../../tools/functions";
 
 
 export default class main extends React.Component{
@@ -29,7 +31,7 @@ export default class main extends React.Component{
         console.log(this.props)
         const isMobileViewPort = document.body.offsetWidth < 600;
         this.setState({isSidebarHidden:isMobileViewPort})
-        if(this.verifSession() === true){
+        if(utilFunctions.verif_session() === true){
             this.verif_acces_roles()
             let path_array = this.props.location.pathname.split("/")
             console.log(path_array)
@@ -41,10 +43,6 @@ export default class main extends React.Component{
             this.props.history.push("/sso/login")
         }
 
-    }
-
-    verifSession(){
-        return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
     }
 
     verif_acces_roles(){

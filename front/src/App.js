@@ -12,6 +12,8 @@ import Extern_signup from "./pages/auth/extern/extern_signup";
 import Accept_service from "./pages/auth/extern/accept_service";
 import moment from "moment";
 import 'moment/locale/fr';
+import jwt_decode from "jwt-decode";
+import utilFunctions from "./tools/functions";
 
 export default class App extends Component {
 
@@ -22,11 +24,6 @@ export default class App extends Component {
 
     componentDidMount() {
 
-    }
-
-
-    verifSession(){
-        return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
     }
 
     render() {
@@ -40,15 +37,15 @@ export default class App extends Component {
                 <Router>
                     <Switch>
                         {
-                            this.verifSession() === true &&
+                            utilFunctions.verif_session() === true &&
                                 [
                                     <Redirect key={0} exact from={"/sso/login"} to={"/main/infos"}/>,
                                     <Redirect key={1} exact from={"/sso/signup"} to={"/main/infos"}/>
                                 ]
                         }
-                        <Redirect exact from={"/"} to={this.verifSession() === false ? "/sso/login" : "/main/infos"} />
+                        <Redirect exact from={"/"} to={utilFunctions.verif_session() === false ? "/sso/login" : "/main/infos"} />
                         {
-                            this.verifSession() === false &&
+                            utilFunctions.verif_session() === false &&
                             [
                                 <Route key={0} exact path="/sso/login" component={Login}/>,
                                 <Route key={1} exact path="/sso/signup" component={Signup}/>

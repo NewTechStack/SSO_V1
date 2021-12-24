@@ -45,8 +45,6 @@ class user:
         self.d = None
         self.data()
         self.askable = {
-         "id":
-         lambda: self.data()['id'],
          "username":
          lambda : self.data()["username"]["main"],
          "email":
@@ -218,11 +216,11 @@ class user:
             return [False, "Invalid id", 403]
         private_key = open(f'{secret_path}jwt-key').read()
         payload = {}
-        if len(roles) != 0:
-            payload["roles"] = roles
-        if len(asked) == 0:
-            payload["id"] = id
-        else:
+        payload["id"] = id
+        if len(registry) != 0:
+            if len(roles) != 0:
+                payload["roles"] = roles
+            payload["id"] = hashlib.md5(str(id).encode()).hexdigest()
             data = dict(self.red.get(id).run())
             possible = self.askable
             if not all(a in possible for a in asked):
@@ -289,12 +287,12 @@ class user:
             self.set_role(self.id, "disabled", False)
         return [True, {"usr_id": id}, None]
 
-    def invite(self, email):
+    def invite(self, email, hash = False):
         email = str(email)
         username = email.split('@')[0]
         ret = [True, {}, None]
         date = str(datetime.datetime.utcnow())
-        if self.__exist(email):
+        if self.__exist(email) and not hash:
             return ret
         data = {
             "username": {
@@ -324,6 +322,8 @@ class user:
         res = dict(self.red.insert([data]).run())
         id = res["generated_keys"][0]
         self.set_role(id, "invite")
+        if hash:
+            return [True, {'usrid': hashlib.md5(str(user(-1, email).id).encode()).hexdigest() }, None]
         return ret
 
     def search_user(self, query, page = 0, bypage = 10, admin = False, invite = False):

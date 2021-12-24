@@ -27,6 +27,8 @@ import ErrorIcon from "@material-ui/icons/Error";
 import AssignmentTurnedInIcon from "@material-ui/icons/AssignmentTurnedIn";
 import HelpIcon from "@material-ui/icons/Help";
 import CloseIcon from '@material-ui/icons/Close';
+import jwt_decode from "jwt-decode";
+import utilFunctions from "../../tools/functions";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -85,7 +87,7 @@ export default function Info(props){
     const [selected_email_status, setSelected_email_status] = React.useState("private");
 
     useEffect(() => {
-            if(verifSession() === true){
+            if(utilFunctions.verif_session() === true){
                 getAccountInfo()
                 getUserInfo()
             }else{
@@ -93,9 +95,6 @@ export default function Info(props){
             }
     }, []);
 
-    const verifSession = () => {
-        return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
-    }
 
     const getUserInfo = () => {
         SSO_service.getUser(localStorage.getItem("usrtoken")).then(infoRes => {
@@ -655,7 +654,8 @@ export default function Info(props){
                                             {
                                                 !loading &&
                                                 <Typography className={classes.secondaryHeadingTitle}>
-                                                    {moment(infoAccount.roles.user.last_update).format("DD-MM-YYYY HH:mm")}
+                                                    {infoAccount && infoAccount.roles && infoAccount.roles.user && infoAccount.roles.user.last_update ?
+                                                        moment(infoAccount.roles.user.last_update).format("DD-MM-YYYY HH:mm") : "---"}
                                                 </Typography>
                                             }
 

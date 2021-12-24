@@ -1,3 +1,6 @@
+import jwt_decode from "jwt-decode";
+import moment from "moment";
+
 const colors = ['#00AA55', '#e91e63', '#9c27b0', '#939393', '#E3BC00', '#D47500', '#DC2A2A', '#2196f3', '#00bcd4', '#ff9800', '#607d8b'];
 
 let utilFunctions = {
@@ -72,6 +75,20 @@ let utilFunctions = {
         }
 
         return 0;
+    },
+
+
+    verif_session(){
+        try {
+            var decoded = jwt_decode(localStorage.getItem("usrtoken"));
+            console.log(decoded)
+            return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment() ||
+                decoded.payload === null || decoded.payload === undefined || decoded.payload.id !== localStorage.getItem("id"));
+        }catch (err){
+            console.log(err)
+            return false
+        }
+
     }
 
 

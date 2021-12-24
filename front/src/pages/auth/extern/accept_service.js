@@ -10,6 +10,8 @@ import '../login_signup.css'
 import { withSnackbar } from 'notistack';
 import SSO_service from "../../../provider/SSO_service";
 import moment from "moment";
+import jwt_decode from "jwt-decode";
+import utilFunctions from "../../../tools/functions";
 
 
 
@@ -25,22 +27,16 @@ class accept_service extends Component {
         key:this.props.match.params.key,
         auth:this.props.match.params.auth,
         error:false,
-
         asked:[],
         registry_name:[],
         approuved:false
     };
 
 
-    verifSession(){
-        return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
-    }
-
-
     componentDidMount() {
 
 
-        if(this.verifSession() === false){
+        if(utilFunctions.verif_session() === false){
             this.props.history.push("/sso/extern/"+this.props.match.params.key+ "/" + this.props.match.params.auth)
         }else{
 

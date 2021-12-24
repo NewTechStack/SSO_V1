@@ -11,6 +11,8 @@ import SSO_service from "../../../provider/SSO_service";
 import Extern_signup from "./extern_signup";
 import { withSnackbar } from 'notistack';
 import moment from "moment";
+import jwt_decode from "jwt-decode";
+import utilFunctions from "../../../tools/functions";
 
 
 
@@ -30,13 +32,9 @@ class extern_login extends Component {
         }
     };
 
-    verifSession(){
-        return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
-    }
-
 
     componentDidMount() {
-        if(this.verifSession() === true){
+        if(utilFunctions.verif_session() === true){
             this.props.history.push("/sso/extern/"+this.props.match.params.key+ "/" + this.props.match.params.auth + "/accept")
         }
     }
@@ -60,6 +58,8 @@ class extern_login extends Component {
                     SSO_service.getUser(loginRes.data.usrtoken).then(infoRes => {
                         console.log(infoRes)
                         if(infoRes.status === 200 && infoRes.succes === true){
+                            var decoded = jwt_decode(loginRes.data.usrtoken);
+                            localStorage.setItem("id",decoded.payload.id)
                             localStorage.setItem("email",this.state.login_form.email)
                             localStorage.setItem("firstname",infoRes.data.first_name.main || "")
                             localStorage.setItem("lastname",infoRes.data.last_name.main || "")

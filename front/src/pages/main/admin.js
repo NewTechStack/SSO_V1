@@ -17,6 +17,8 @@ import TextField from "@material-ui/core/TextField";
 import {CheckboxSelect as Checkbox} from "@atlaskit/select";
 import Toggle from '@atlaskit/toggle';
 import { List } from 'semantic-ui-react'
+import jwt_decode from "jwt-decode";
+import utilFunctions from "../../tools/functions";
 
 export default function Admin(props){
 
@@ -107,16 +109,14 @@ export default function Admin(props){
     const [loadingBtn, setLoadingBtn] = React.useState(false);
 
     useEffect(() => {
-            if(verifSession() === true){
+            if(utilFunctions.verif_session() === true){
                 verif_acces_roles()
             }else{
                 props.history.push("/sso/login")
             }
     }, []);
 
-    const verifSession = () => {
-        return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
-    }
+
     const verif_acces_roles = () => {
         let roles = JSON.parse(localStorage.getItem("roles")) || []
         console.log(roles)

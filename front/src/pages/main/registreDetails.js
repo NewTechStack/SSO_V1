@@ -34,6 +34,8 @@ import CloseIcon from "@material-ui/icons/Close";
 import StopIcon from '@material-ui/icons/Stop';
 import PQueue from "p-queue/dist";
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import jwt_decode from "jwt-decode";
+import utilFunctions from "../../tools/functions";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -382,7 +384,7 @@ export default function RegistreDetails(props) {
 
         console.log(props)
 
-        if (verifSession() === true) {
+        if (utilFunctions.verif_session() === true) {
             getInforegistre()
             getRoles()
             getActions()
@@ -419,9 +421,6 @@ export default function RegistreDetails(props) {
         })
     }
 
-    const verifSession = () => {
-        return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment());
-    }
 
     const getInforegistre = () => {
         setLoading(true)
