@@ -1009,7 +1009,7 @@ class user:
         return [True, {}, None]
 
     def KYC(self, img):
-        now = datetime.datetime.utcnow()
+        now = str(datetime.datetime.utcnow())
         generic = {
             "main": True,
             "using": ['passport-2532525325325.jpg'],
