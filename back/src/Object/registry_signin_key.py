@@ -3,7 +3,7 @@ import json
 import logging
 import uuid
 import hashlib
-from tqdm import tqdm
+
 try:
     from .registry import registry
     from .rethink import get_conn, r
