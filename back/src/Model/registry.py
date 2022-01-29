@@ -179,7 +179,7 @@ def regi_verify_signin(cn, nextc):
     if exist[0] is False:
         err = [False, f"User is not part of registry: {reg}", 403]
     else:
-        can_use = cn.private["reg_user"].can("use")
+        can_use = cn.private["reg_user"].can("get_infos")
         if can_use is False:
             err = [False, f"User is not allowed to use registry: {reg}", 403]
         else:

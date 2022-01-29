@@ -10,6 +10,7 @@ import LinearProgress from "@material-ui/core/LinearProgress";
 import SSO_service from "../../provider/SSO_service";
 import { withSnackbar } from 'notistack';
 import signup_img from "../../assets/images/signup2.jpg"
+import jwt_decode from "jwt-decode";
 
 class signup extends Component {
 
@@ -48,15 +49,15 @@ class signup extends Component {
                     SSO_service.getUser(registerRes.data.usrtoken).then(infoRes => {
                         console.log(infoRes)
                         if(infoRes.status === 200 && infoRes.succes === true){
-
+                            var decoded = jwt_decode(registerRes.data.usrtoken);
+                            localStorage.setItem("id",decoded.payload.id)
                             localStorage.setItem("email",this.state.signup_form.email)
-                            this.props.enqueueSnackbar("Votre inscription est effectuée avec succès !",
-                                {variant:"success"})
                             localStorage.setItem("firstname",infoRes.data.first_name.main || "")
                             localStorage.setItem("lastname",infoRes.data.last_name.main || "")
                             localStorage.setItem("usrtoken",registerRes.data.usrtoken)
                             localStorage.setItem("exp",registerRes.data.exp)
-
+                            this.props.enqueueSnackbar("Votre inscription est effectuée avec succès !",
+                                {variant:"success"})
                             let roles_object = infoRes.data.roles || {}
                             const roles_array = [];
                             Object.keys(roles_object).forEach(key => roles_array.push({
@@ -67,7 +68,7 @@ class signup extends Component {
 
                             setTimeout(() => {
                                 this.setState({loading:false})
-                                this.props.history.push("/main/infos")
+                                this.props.history.push("/main")
                             },1000)
 
                         }else{
