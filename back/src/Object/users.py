@@ -167,7 +167,16 @@ class user:
                     },
                     "last_update": None
                 },
-                "nationality": {},
+                "nationality": {
+                    "main": None,
+                    "public": False,
+                    "verified": {
+                        "main": False,
+                        "using": [],
+                        "last_update": None
+                    },
+                    "last_update": None
+                },
                 "address": {
                     "main" : [],
                     "others": {}
@@ -402,11 +411,15 @@ class user:
             return [False, "Email too long", 401]
         if role not in self.av_roles:
             return [False, f"Invalid role: {role}", 400]
-        while True;
+        i = 0
+        while True:
             random_number = str(random.randint(0, 999)).rjust(3, '0')
             username = email.split('@')[0] + random_number
             if not self.__username_exist(username):
                 break
+            i += 1
+            if i > 10000:
+                return [False, "err", 500]
         password_email = self.__hash(email, pass1)
         password_username = self.__hash(username, pass1)
         data = self.model
@@ -548,7 +561,7 @@ class user:
                 up["first_name"]["verified"] = {
                     "main": False,
                     "using": [],
-                    "last_update": None
+                    "last_update": date
                 }
             self.red.get(self.id).update(
                 {
@@ -558,9 +571,6 @@ class user:
                     "last_update": date
                 }
             ).run()
-            if "verified" in up['first_name']:
-                up["first_name"]["verified"] = False
-
 
         if  isinstance(lname, dict) and "last_name" in lname and \
             isinstance(lname["last_name"], str):
@@ -588,8 +598,6 @@ class user:
                     "last_update": date
                 }
             ).run()
-            if "verified" in up['last_name']:
-                up["last_name"]["verified"] = False
 
         return [True, up, None]
 
@@ -998,6 +1006,38 @@ class user:
             },
         "last_update": date
         }).run()
+        return [True, {}, None]
+
+    def KYC(self, img):
+        now = datetime.datetime.utcnow()
+        generic = {
+            "main": True,
+            "using": ['passport-2532525325325.jpg'],
+            "last_update": now
+        }
+        data = {
+            "first_name": {
+                "main" : None,
+                "verified": generic,
+                "last_update": now
+            },
+            "last_name": {
+                "main" : None,
+                "verified": generic,
+                "last_update": now
+            },
+            "age": {
+                "main": None,
+                "verified": generic,
+                "last_update": now
+            },
+            "nationality": {
+                "main": None,
+                "verified": generic,
+                "last_update": now
+            }
+        }
+        self.red.get(self.id).update(data).run()
         return [True, {}, None]
 
     def __random_key(self, length = 6):

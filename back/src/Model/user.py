@@ -93,6 +93,10 @@ def user_register(cn, nextc):
     )
     return cn.call_next(nextc, err)
 
+def user_kyc(cn, nextc):
+    err = cn.private["user"].KYC('')
+    return cn.call_next(nextc, err)
+
 def user_login(cn, nextc):
     err = check.contain(cn.pr, ["login", "password"])
     if not err[0]:
