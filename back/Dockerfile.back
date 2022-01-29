@@ -8,4 +8,4 @@ FROM base as sso
 COPY ./src/requirements.txt ./
 RUN pip3 install --upgrade -r requirements.txt
 
-ENTRYPOINT ls -la; python3 test.py; python3 server.py;
+ENTRYPOINT python3 server.py;
