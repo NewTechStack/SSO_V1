@@ -940,6 +940,8 @@ class user:
     def verify_reset_key(self, key, password):
         if not isinstance(key, str) or not isinstance(password, str):
             return [False, "Invalid param type"]
+        if not self.__strong_pass(password):
+            return [False, "Password too weak", 400]
         if self.id == '-1':
             return [False, "Invalid email / key", 401]
         u = self.data()
@@ -1033,5 +1035,5 @@ class user:
         return re.match(reg, email)
 
     def __strong_pass(self, password):
-        reg = "(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{8}"
+        reg = "(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}"
         return re.match(reg, password)

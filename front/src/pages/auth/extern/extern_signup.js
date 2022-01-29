@@ -9,6 +9,8 @@ import '../login_signup.css'
 import LinearProgress from "@material-ui/core/LinearProgress";
 import SSO_service from "../../../provider/SSO_service";
 import { withSnackbar } from 'notistack';
+import signup_img from "../../../assets/images/signup2.jpg"
+import jwt_decode from "jwt-decode";
 
 class extern_signup extends Component {
 
@@ -47,7 +49,8 @@ class extern_signup extends Component {
                     SSO_service.getUser(registerRes.data.usrtoken).then(infoRes => {
                         console.log(infoRes)
                         if(infoRes.status === 200 && infoRes.succes === true){
-
+                            var decoded = jwt_decode(registerRes.data.usrtoken);
+                            localStorage.setItem("id",decoded.payload.id)
                             localStorage.setItem("email",this.state.signup_form.email)
                             this.props.enqueueSnackbar("Votre inscription est effectuée avec succès !",
                                 {variant:"success"})
@@ -118,31 +121,8 @@ class extern_signup extends Component {
                                           }
                                       }}
                                 >
+
                                     <div className="row mt-4">
-                                        <div className="col-md-6 mt-2">
-                                            <TextField
-                                                label="Nom"
-                                                variant="outlined"
-                                                size="small"
-                                                style={{width:"100%"}}
-                                                //required={true}
-                                                value={this.state.signup_form.firstname}
-                                                onChange={this.handleObjectChange('signup_form','firstname')}
-                                            />
-                                        </div>
-                                        <div className="col-md-6 mt-2">
-                                            <TextField
-                                                label="Prénom"
-                                                variant="outlined"
-                                                size="small"
-                                                style={{width:"100%"}}
-                                                //required={true}
-                                                value={this.state.signup_form.lastname}
-                                                onChange={this.handleObjectChange('signup_form','lastname')}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="row mt-2">
                                         <div className="col-md-12 mt-2">
                                             <TextField
                                                 label="Email"
@@ -213,7 +193,7 @@ class extern_signup extends Component {
                                     </div>
                                 </form>
                             </div>
-                            <img alt="" src={require("../../../assets/images/signup2.jpg")} className="signup_img"/>
+                            <img alt="" src={signup_img} className="signup_img"/>
                         </div>
 
                     </div>
