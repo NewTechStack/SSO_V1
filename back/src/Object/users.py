@@ -179,6 +179,24 @@ class user:
                     }
                 },
             },
+            "preferences": {
+                "store_user_agent": {
+                    "main": True,
+                    "strict_login": {
+                        "main": False,
+                        "last_update": None
+                    },
+                    "last_update": None
+                },
+                "store_ip": {
+                    "main": True,
+                    "last_update": None
+                },
+                "dark_mode": {
+                    "main": True,
+                    "last_update": None
+                }
+            },
             "last_update": None,
             "signup": None,
         }
@@ -383,10 +401,12 @@ class user:
         if len(email) > 60:
             return [False, "Email too long", 401]
         if role not in self.av_roles:
-            return [False, f"Invalid role: {role}"]
-        username = email.split('@')[0]
-        while (len(list(self.red.filter(r.row["username"]["main"] == username).run())) > 0):
-            username = email.split('@')[0] + str(random.randint(0, 999)).rjust(3, '0')
+            return [False, f"Invalid role: {role}", 400]
+        while True;
+            random_number = str(random.randint(0, 999)).rjust(3, '0')
+            username = email.split('@')[0] + random_number
+            if not self.__username_exist(username):
+                break
         password_email = self.__hash(email, pass1)
         password_username = self.__hash(username, pass1)
         data = self.model
@@ -1015,68 +1035,3 @@ class user:
     def __strong_pass(self, password):
         reg = "(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z]).{8}"
         return re.match(reg, password)
-
-
-
-def test():
-    logging.warning("-")
-    logging.warning("Starting user's test")
-    u = user()
-    u2 = user()
-
-    email = "eliot1@test.fr"
-    email2 = "test1@test.fr"
-    password = "T2*eeeee"
-    phone = "0626232886"
-    prenom = "eliot"
-    nom = "courtel"
-    user(None, email).delete(True)
-    user(None, email2).delete(True)
-    u.register(email, password, password)
-    u.login(email, password)
-    key = u.get_key()
-    key = u.get_key()
-    key = u.get_key()
-    key = u.get_key()
-    key = key[1]["key"] if isinstance(key[1], dict) else None
-    sec = key[1]["secret"] if isinstance(key[1], dict) else None
-    u.get_token(registeries=["test"], key=key)
-    u.wait_token(key, sec)
-    token = u.get_token()
-    token = token[1]["usrtoken"] if isinstance(token[1], dict) else None
-    u.verify(token)
-    key = u.reset_key()
-    del u
-    u = user(None, email)
-    key = key[1]["key"] if isinstance(key[1], dict) else None
-    u.verify_reset_key(key, password + "e")
-    u.login(email, password + "e")
-    u.updetails({"number": phone, "lang": 'FR'}, {"first_name": prenom}, {"last_name": nom, "public": True})
-    key = u.check_email()
-    key = key[1]["key"] if isinstance(key[1], dict) else None
-    u.verify_email_key(key)
-    key = u.check_phone()
-    key = key[1]["key"] if isinstance(key[1], dict) else None
-    u.verify_phone_key(key)
-    u.invite(email2)
-    u2.register(email2, password, password)
-    u2.login(email2, password)
-    u2.get_infos(True, u.id)
-    u2.get_infos(True)
-    u2.delete(True)
-    token = u.get_token()[1]["usrtoken"]
-    del u
-    u = user()
-    u.verify(token)
-    u.get_infos(True)
-    u.delete()
-    u = user(None, email)
-    u.delete(True)
-    u = user(None, email2)
-    u.delete(True)
-    logging.warning("Ending user's test")
-try:
-    #test()
-    print('')
-except:
-    logging.error("User's test error")

@@ -125,21 +125,15 @@ class check:
 
     def json(request):
         res = {}
-        #try:
         res = request.json
-        #except:
-        #    pass
         return res
 
     def head_json(request, cookie = None):
         res = {}
-        # try:
         for i in cookie:
             res[i.lower()] = cookie[i]
         for i in request.headers.keys():
             res[i.lower()] = request.headers.raw(i)
-        # except:
-            # pass
         return res
 
     def cookies_json(request):
@@ -162,21 +156,25 @@ class check:
             i += 1
         return res
 
+    def params(request):
+        res =  dict(request.query.decode())
+        for param in res:
+            value = res[param]
+            if value == "true":
+                 res[param] = True
+            elif value == "false":
+                 res[param] = False
+        return res
+
 
 class callnext:
     def __init__(self, req, resp = None, err = None, anonlvl = None):
-        self.pr = check.json(req)
-        self.ck = check.cookies_json(req)
-        self.hd = check.head_json(req, self.ck)
-        self.rt = check.route_json(req)
-        self.ws = req.environ.get('wsgi.websocket')
-        self.get = dict(req.query.decode())
-        for i in self.get:
-            s = self.get[i]
-            if s == "true":
-                 self.get[i] = True
-            elif s == "false":
-                 self.get[i] = False
+        self.pr = check.json(req) #json body
+        self.ck = check.cookies_json(req) #cookies
+        self.hd = check.head_json(req, self.ck) #header merged with cookie (header priority)
+        self.rt = check.route_json(req) #route to json /t1/t2/t3 = {"t1": "t2", "t2": "t3", "t3": None}
+        self.ws = req.environ.get('wsgi.websocket') #get websocket if available
+        self.get = check.params(req) #get args
         self.private = {}
         self.cookie = {}
         self.toret = ret(req.path, self.pr, self.hd, self.ck, anonlvl)
