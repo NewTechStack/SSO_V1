@@ -1016,25 +1016,27 @@ class user:
             "last_update": now
         }
         data = {
-            "first_name": {
-                "main" : None,
-                "verified": generic,
-                "last_update": now
-            },
-            "last_name": {
-                "main" : None,
-                "verified": generic,
-                "last_update": now
-            },
-            "age": {
-                "main": None,
-                "verified": generic,
-                "last_update": now
-            },
-            "nationality": {
-                "main": None,
-                "verified": generic,
-                "last_update": now
+        'details': {
+                "first_name": {
+                    "main" : None,
+                    "verified": generic,
+                    "last_update": now
+                },
+                "last_name": {
+                    "main" : None,
+                    "verified": generic,
+                    "last_update": now
+                },
+                "age": {
+                    "main": None,
+                    "verified": generic,
+                    "last_update": now
+                },
+                "nationality": {
+                    "main": None,
+                    "verified": generic,
+                    "last_update": now
+                }
             }
         }
         self.red.get(self.id).update(data).run()
