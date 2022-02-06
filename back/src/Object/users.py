@@ -319,8 +319,8 @@ class user:
         username = email.split('@')[0]
         ret = [True, {}, None]
         date = str(datetime.datetime.utcnow())
-        if self.__exist(email) and not hash:
-            return ret
+        if self.__exist(email):
+            return ret if not hash else self.__encoded_id(email)
         data = {
             "username": {
                 "main" : username,
@@ -349,9 +349,7 @@ class user:
         res = dict(self.red.insert([data]).run())
         id = res["generated_keys"][0]
         self.set_role(id, "invite")
-        if hash:
-            return [True, {'usrid': hashlib.md5(str(user(-1, email).id).encode()).hexdigest() }, None]
-        return ret
+        return ret if not hash else self.__encoded_id(email)
 
     def search_user(self, query, page = 0, bypage = 10, admin = False, invite = False):
         page = int(page)
@@ -1079,3 +1077,6 @@ class user:
     def __strong_pass(self, password):
         reg = "(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}"
         return re.match(reg, password)
+   
+    def __encoded_id(self, email):
+         return [True, {'usrid': hashlib.md5(str(user(-1, email).id).encode()).hexdigest() }, None]
