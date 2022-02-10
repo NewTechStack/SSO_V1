@@ -29,7 +29,8 @@ class registry_granted:
                 },
                 "browser": {
                     "family": None,
-                    "version": None
+                    "version": None,
+                    "hash": None
                 },
                 "device": {
                     "family": None,
@@ -66,6 +67,7 @@ class registry_granted:
         details['device']['type']['pc'] = user_agent.is_pc
         details['device']['type']['bot'] = user_agent.is_bot
         details['device']['hash'] = hashlib.md5(str(details['device']).encode()).hexdigest()
+        details['browser']['hash'] = hashlib.md5(str(details['browser']).encode()).hexdigest()
         return details
 
     def validate(self, user_id, registry_id, data, ip = '', user_agents = None, clic = False, exp = None):
@@ -90,12 +92,11 @@ class registry_granted:
         ret['data'] = data
         ret['date']['start'] = str(now)
         ret['date']['end'] = str(exp)
-        """todo insert"""
-        print(ret)
+        res = dict(self.red.insert([ret]).run())
         return [True, {}, None]
 
     def need_validation(self, user_id, registry_id, data, ip = '', user_agents = None, strict = False):
-        now = datetime.datetime.utcnow()
+        now = str(datetime.datetime.utcnow())
         details = self.__details(user_agents, ip)
         if user_agents is None:
             return [True, {"need_validation": True}, None]
@@ -104,13 +105,22 @@ class registry_granted:
             &
             (r.row["registry_id"] == registry_id)
             &
-            ("""date""")
+            (r.row['date']['start'] <= now & r.row['date']['end'] >= now)
             &
-            (strict == False | r.row['details'] == details)
+            (
+                strict == False
+                |
+                (
+                    r.row['details']['device']['hash'] == details['device']['hash']
+                    &
+                    r.row['details']['browser']['hash'] == details['browser']['hash']
+                )
+            )
         ).run())
-        """need check data + date"""
         if len(res) == 0:
             return [True, {"need_validation": True}, None]
+        print(res)
+        return [True, {}, None]
         exp = '' """todo retrieve"""
         self.validate(user_id, registry_id, data, user_agents, clic = False, exp=exp)
         return [True, {"need_validation": False}, None]
