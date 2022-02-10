@@ -130,3 +130,17 @@ class registry_granted:
                 self.validate(user_id, registry_id, data, user_agents, clic = False, exp=potential['date']['end'])
                 return [True, {"need_validation": False}, None]
         return [True, {"need_validation": True}, None]
+
+    def logs(self, user_id):
+        now = str(datetime.datetime.utcnow())
+        valid = list(self.red.filter(
+            (r.row["user_id"] == user_id)
+            &
+            (r.row['date']['start'] <= now & r.row['date']['end'] >= now)
+        ).order_by(r.desc(r.row['date']['start'])).group('registry_id', 'manual_validation').run())
+        invalid = list(self.red.filter(
+            (r.row["user_id"] == user_id)
+            &
+            (r.row['date']['start'] <= now & r.row['date']['end'] >= now)
+        ).order_by(r.desc(r.row['date']['start'])).group('registry_id', 'manual_validation').run())
+        return [True, {'logs': valid + invalid}, None]

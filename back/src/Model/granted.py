@@ -25,3 +25,8 @@ def registry_need_validation(cn, nextc):
     if err[0]:
         cn.private['need_validation'] = err[1]['need_validation']
     return cn.call_next(nextc, err)
+
+def registry_granted_logs(cn, nextc):
+    user_id = cn.private['user'].id
+    err = registry_granted().logs(user_id)
+    return cn.call_next(nextc, err)

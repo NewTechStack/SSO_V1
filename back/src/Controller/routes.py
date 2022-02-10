@@ -50,6 +50,8 @@ def setuproute(app, call):
 
     @app.route('/registry/<>/users',           ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, registry_users])) #done
 
+    @app.route('/registries/logs',              ['OPTIONS', 'GET'],        lambda x = None: call([user_verify_token, registry_granted_logs])) #done
+
     @app.route('/extern/public',                ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_publickey])) #done
     @app.route('/extern/askable',               ['OPTIONS', 'POST'],         lambda x = None: call([regi_check_key, user_get_askable])) #for dev only
     @app.route('/extern/key',                   ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_check_asked, regi_get_signin])) #done
