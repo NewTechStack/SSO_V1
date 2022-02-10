@@ -133,15 +133,31 @@ class registry_granted:
 
     def logs(self, user_id):
         now = str(datetime.datetime.utcnow())
-        valid = dict(self.red.filter(
-            (r.row["user_id"] == user_id)
-            &
-            (r.row['date']['start'] <= now & r.row['date']['end'] >= now)
-        ).order_by(r.desc(r.row['date']['start'])).group('registry_id').run())
-        invalid = self.red.filter(
+        ret = {'active': {}, 'inactive': {}}
+        active = self.red.filter(
             (r.row["user_id"] == user_id)
             &
             (r.row['date']['start'] <= now & r.row['date']['end'] >= now)
         ).order_by(r.desc(r.row['date']['start'])).group('registry_id', 'manual_validation').run()
-        invalid = {str(i[0]) + '_' + str(i[1]): invalid[i] for i in invalid}
-        return [True, {'logs_active': valid, 'logs_inactive': invalid}, None]
+        for i in active:
+            registry_id = str(i[0])
+            manual_validation = str(i[1])
+            if registry_id not in ret:
+                ret['active'][registry_id] = {}
+            if manual_validation not in ret[registry_id]:
+                ret['active'][registry_id][manual_validation] = []
+            ret['active'][registry_id][manual_validation] = active[i]
+        inactive = self.red.filter(
+            (r.row["user_id"] == user_id)
+            &
+            (r.row['date']['start'] <= now & r.row['date']['end'] >= now)
+        ).order_by(r.desc(r.row['date']['start'])).group('registry_id', 'manual_validation').run()
+        for i in inactive:
+            registry_id = str(i[0])
+            manual_validation = str(i[1])
+            if registry_id not in ret:
+                ret['inactive'][registry_id] = {}
+            if manual_validation not in ret[registry_id]:
+                ret['inactive'][registry_id][manual_validation] = []
+            ret['inactive'][registry_id][manual_validation] = inactive[i]
+        return [True, ret, None]
