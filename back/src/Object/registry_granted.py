@@ -106,17 +106,25 @@ class registry_granted:
             (r.row["registry_id"] == registry_id)
             &
             (r.row['date']['start'] <= now & r.row['date']['end'] >= now)
-            &
-            (
-                strict == False
-                |
-                (
-                    r.row['details']['device']['hash'] == details['device']['hash']
-                    &
-                    r.row['details']['browser']['hash'] == details['browser']['hash']
-                )
-            )
+            # &
+            # (
+            #     strict == False
+            #     |
+            #     (
+            #         r.row['details']['device']['hash'] == details['device']['hash']
+            #         &
+            #         r.row['details']['browser']['hash'] == details['browser']['hash']
+            #     )
+            # )
         ).run())
+        print(
+            list(self.red.filter(
+                (r.row["user_id"] == user_id)
+                &
+                (r.row["registry_id"] == registry_id)
+            ).run())
+        )
+        print(res)
         if len(res) == 0:
             return [True, {"need_validation": True}, None]
         return [True, res, None]
