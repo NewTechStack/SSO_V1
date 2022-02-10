@@ -117,17 +117,9 @@ class registry_granted:
             #     )
             # )
         ).run())
-        print(
-            list(self.red.filter(
-                (r.row["user_id"] == user_id)
-                &
-                (r.row["registry_id"] == registry_id)
-            ).run())
-        )
-        print(res)
         if len(res) == 0:
             return [True, {"need_validation": True}, None]
-        return [True, res, None]
+        return [True, [res, data], None]
         exp = '' """todo retrieve"""
         self.validate(user_id, registry_id, data, user_agents, clic = False, exp=exp)
         return [True, {"need_validation": False}, None]
