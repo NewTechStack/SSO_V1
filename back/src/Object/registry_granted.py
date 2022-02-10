@@ -133,14 +133,14 @@ class registry_granted:
 
     def logs(self, user_id):
         now = str(datetime.datetime.utcnow())
-        valid = list(self.red.filter(
+        valid = dict(self.red.filter(
             (r.row["user_id"] == user_id)
             &
             (r.row['date']['start'] <= now & r.row['date']['end'] >= now)
         ).order_by(r.desc(r.row['date']['start'])).group('registry_id').run())
-        invalid = list(self.red.filter(
+        invalid = dict(self.red.filter(
             (r.row["user_id"] == user_id)
             &
-            (r.row['date']['start'] > now | r.row['date']['end'] < now)
-        ).order_by(r.desc(r.row['date']['start'])).group('registry_id').run())
-        return [True, {'logs': valid + invalid}, None]
+            (r.row['date']['start'] <= now & r.row['date']['end'] >= now)
+        ).order_by(r.desc(r.row['date']['start'])).group('registry_id', 'manual_validation').run())
+        return [True, {'logs_active': valid, 'logs_inactive': invalid}, None]
