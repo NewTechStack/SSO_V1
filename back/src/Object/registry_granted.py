@@ -4,6 +4,7 @@ import logging
 import uuid
 from user_agents import parse
 from .rethink import get_conn, r
+import hashlib
 
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='[ %m/%d/%Y-%I:%M:%S%p ]')
 
