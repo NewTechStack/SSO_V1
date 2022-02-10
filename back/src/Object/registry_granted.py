@@ -26,26 +26,25 @@ class registry_granted:
                 "ip": {
                     "address": None,
                 },
-                "match": {
-                    "browser": {
-                        "family": None,
-                        "version": None
-                    },
+                "browser": {
+                    "family": None,
+                    "version": None
+                },
+                "device": {
+                    "family": None,
+                    "brand": None,
+                    "model": None,
                     "os": {
                         "family": None,
                         "version": None
                     },
-                    "device": {
-                        "family": None,
-                        "brand": None,
-                        "model": None,
-                        "type": {
-                            "mobile": None,
-                            "tablet": None,
-                            "pc": None,
-                            "bot": None
-                        }
+                    "type": {
+                        "mobile": None,
+                        "tablet": None,
+                        "pc": None,
+                        "bot": None
                     },
+                    "hash": None
                 }
             }
         }
@@ -54,28 +53,29 @@ class registry_granted:
         details = self.model["details"]
         user_agent = parse(user_agents)
         details['ip']['address'] = str(ip)
-        details['match']['browser']['family'] = user_agent.browser.family
-        details['match']['browser']['version'] = user_agent.browser.version_string
-        details['match']['os']['family'] = user_agent.os.family
-        details['match']['os']['version'] = user_agent.os.version_string
-        details['match']['device']['family'] = user_agent.device.family
-        details['match']['device']['brand'] = user_agent.device.brand
-        details['match']['device']['model'] = user_agent.device.model
-        details['match']['device']['type']['mobile'] = user_agent.is_mobile
-        details['match']['device']['type']['tablet'] = user_agent.is_tablet
-        details['match']['device']['type']['pc'] = user_agent.is_pc
-        details['match']['device']['type']['bot'] = user_agent.is_bot
+        details['browser']['family'] = user_agent.browser.family
+        details['browser']['version'] = user_agent.browser.version_string
+        details['device']['family'] = user_agent.device.family
+        details['device']['brand'] = user_agent.device.brand
+        details['device']['model'] = user_agent.device.model
+        details['device']['os']['family'] = user_agent.os.family
+        details['device']['os']['version'] = user_agent.os.version_string
+        details['device']['type']['mobile'] = user_agent.is_mobile
+        details['device']['type']['tablet'] = user_agent.is_tablet
+        details['device']['type']['pc'] = user_agent.is_pc
+        details['device']['type']['bot'] = user_agent.is_bot
+        details['device']['hash'] = hashlib.md5(str(details['device']).encode()).hexdigest()
         return details
 
     def validate(self, user_id, registry_id, data, ip = '', user_agents = None, clic = False, exp = None):
         ret = self.model
         now = datetime.datetime.utcnow()
         """
-        if clic by user exp in 1month
+        if clic by user exp in 4 weeks
         else but already clicked by the past and exp in les than 7 days exp in 7 days
         """
         if clic is True:
-            exp = now + datetime.timedelta(months = 12)
+            exp = now + datetime.timedelta(weeks = 4)
         else:
             if exp is not None and now > exp - datetime.timedelta(days = 7):
                 exp = now + datetime.timedelta(days = 7)
@@ -90,6 +90,7 @@ class registry_granted:
         ret['date']['start'] = str(now)
         ret['date']['end'] = str(exp)
         """todo insert"""
+        print(ret)
         return [True, {}, None]
 
     def need_validation(self, user_id, registry_id, data, ip = '', user_agents = None, strict = False):
@@ -104,7 +105,7 @@ class registry_granted:
             &
             ("""date""")
             &
-            (strict == False | r.row['details']['match'] == details['match'])
+            (strict == False | r.row['details'] == details)
         ).run())
         """need check data + date"""
         if len(res) == 0:
