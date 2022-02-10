@@ -184,7 +184,6 @@ def regi_verify_signin(cn, nextc):
             err = [False, f"User is not allowed to use registry: {reg}", 403]
         else:
             cn.private['roles'] = cn.private["reg_user"].froles(active = True)[1]['roles']
-            print(cn.private['roles'])
     return cn.call_next(nextc, err)
 
 def regi_end_signin(cn, nextc):

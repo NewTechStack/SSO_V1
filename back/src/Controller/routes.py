@@ -56,7 +56,7 @@ def setuproute(app, call):
     @app.route('/extern/key/<>/token',          ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, regi_wait_token])) #done
     @app.route('/extern/invite',                ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_invite_ext]))
 
-    @app.route('/intern/key/<>/infos',          ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, regi_info_signin])) #done
+    @app.route('/intern/key/<>/infos',          ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, regi_info_signin, registry_need_validation])) #done
     @app.route('/intern/key/<>/signin',         ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, regi_info_signin, regi_verify_signin, user_get_token, regi_end_signin, registry_granted_click])) #todo
 
     @app.route('/user/password/reset',          ['OPTIONS', 'POST'],        lambda x = None: call([user_tmp_spoof, user_password_reset])) #done not imp

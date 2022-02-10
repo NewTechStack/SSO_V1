@@ -119,8 +119,7 @@ class registry_granted:
         ).run())
         if len(res) == 0:
             return [True, {"need_validation": True}, None]
-        print(res)
-        return [True, {}, None]
+        return [True, res, None]
         exp = '' """todo retrieve"""
         self.validate(user_id, registry_id, data, user_agents, clic = False, exp=exp)
         return [True, {"need_validation": False}, None]
