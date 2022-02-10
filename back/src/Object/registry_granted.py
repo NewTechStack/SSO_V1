@@ -137,10 +137,10 @@ class registry_granted:
             (r.row["user_id"] == user_id)
             &
             (r.row['date']['start'] <= now & r.row['date']['end'] >= now)
-        ).order_by(r.desc(r.row['date']['start'])).group('registry_id', 'manual_validation').run())
+        ).order_by(r.desc(r.row['date']['start'])).group('registry_id').run())
         invalid = list(self.red.filter(
             (r.row["user_id"] == user_id)
             &
-            (r.row['date']['start'] <= now & r.row['date']['end'] >= now)
-        ).order_by(r.desc(r.row['date']['start'])).group('registry_id', 'manual_validation').run())
+            (r.row['date']['start'] > now | r.row['date']['end'] < now)
+        ).order_by(r.desc(r.row['date']['start'])).group('registry_id').run())
         return [True, {'logs': valid + invalid}, None]
