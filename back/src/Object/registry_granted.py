@@ -80,8 +80,9 @@ class registry_granted:
         if clic is True:
             exp = now + datetime.timedelta(weeks = 4)
         else:
-            if exp is not None and now > exp - datetime.timedelta(days = 7):
-                exp = now + datetime.timedelta(days = 7)
+            if exp is not None:
+                if now > exp - datetime.timedelta(days = 7):
+                    exp = now + datetime.timedelta(days = 7)
             else:
                 return [False, "Internal error", 500]
         if user_agents is not None:
@@ -116,10 +117,15 @@ class registry_granted:
             #         r.row['details']['browser']['hash'] == details['browser']['hash']
             #     )
             # )
-        ).run())
+        ).order_by(r.desc(r.row['date']['end'])).run())
         if len(res) == 0:
             return [True, {"need_validation": True}, None]
-        return [True, [res, data], None]
-        exp = '' """todo retrieve"""
-        self.validate(user_id, registry_id, data, user_agents, clic = False, exp=exp)
-        return [True, {"need_validation": False}, None]
+        for potential in res:
+            in_data = {i : False for i in data}
+            for d in data:
+                if d in potential['data']:
+                    in_data[d] = True
+            if all(i for i in in_data.values()):
+                self.validate(user_id, registry_id, data, user_agents, clic = False, exp=potential['date']['end'])
+                return [True, {"need_validation": False}, None]
+        return [True, {"need_validation": True}, None]

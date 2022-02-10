@@ -170,6 +170,9 @@ def regi_verify_signin(cn, nextc):
         POST /intern/key/<>/signin
     """
     err = [True, None, None]
+    if 'need_validation' in cn.private:
+        if cn.private['need_validation'] != False:
+            return cn.call_next(nextc, err)
     reg = cn.private['registry']
     cn.private["reg_user"] = user_registry(
         cn.private["user"],
@@ -189,6 +192,9 @@ def regi_verify_signin(cn, nextc):
 def regi_end_signin(cn, nextc):
     """
     """
+    if 'need_validation' in cn.private:
+        if cn.private['need_validation'] != False:
+            return regi_info_signin(cn, nextc)
     key = cn.rt["key"] if "key" in cn.rt else None
     if key is None:
         return cn.toret.add_error("Invalid key", 400)
