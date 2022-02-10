@@ -142,9 +142,9 @@ class registry_granted:
         for i in active:
             registry_id = str(i[0])
             manual_validation = str(i[1])
-            if registry_id not in ret:
+            if registry_id not in ret['active']:
                 ret['active'][registry_id] = {}
-            if manual_validation not in ret[registry_id]:
+            if manual_validation not in ret['active'][registry_id]:
                 ret['active'][registry_id][manual_validation] = []
             ret['active'][registry_id][manual_validation] = active[i]
         inactive = self.red.filter(
@@ -155,9 +155,9 @@ class registry_granted:
         for i in inactive:
             registry_id = str(i[0])
             manual_validation = str(i[1])
-            if registry_id not in ret:
+            if registry_id not in ret['inactive']:
                 ret['inactive'][registry_id] = {}
-            if manual_validation not in ret[registry_id]:
+            if manual_validation not in ret['inactive'][registry_id]:
                 ret['inactive'][registry_id][manual_validation] = []
             ret['inactive'][registry_id][manual_validation] = inactive[i]
         return [True, ret, None]
