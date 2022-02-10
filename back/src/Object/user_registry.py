@@ -144,7 +144,6 @@ class user_registry:
             return [False, "Error in finding user default role", 500]
         roles = roles[1]['roles']
         open =  self.reg.is_open()
-        print(open)
         if not open[0]:
             return open
         return self.add_user(id_user, roles, force = force)
@@ -292,7 +291,7 @@ class user_registry:
 
     def check_key(self, key, ip):
         return self.keys.check(key, ip)
-   
+
     def status(self, q, w, e):
         return self.__status(q, w, e)
 

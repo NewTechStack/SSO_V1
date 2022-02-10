@@ -1,6 +1,7 @@
 from Model.auth import *
 from Model.user import *
 from Model.registry import *
+from Model.granted import *
 
 def setuproute(app, call):
     @app.route('/',                             ['OPTIONS', 'GET'],         lambda x = None: call([origin_check])) #done
@@ -10,7 +11,7 @@ def setuproute(app, call):
     @app.route('/token',                        ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_get_token])) #done
 
     @app.route('/users',                        ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_search])) #done
-    @app.route('/user',                         ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_infos])) #done
+    @app.route('/user',                         ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, registry_granted_validate, user_infos])) #done
     @app.route('/user',                         ['OPTIONS', 'PUT'],         lambda x = None: call([user_verify_token, user_update])) #done
     @app.route('/user',                         ['OPTIONS', 'DELETE'],      lambda x = None: call([user_verify_token, user_disable])) #done
     @app.route('/user/invite',                  ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_invite])) #done
@@ -56,7 +57,7 @@ def setuproute(app, call):
     @app.route('/extern/invite',                ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_invite_ext]))
 
     @app.route('/intern/key/<>/infos',          ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, regi_info_signin])) #done
-    @app.route('/intern/key/<>/signin',         ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, regi_info_signin, regi_verify_signin, user_get_token, regi_end_signin])) #todo
+    @app.route('/intern/key/<>/signin',         ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, regi_info_signin, regi_verify_signin, user_get_token, regi_end_signin, registry_granted_click])) #todo
 
     @app.route('/user/password/reset',          ['OPTIONS', 'POST'],        lambda x = None: call([user_tmp_spoof, user_password_reset])) #done not imp
     @app.route('/user/password/change',         ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_password_reset])) #done not imp
