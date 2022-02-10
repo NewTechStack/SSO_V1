@@ -81,6 +81,7 @@ class registry_granted:
             exp = now + datetime.timedelta(weeks = 4)
         else:
             if exp is not None:
+                exp = datetime.datetime.strptime(exp, '%Y-%m-%d %H:%M:%S.%f')
                 if now > exp - datetime.timedelta(days = 7):
                     exp = now + datetime.timedelta(days = 7)
             else:
