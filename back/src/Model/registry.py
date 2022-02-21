@@ -127,6 +127,10 @@ def regi_keys(cn, nextc):
     err = cn.private["reg_user"].get_keys()
     return cn.call_next(nextc, err)
 
+def regi_is_partener(cn, nextc):
+    err = [True, {}, None]
+    return cn.call_next(nextc, err)
+
 def regi_check_key(cn, nextc):
     """
 
@@ -165,7 +169,7 @@ def regi_get_signin(cn, nextc):
 def regi_verify_signin(cn, nextc):
     """
         check user appartenance to every registry
-        force subscribe him if it's isn't the case (TODO)
+        force subscribe him if it's isn't the case
 
         POST /intern/key/<>/signin
     """
@@ -173,7 +177,12 @@ def regi_verify_signin(cn, nextc):
     if 'need_validation' in cn.private:
         if cn.private['need_validation'] != False:
             return cn.call_next(nextc, err)
-    reg = cn.private['registry']
+    if 'registry' in cn.private:
+        reg = cn.private['registry']
+    elif 'signin_reg' in cn.private:
+        reg = cn.private['signin_reg']
+    else:
+        return cn.toret.add_error("Internal Error", 500)
     cn.private["reg_user"] = user_registry(
         cn.private["user"],
         registry(id=reg)

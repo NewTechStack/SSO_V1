@@ -8,6 +8,10 @@ def setuproute(app, call):
 
     @app.route('/signup',                       ['OPTIONS', 'POST'],        lambda x = None: call([user_register, user_get_token])) #done
     @app.route('/signin',                       ['OPTIONS', 'POST'],        lambda x = None: call([user_login, user_get_token])) #done
+
+    @app.route('/partener/signup',              ['POST'],                   lambda x = None: call([regi_check_key, regi_is_partener, user_register, regi_verify_signin, user_get_token])) #done
+    @app.route('/partener/signin',              ['POST'],                   lambda x = None: call([regi_check_key, regi_is_partener, user_login, regi_verify_signin, user_get_token])) #done
+
     @app.route('/token',                        ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_get_token])) #done
 
     @app.route('/users',                        ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_search])) #done
@@ -52,11 +56,11 @@ def setuproute(app, call):
 
     @app.route('/registries/logs',              ['OPTIONS', 'GET'],        lambda x = None: call([user_verify_token, registry_granted_logs])) #done
 
-    @app.route('/extern/public',                ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_publickey])) #done
-    @app.route('/extern/askable',               ['OPTIONS', 'POST'],         lambda x = None: call([regi_check_key, user_get_askable])) #for dev only
-    @app.route('/extern/key',                   ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_check_asked, regi_get_signin])) #done
-    @app.route('/extern/key/<>/token',          ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, regi_wait_token])) #done
-    @app.route('/extern/invite',                ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_invite_ext]))
+    @app.route('/extern/public',                ['POST'],                  lambda x = None: call([regi_check_key, user_publickey])) #done
+    @app.route('/extern/askable',               ['POST'],                  lambda x = None: call([regi_check_key, user_get_askable])) #for dev only
+    @app.route('/extern/key',                   ['POST'],                  lambda x = None: call([regi_check_key, user_check_asked, regi_get_signin])) #done
+    @app.route('/extern/key/<>/token',          ['POST'],                  lambda x = None: call([regi_check_key, regi_wait_token])) #done
+    @app.route('/extern/invite',                ['POST'],                  lambda x = None: call([regi_check_key, user_invite_ext]))
 
     @app.route('/intern/key/<>/infos',          ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, regi_info_signin, registry_need_validation, regi_verify_signin, user_get_token, regi_end_signin])) #done
     @app.route('/intern/key/<>/signin',         ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, regi_info_signin, regi_verify_signin, user_get_token, regi_end_signin, registry_granted_click])) #todo

@@ -147,17 +147,4 @@ class registry_granted:
             if manual_validation not in ret['active'][registry_id]:
                 ret['active'][registry_id][manual_validation] = []
             ret['active'][registry_id][manual_validation] = active[i]
-        inactive = self.red.filter(
-            (r.row["user_id"] == user_id)
-            &
-            (r.row['date']['start'] <= now & r.row['date']['end'] >= now)
-        ).order_by(r.desc(r.row['date']['start'])).group('registry_id', 'manual_validation').run()
-        for i in inactive:
-            registry_id = str(i[0])
-            manual_validation = str(i[1])
-            if registry_id not in ret['inactive']:
-                ret['inactive'][registry_id] = {}
-            if manual_validation not in ret['inactive'][registry_id]:
-                ret['inactive'][registry_id][manual_validation] = []
-            ret['inactive'][registry_id][manual_validation] = inactive[i]
         return [True, ret, None]
