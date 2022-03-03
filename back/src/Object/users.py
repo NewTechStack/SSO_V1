@@ -45,40 +45,70 @@ class user:
         self.d = None
         self.data()
         self.askable = {
-         "username":
-         lambda : self.data()["username"]["main"],
-         "email":
-         lambda : self.data()["email"]["main"],
-         "phone":
-         lambda : self.data()["details"]["phone"]["main"],
-         "first_name":
-         lambda : self.data()["details"]["first_name"]["main"],
-         "last_name":
-         lambda : self.data()["details"]["last_name"]["main"],
-         "age":
-         lambda : self.data()["details"]["last_name"]["main"],
-         "is_over_12":
-         lambda : self.data()["details"]["age"]["main"] is not None and \
-                  self.data()["details"]["age"]["main"] >= 12,
-         "is_over_16":
-         lambda : self.data()["details"]["age"]["main"] is not None and \
-                  self.data()["details"]["age"]["main"] >= 16,
-         "is_over_18":
-         lambda : self.data()["details"]["age"]["main"] is not None and \
-                  self.data()["details"]["age"]["main"] >= 18,
-         "is_over_21":
-         lambda : self.data()["details"]["age"]["main"] is not None and \
-                  self.data()["details"]["age"]["main"] >= 21,
-         "is_phone_verified":
-         lambda : self.data()["details"]["phone"]["verified"]["main"],
-         "is_email_verified":
-         lambda : self.data()["email"]["verified"]["main"],
-         "is_age_verified":
-         lambda : self.data()["details"]["age"]["verified"]["main"],
-         "is_first_name_verified":
-         lambda : self.data()["details"]["first_name"]["verified"]["main"],
-         "is_last_name_verified":
-         lambda : self.data()["details"]["last_name"]["verified"]["main"]
+         "username": {
+                'in_payload': True,
+                'data': lambda : self.data()["username"]["main"]
+            },
+         "email": {
+                'in_payload': True,
+                'data': lambda : self.data()["email"]["main"]
+            },
+         "phone": {
+                'in_payload': False,
+                'data':lambda : self.data()["details"]["phone"]["main"]
+            },
+         "first_name": {
+                'in_payload': True,
+                'data': lambda : self.data()["details"]["first_name"]["main"]
+            },
+         "last_name": {
+                'in_payload': True,
+                'data': lambda : self.data()["details"]["last_name"]["main"]
+            },
+         "age": {
+                'in_payload': False,
+                'data': lambda : self.data()["details"]["last_name"]["main"]
+            },
+         "is_over_12": {
+                'in_payload': True,
+                'data': lambda : self.data()["details"]["age"]["main"] is not None and \
+                                 self.data()["details"]["age"]["main"] >= 12
+            },
+         "is_over_16": {
+                'in_payload': True,
+                'data': lambda : self.data()["details"]["age"]["main"] is not None and \
+                                 self.data()["details"]["age"]["main"] >= 16
+            },
+         "is_over_18": {
+                'in_payload': True,
+                'data': lambda : self.data()["details"]["age"]["main"] is not None and \
+                                 self.data()["details"]["age"]["main"] >= 18
+            },
+         "is_over_21": {
+                'in_payload': True,
+                'data': lambda : self.data()["details"]["age"]["main"] is not None and \
+                                 self.data()["details"]["age"]["main"] >= 21
+            },
+         "is_phone_verified": {
+                'in_payload': False,
+                'data': lambda : self.data()["details"]["phone"]["verified"]["main"]
+            },
+         "is_email_verified": {
+                'in_payload': False,
+                'data': lambda : self.data()["email"]["verified"]["main"]
+            },
+         "is_age_verified": {
+                'in_payload': False,
+                'data': lambda : self.data()["details"]["age"]["verified"]["main"]
+            },
+         "is_first_name_verified": {
+                'in_payload': False,
+                'data': lambda : self.data()["details"]["first_name"]["verified"]["main"]
+            },
+         "is_last_name_verified": {
+                'in_payload': False
+                'data': lambda : self.data()["details"]["last_name"]["verified"]["main"]
+            }
         }
         self.model = {
             "username": {
@@ -211,7 +241,12 @@ class user:
         }
 
     def get_askable(self):
-        return [True, {"askable": list(self.askable.keys())}, None]
+        askable_details = {}
+        for i in self.askable.keys():
+            askable_details[information] =  {
+                'in_payload': self.askable[information]['in_payload']
+            }
+        return [True, {"askable": askable_details}, None]
 
     def check_asked(self, asked):
         if not isinstance(asked, list) or not all(isinstance(term, str) for term in asked):
@@ -244,18 +279,24 @@ class user:
         private_key = open(f'{secret_path}jwt-key').read()
         payload = {}
         payload["id"] = id
+        sub_payload = None
         if len(registry) != 0:
+            sub_payload = {}
             if len(roles) != 0:
                 payload["roles"] = roles
             payload["id"] = hashlib.md5(str(id).encode()).hexdigest()
             data = dict(self.red.get(id).run())
-            possible = self.askable
-            if not all(a in possible for a in asked):
+            if not all(a in self.askable for a in asked):
                 return [False, "Invalid information asked", 401]
             for i in asked:
-                if possible[i]() is None:
+                information_in_payload = self.askable[i]['in_payload']
+                information_data = self.askable[i]['data']()
+                if information_data is None:
                     return [False, f"Information not completed: {i}", 403]
-                payload[i] = possible[i]()
+                if information_in_payload is True:
+                    payload[i] = information_data
+                else:
+                    sub_payload[i] = information_data
         now = datetime.datetime.utcnow()
         exp = now + datetime.timedelta(hours=delta)
         issuer = "auth:back"
@@ -268,9 +309,11 @@ class user:
             'aud': audience,
             'payload': payload,
         }, private_key, algorithm='RS256')
-        ret = [True, {'exp': str(exp), "usrtoken": token}, None, ]
+        ret = [True, {'exp': str(exp), "usrtoken": token}, None]
         if registry == "":
             ret.append({"usrtoken": str(token)})
+        if sub_payload is not None:
+            ret['subpayload'] = sub_payload
         return ret
 
     def verify(self, token, reenable = False):
@@ -417,7 +460,7 @@ class user:
                 break
             i += 1
             if i > 10000:
-                return [False, "err", 500]
+                return [False, "Contact system administrator", 500]
         password_email = self.__hash(email, pass1)
         password_username = self.__hash(username, pass1)
         data = self.model
@@ -1077,6 +1120,6 @@ class user:
     def __strong_pass(self, password):
         reg = "(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}"
         return re.match(reg, password)
-   
+
     def __encoded_id(self, email):
          return [True, {'usrid': hashlib.md5(str(user(-1, email).id).encode()).hexdigest() }, None]

@@ -10,7 +10,14 @@ def registry_granted_click(cn, nextc):
     user_id = cn.private['user'].id
     registry_id = cn.private['registry']
     data = cn.private['asked']
-    err = registry_granted().validate(user_id, registry_id, data, ip = client_ip, user_agents = user_agents, clic = True, exp = None)
+    err = registry_granted().validate(
+        user_id = user_id,
+        registry_id = registry_id,
+        data = data,
+        ip = client_ip,
+        user_agents = user_agents,
+        clic = True,
+        exp = None)
     return cn.call_next(nextc, err)
 
 def registry_need_validation(cn, nextc):
