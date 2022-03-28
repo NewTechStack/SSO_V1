@@ -1,4 +1,3 @@
-from Model.auth import *
 from Model.user import *
 from Model.registry import *
 from Model.granted import *

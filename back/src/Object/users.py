@@ -106,7 +106,7 @@ class user:
                 'data': lambda : self.data()["details"]["first_name"]["verified"]["main"]
             },
          "is_last_name_verified": {
-                'in_payload': False
+                'in_payload': False,
                 'data': lambda : self.data()["details"]["last_name"]["verified"]["main"]
             }
         }
@@ -239,6 +239,17 @@ class user:
             "last_update": None,
             "signup": None,
         }
+
+    def update_preferences(self, store_user_agent, store_ip, dark_mode):
+        if not isinstance(store_user_agent, dict):
+            return [False, 'Invalid user_agent params', 400]
+        if not 'user_agent' in store_user_agent or not 'strict_login' in store_user_agent:
+            return [False, 'Invalid user_agent params', 400]
+        if not isinstance(store_ip, bool):
+            return [False, 'Invalid store_ip param', 400]
+        if not isinstance(dark_mode, bool):
+            return [False, 'Invalid dark_mode param', 400]
+        return [True, {}, None]
 
     def get_askable(self):
         askable_details = {}
@@ -702,6 +713,7 @@ class user:
                     "last_update": res["email"]["last_update"],
                     "public": res["email"]["public"]
                 }
+                ret["preferences"] = res['preferences']
                 ret["verified"]["contact"] = {
                     "score":  vscore,
                     "data": {
