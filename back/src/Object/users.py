@@ -245,10 +245,41 @@ class user:
             return [False, 'Invalid user_agent params', 400]
         if not 'user_agent' in store_user_agent or not 'strict_login' in store_user_agent:
             return [False, 'Invalid user_agent params', 400]
+        if not isinstance(store_user_agent['user_agent'], bool):
+            return [False, 'Invalid user_agent value', 400]
+        if not isinstance(store_user_agent['strict_login'], bool):
+            return [False, 'Invalid strict_login value', 400]
         if not isinstance(store_ip, bool):
             return [False, 'Invalid store_ip param', 400]
         if not isinstance(dark_mode, bool):
             return [False, 'Invalid dark_mode param', 400]
+        u = self.data()
+        date = str(datetime.datetime.utcnow())
+        update_store_user_agent = u.get('preferences', {}).get('store_user_agent', {}).get('main')
+        update_store_user_agent = u.get('preferences', {}).get('store_user_agent', {}).get('main')
+        data = {
+            "preferences": {
+                "store_user_agent": {
+                    "main": True,
+                    "strict_login": {
+                        "main": False,
+                        "last_update": None
+                    },
+                    "last_update": None
+                },
+                "store_ip": {
+                    "main": True,
+                    "last_update": None
+                },
+                "dark_mode": {
+                    "main": True,
+                    "last_update": None
+                }
+            },
+            "last_update": None
+        }
+        self.
+        self.red.get(self.id).update()
         return [True, {}, None]
 
     def get_askable(self):
