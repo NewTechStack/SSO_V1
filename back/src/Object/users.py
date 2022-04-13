@@ -255,8 +255,10 @@ class user:
             return [False, 'Invalid dark_mode param', 400]
         u = self.data()
         date = str(datetime.datetime.utcnow())
-        update_store_user_agent = u.get('preferences', {}).get('store_user_agent', {}).get('main')
-        update_store_user_agent = u.get('preferences', {}).get('store_user_agent', {}).get('main')
+        value_store_user_agent = u.get('preferences', {}).get('store_user_agent', {}).get('main')
+        value_store_user_agent_strict = u.get('preferences', {}).get('store_user_agent', {}).get('strict_login',  {}).get('main')
+        value_store_ip = u.get('preferences', {}).get('store_ip', {}).get('main')
+        value_dark_mode = u.get('preferences', {}).get('dark_mode', {}).get('main')
         data = {
             "preferences": {
                 "store_user_agent": {
@@ -278,8 +280,24 @@ class user:
             },
             "last_update": None
         }
-        self.
-        self.red.get(self.id).update()
+        if value_store_user_agent != store_user_agent['user_agent']:
+            data['preferences']['store_user_agent']['main'] = store_user_agent['user_agent']
+            data['preferences']['store_user_agent']['last_update'] = date
+            data['preferences']['last_update'] = date
+        if value_store_user_agent_strict != store_user_agent['strict_login']:
+            data['preferences']['store_user_agent']['strict_login']['main'] = store_user_agent['user_agent']
+            data['preferences']['store_user_agent']['strict_login']['last_update'] = date
+            data['preferences']['store_user_agent']['last_update'] = date
+            data['preferences']['last_update'] = date
+        if value_store_ip != store_ip:
+            data['preferences']['store_ip']['main'] = store_ip
+            data['preferences']['store_ip']['last_update'] = date
+            data['preferences']['last_update'] = date
+        if value_dark_mode != dark_mode:
+            data['preferences']['dark_mode']['main'] = dark_mode
+            data['preferences']['dark_mode']['last_update'] = date
+            data['preferences']['last_update'] = date
+        self.red.get(self.id).update(data)
         return [True, {}, None]
 
     def get_askable(self):

@@ -127,6 +127,17 @@ def user_update(cn, nextc):
     )
     return cn.call_next(nextc, err)
 
+def user_preferences(cn. nextc):
+    err = check.contain(cn.pr, ["store_user_agent", "store_ip", "dark_mode"])
+    if not err[0]:
+        return cn.toret.add_error(err[1], err[2])
+    err = cn.private["user"].update_preferences(
+        store_user_agent = cn.pr['store_user_agent'],
+        store_ip = cn.pr['store_ip'],
+        dark_mode = cn.pr['dark_mode']
+    )
+    return cn.call_next(nextc, err)
+
 def user_role(cn, nextc):
     err = cn.private["user"].roles()
     return cn.call_next(nextc, err)
