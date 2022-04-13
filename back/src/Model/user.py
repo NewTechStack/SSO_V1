@@ -204,7 +204,7 @@ def user_invite_ext(cn, nextc):
     err = check.contain(cn.pr, ["email"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    err = cn.private["user"].invite(cn.pr["email"], hash = True)
+    err = user().invite(cn.pr["email"], hash = True)
     return cn.call_next(nextc, err)
 
 def user_is_admin(cn, nextc):

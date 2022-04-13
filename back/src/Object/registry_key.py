@@ -92,6 +92,6 @@ class registry_key:
 		          (k["active"] == True)
         ).run()))
         if len(res) != 1:
-            return [False, "Invalid key", None]
+            return [False, "Invalid key", 403]
         registry = res[0]["registry_id"]
         return [True, {'registry': registry}, None]
