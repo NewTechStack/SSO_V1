@@ -108,7 +108,31 @@ class user:
          "is_last_name_verified": {
                 'in_payload': False,
                 'data': lambda : self.data()["details"]["last_name"]["verified"]["main"]
-            }
+            },
+         "nationality": {
+                'in_payload': False,
+                'data': lambda : self.data()["details"]["nationality"]["main"]
+            },
+         "is_nationality_verified": {
+                'in_payload': False,
+                'data': lambda : self.data()["details"]["nationality"]["verified"]["main"]
+            },
+         "address_city": {
+                'in_payload': False,
+                'data': lambda : self.data()["location"]["main_address"]["city"]
+            },
+         "address_details": {
+                'in_payload': False,
+                'data': lambda : self.data()["location"]["main_address"]["details"]
+            },
+         "is_address_verified": {
+                'in_payload': False,
+                'data': lambda : self.data()["location"]["main_address"]["city"]["verified"]["main"]
+            },
+         "is_address_details_verified": {
+                'in_payload': False,
+                'data': lambda : self.data()["location"]["main_address"]["details"]["verified"]["main"]
+            },
         }
         self.model = {
             "username": {
