@@ -8,9 +8,6 @@ def setuproute(app, call):
     @app.route('/signup',                       ['OPTIONS', 'POST'],        lambda x = None: call([user_register, user_get_token])) #done
     @app.route('/signin',                       ['OPTIONS', 'POST'],        lambda x = None: call([user_login, user_get_token])) #done
 
-    @app.route('/partener/signup',              ['POST'],                   lambda x = None: call([regi_check_key, regi_is_partener, user_register, regi_verify_signin, user_get_token])) #done
-    @app.route('/partener/signin',              ['POST'],                   lambda x = None: call([regi_check_key, regi_is_partener, user_login, regi_verify_signin, user_get_token])) #done
-
     @app.route('/token',                        ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_get_token])) #done
 
     @app.route('/users',                        ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_search])) #done
@@ -41,6 +38,10 @@ def setuproute(app, call):
     @app.route('/registry/<>/user/<>',         ['OPTIONS', 'PUT'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_change_role, user_regi_change_role])) #done
     @app.route('/registry/<>/user/<>/roles',   ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, user_regi_role])) #done
     @app.route('/registry/<>/user/<>/actions', ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, user_regi_actions])) #done
+
+    @app.route('/registry/<>/askable',         ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, user_get_askable])) #done
+    @app.route('/registry/<>/asked',           ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, regi_asked])) #done
+    @app.route('/registry/<>/asked',           ['OPTIONS', 'PUT'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_use_api, regi_set_asked])) #done
 
     @app.route('/registry/<>/actions',         ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_get_infos, regi_actions])) #done
     @app.route('/registry/<>/action',          ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_regi, user_regi_exist, regi_can_edit_action, regi_add_action])) #done

@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 import uuid
+from users import user
 from .rethink import get_conn, r
 
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='[ %m/%d/%Y-%I:%M:%S%p ]')
@@ -102,6 +103,10 @@ class registry:
                         "key_number": -1,
                         "key_per_dev": -1
                     },
+                    "last_update": None
+                },
+                'informations_asked': {
+                    "main": [],
                     "last_update": None
                 },
                 "last_update": None
@@ -315,6 +320,32 @@ class registry:
             roles_builtin = list(roles_builtin.keys())
             roles_custom = list(roles_custom.keys())
         return [True, {"builtin": roles_builtin, "custom": roles_custom}, None]
+
+    def asked(self):
+        res = self.data()
+        asked = res["dev_settings"]["informations_asked"]
+        return [True, asked, None]
+
+    def set_asked(self, asked):
+        if not isinstance(asked, list):
+            return [False, "Invalid asked type", 400]
+        if not all(isinstance(self.i, str) for self.i in asked):
+            return [False, f"Invalid action type {self.i}", 400]
+        askable = user().askable.keys()
+        if not all(self.i in askable for self.i in asked):
+            return [False, f"Invalid action type {self.i}", 400]
+        date = str(datetime.datetime.utcnow())
+        self.red.get(self.id).update({
+            "dev_settings": {
+                "informations_asked": {
+                    "main": asked,
+                    "last_update": date
+                },
+                "last_update": date
+            },
+            "last_update": date
+        }).run()
+        return [True, {}, None]
 
     def actions(self):
         res = self.data()

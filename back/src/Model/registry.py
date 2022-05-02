@@ -95,6 +95,18 @@ def regi_roles(cn, nextc):
     err = cn.private["reg"].roles()
     return cn.call_next(nextc, err)
 
+def regi_asked(cn, nextc):
+    err = cn.private["reg"].asked()
+    return cn.call_next(nextc, err)
+
+def regi_set_asked(cn, nextc):
+    err = check.contain(cn.pr, ["asked"])
+    if not err[0]:
+        return cn.toret.add_error(err[1], err[2])
+    err = cn.private["reg"].set_asked(cn.pr["asked"])
+    return cn.call_next(nextc, err)
+
+
 def regi_add_action(cn, nextc):
     err = check.contain(cn.pr, ["action"])
     if not err[0]:
@@ -143,6 +155,7 @@ def regi_check_key(cn, nextc):
 	None
 	).check_key(cn.pr["apitoken"], '*')
     if err[0]:
+        cn.private["reg"] = registry(err[1]["registry"])
         cn.private["signin_reg"] = err[1]["registry"]
     return cn.call_next(nextc, err)
 
@@ -153,7 +166,7 @@ def regi_get_signin(cn, nextc):
 
         POST /external/key
     """
-    err = check.contain(cn.pr, ["valid_until", "apitoken", "asked"])
+    err = check.contain(cn.pr, ["valid_until", "apitoken"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
     if not "signin_reg" in cn.private:
@@ -162,7 +175,8 @@ def regi_get_signin(cn, nextc):
     err = registry_signin_key().create(
             registry=cn.private["signin_reg"],
             time=cn.pr["valid_until"],
-            asked=cn.pr["asked"]
+            asked=cn.private["reg"].asked()[1]['main'],
+            redirect=cn.pr["redirect"] if 'redirect' in cn.pr else None
         )
     return cn.call_next(nextc, err)
 

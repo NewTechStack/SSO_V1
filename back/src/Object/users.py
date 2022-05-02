@@ -119,19 +119,35 @@ class user:
             },
          "address_city": {
                 'in_payload': False,
-                'data': lambda : self.data()["location"]["main_address"]["city"]
+                'data': lambda name=None : self.data()['details']["location"]["main"]["city"] \
+                                           if name is None else \
+                                           self.data()['details']["location"]["others"][name]["city"] \
+                                           if name in self.data()['details']["location"]["others"] else \
+                                           None
             },
          "address_details": {
                 'in_payload': False,
-                'data': lambda : self.data()["location"]["main_address"]["details"]
+                'data': lambda name=None : self.data()['details']["location"]["main"]["details"]\
+                                           if name is None else \
+                                           self.data()['details']["location"]["others"][name]["details"] \
+                                           if name in self.data()['details']["location"]["others"] else \
+                                           None
             },
-         "is_address_verified": {
+         "is_address_city_verified": {
                 'in_payload': False,
-                'data': lambda : self.data()["location"]["main_address"]["city"]["verified"]["main"]
+                'data': lambda name=None : self.data()['details']["location"]["main"]["city"]["verified"]["main"] \
+                                           if name is None else \
+                                           self.data()['details']["location"]["others"][name]["city"]["verified"]["main"] \
+                                           if name in self.data()['details']["location"]["others"] else \
+                                           False
             },
          "is_address_details_verified": {
                 'in_payload': False,
-                'data': lambda : self.data()["location"]["main_address"]["details"]["verified"]["main"]
+                'data': lambda name=None : self.data()['details']["location"]["main"]["details"]["verified"]["main"] \
+                                           if name is None else \
+                                           self.data()['details']["location"]["others"][name]["details"]["verified"]["main"] \
+                                           if name in self.data()['details']["location"]["others"] else \
+                                           False
             },
         }
         self.model = {
@@ -231,15 +247,21 @@ class user:
                     },
                     "last_update": None
                 },
-                "address": {
-                    "main" : [],
-                    "others": {}
-                },
                 "payments": {
                     "cards": {
-                        "main" : [],
-                        "others": {}
+                        "main" : {},
+                        "others": [],
+                        "last_update": None
                     }
+                },
+                "location": {
+                    "main": {
+                        "city": None,
+                        "details": {},
+                        "last_update": None
+                    },
+                    "others": {},
+                    "last_update": None
                 },
             },
             "preferences": {
@@ -326,7 +348,7 @@ class user:
 
     def get_askable(self):
         askable_details = {}
-        for i in self.askable.keys():
+        for information in self.askable.keys():
             askable_details[information] =  {
                 'in_payload': self.askable[information]['in_payload']
             }

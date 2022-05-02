@@ -3,6 +3,7 @@ import json
 import logging
 import uuid
 import hashlib
+import re
 
 try:
     from .registry import registry
@@ -28,6 +29,7 @@ class registry_signin_key:
             "key": None,
             "secret": None,
             "until": None,
+            "redirect": None,
             "registry": None,
             "auth": None,
             "date": None,
@@ -35,11 +37,14 @@ class registry_signin_key:
             "asked": None
         }
 
-    def create(self, registry, time, asked):
+    def create(self, registry, time, asked, redirect = None):
         if not isinstance(time, int) or time < 10 or time > 180:
             return [False, "Invalid time argument", 400]
         if not isinstance(registry, str):
 	        return [False, "Invalid registry", 400]
+        urlregex = re.compile(r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*")
+        if redirect is not None and not urlregex.fullmatch(redirect):
+            return [False, "Invalid redirect url", 400]
         key = str(uuid.uuid4())
         secret = str(hash(uuid.uuid4()))
         while self.__key_exist(key, secret=secret)[0]:
@@ -52,6 +57,7 @@ class registry_signin_key:
         data["key"] = key
         data["secret"] = secret
         data["until"] = until
+        data["redirect"] = redirect
         data["registry"] = registry
         data["auth"] = auth_hash
         data["date"] = None
