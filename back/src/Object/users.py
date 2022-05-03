@@ -419,7 +419,7 @@ class user:
         if registry == "":
             ret.append({"usrtoken": str(token)})
         if sub_payload is not None:
-            ret['subpayload'] = sub_payload
+            ret.append({'subpayload': sub_payload})
         return ret
 
     def verify(self, token, reenable = False):
@@ -808,7 +808,7 @@ class user:
                     "last_update": res["email"]["last_update"],
                     "public": res["email"]["public"]
                 }
-                ret["preferences"] = res['preferences']
+                ret["preferences"] = res.get('preferences')
                 ret["verified"]["contact"] = {
                     "score":  vscore,
                     "data": {

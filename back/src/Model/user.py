@@ -127,7 +127,7 @@ def user_update(cn, nextc):
     )
     return cn.call_next(nextc, err)
 
-def user_preferences(cn. nextc):
+def user_preferences(cn, nextc):
     err = check.contain(cn.pr, ["store_user_agent", "store_ip", "dark_mode"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
