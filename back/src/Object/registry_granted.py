@@ -133,18 +133,23 @@ class registry_granted:
 
     def logs(self, user_id):
         now = str(datetime.datetime.utcnow())
-        ret = {'active': {}, 'inactive': {}}
-        active = self.red.filter(
+        ret = {'devices': {}}
+        logs = list(self.red.filter(
             (r.row["user_id"] == user_id)
             &
             (r.row['date']['start'] <= now & r.row['date']['end'] >= now)
-        ).order_by(r.desc(r.row['date']['start'])).group('registry_id', 'manual_validation').run()
-        for i in active:
-            registry_id = str(i[0])
-            manual_validation = str(i[1])
-            if registry_id not in ret['active']:
-                ret['active'][registry_id] = {}
-            if manual_validation not in ret['active'][registry_id]:
-                ret['active'][registry_id][manual_validation] = []
-            ret['active'][registry_id][manual_validation] = active[i]
+        ).order_by(r.desc(r.row['date']['start'])).group(
+            r.row['details']['device']['hash'],
+            r.row['details']['browser']['hash'],
+            r.row['details']['ip']['address'],
+            r.row['registry_id']
+        ).ungroup().run())
+        for log in logs:
+            if log['group'][0] not in ret['devices']:
+                ret['devices'][log['group'][0]] = {}
+            if log['group'][1] not in ret['devices'][log['group'][0]]:
+                ret['devices'][log['group'][0]][log['group'][1]] = {}
+            if log['group'][2] not in ret['devices'][log['group'][0]][log['group'][1]]:
+                ret['devices'][log['group'][0]][log['group'][1]][log['group'][2]] = {}
+            ret['devices'][log['group'][0]][log['group'][1]][log['group'][2]][log['group'][3]] = log['reduction']
         return [True, ret, None]
