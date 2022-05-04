@@ -373,7 +373,7 @@ class user:
     def wait_token(self, key, secret):
         return [True, {}, None]
 
-    def get_token(self, id = None, registry = "", delta = 48, asked = [], roles = []):
+    def get_token(self, id = None, registry = "", delta = 24 * 7, asked = [], roles = []):
         if (not isinstance(id, str) and id is not None) or not isinstance(registry, str) or \
            not isinstance(delta, int) or not isinstance(asked, list) or \
            not all(isinstance(a, str) for a in asked) or not isinstance(roles, list) or \
