@@ -72,7 +72,7 @@ class registry_signin_key:
             return res
         key_data = res[1]["key"]
         if len(key_data) > 1:
-            return [False, "Inernal error retry", 500]
+            return [False, "Internal error retry", 500]
         key_data = key_data[0]
         res = self.verify_time(key_data)
         if not res[0]:
@@ -80,13 +80,20 @@ class registry_signin_key:
         ret = key_data
         if 'registry' in key_data:
             ret['registry_id'] = str(key_data['registry'])
-            ret['registry'] = registry(ret['registry_id']).data()['name']['main']
+            ret['registry'] = registry(key_data['registry']).data()['name']['main']
         del ret["secret"]
         return [True, {"data": ret}, None]
 
     def signin(self, key, auth, usrtoken):
-        if not self.__key_exist(key, auth=auth)[0]:
+        res = self.__key_exist(key, auth=auth)
+        if not res[0]:
             return [False, "Error invalid connection", 404]
+        if len(res[1]) > 1:
+            return [False, "Internal error retry", 500]
+        ret = {
+		"registry": res[1]["key"][0]["registry"],
+                "redirect": res[1]["key"][0]["redirect"]
+	}
         res = dict(self.red.filter(
             (r.row["key"] == key)
             &
@@ -94,7 +101,7 @@ class registry_signin_key:
         ).update({"usrtoken": usrtoken}).run())
         if res['replaced'] != 1:
             return [False, "Error", 500]
-        return [True, {}, None]
+        return [True, ret, None]
 
     def wait_token(self, key, secret):
         query = res = self.red.filter(

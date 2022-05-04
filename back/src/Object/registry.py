@@ -2,7 +2,7 @@ import datetime
 import json
 import logging
 import uuid
-from users import user
+from .users import user
 from .rethink import get_conn, r
 
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='[ %m/%d/%Y-%I:%M:%S%p ]')

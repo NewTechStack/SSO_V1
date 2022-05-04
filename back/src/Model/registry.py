@@ -226,8 +226,7 @@ def regi_end_signin(cn, nextc):
         return cn.toret.add_error(err[1], err[2])
     if not 'usrtoken' in cn.private:
        return cn.toret.add_error('Invalid signin', 403)
-    registry_signin_key().signin(key, cn.pr["auth"], cn.private['usrtoken'])
-    err = [True, {'registry': cn.private['registry']}, None]
+    err = registry_signin_key().signin(key, cn.pr["auth"], cn.private['usrtoken'])
     return cn.call_next(nextc, err)
 
 def regi_info_signin(cn, nextc):

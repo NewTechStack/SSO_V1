@@ -59,7 +59,7 @@ def setuproute(app, call):
 
     @app.route('/extern/public',                ['POST'],                  lambda x = None: call([regi_check_key, user_publickey])) #done
     @app.route('/extern/askable',               ['POST'],                  lambda x = None: call([regi_check_key, user_get_askable])) #for dev only
-    @app.route('/extern/key',                   ['POST'],                  lambda x = None: call([regi_check_key, user_check_asked, regi_get_signin])) #done
+    @app.route('/extern/key',                   ['POST'],                  lambda x = None: call([regi_check_key, regi_get_signin])) #done
     @app.route('/extern/key/<>/token',          ['POST'],                  lambda x = None: call([regi_check_key, regi_wait_token])) #done
     @app.route('/extern/invite',                ['POST'],                  lambda x = None: call([regi_check_key, user_invite_ext]))
 

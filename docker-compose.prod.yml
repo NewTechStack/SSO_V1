@@ -10,7 +10,7 @@ services:
       context: ./
       dockerfile: Dockerfile.front
       target: prod
-    container_name: front-sso
+    container_name: sso-front
     tty: true
     restart: always
     networks:
@@ -34,7 +34,7 @@ services:
     build:
       context: ./back
       dockerfile: Dockerfile.back
-    container_name: back-sso
+    container_name: soo-back
     tty: true
     restart: always
     networks:
@@ -56,7 +56,7 @@ services:
 
   rethink:
     image: rethinkdb:latest
-    container_name: rethink-sso
+    container_name: sso-rethink
     restart: always
     expose:
       - 8080
