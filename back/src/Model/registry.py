@@ -215,18 +215,18 @@ def regi_verify_signin(cn, nextc):
 def regi_end_signin(cn, nextc):
     """
     """
-    if 'need_validation' in cn.private:
-        if cn.private['need_validation'] != False:
-            return regi_info_signin(cn, nextc)
     key = cn.rt["key"] if "key" in cn.rt else None
     if key is None:
         return cn.toret.add_error("Invalid key", 400)
     err = check.contain(cn.pr, ["auth"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    if not 'usrtoken' in cn.private:
-       return cn.toret.add_error('Invalid signin', 403)
-    err = registry_signin_key().signin(key, cn.pr["auth"], cn.private['usrtoken'])
+    if 'need_validation' in cn.private and cn.private['need_validation'] is True:
+            err = registry_signin_key().infos(key, cn.pr["auth"])
+    elif not 'usrtoken' in cn.private:
+        return cn.toret.add_error('Invalid signin', 403)
+    else:
+        err = registry_signin_key().signin(key, cn.pr["auth"], cn.private['usrtoken'])
     return cn.call_next(nextc, err)
 
 def regi_info_signin(cn, nextc):
