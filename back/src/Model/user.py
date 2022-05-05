@@ -57,7 +57,7 @@ def user_check_asked(cn, nextc):
     return cn.call_next(nextc, err)
 
 def admin_user_search(cn, nextc):
-    query = cn.get["q"] if "query" in cn.get else None
+    query = cn.get["q"] if "q" in cn.get else None
     page = cn.get["page"] if "page" in cn.get else 0
     bypage = cn.get["bypage"] if "bypage" in cn.get else 10
     invite = cn.get["invite"] if "invite" in cn.get else False

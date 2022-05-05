@@ -531,7 +531,7 @@ class user:
                             doc['username']['main'].match(f"(?i){query}")
                             or
                             (
-                                doc['email']['main'].match(f"(?i){query}")
+                                doc['email']['main'].match(f"{query}")
                                 and
                                 doc['email']['public'] is True
                             )
