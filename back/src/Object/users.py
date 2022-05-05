@@ -515,7 +515,7 @@ class user:
             ret = self.red.filter(~r.row.has_fields({"roles": "invite"}))
         if query is not None:
             if admin is True:
-                if expand is False:
+                if expand is True:
                     map_func = lambda res: {
                         "user_id": res['id'],
                         "username": res['username']['main'],
