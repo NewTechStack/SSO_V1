@@ -558,9 +558,9 @@ class user:
                             )
                         )
                 )
+        in_search = int(ret.count().run())
         ret = list(ret.map(map_func).slice(start, end).run())
         total = int(self.red.count().run())
-        in_search = int(ret.count().run())
         pagination = { "actual": page, "min": 0, "max": int(math.ceil(in_search / bypage)) - 1 }
         if pagination['actual'] > pagination['max']:
             return [False, "Over pagination", 404]
