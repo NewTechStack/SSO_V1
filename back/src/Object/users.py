@@ -511,31 +511,45 @@ class user:
         if invite is False:
             ret = self.red.filter(~r.row.has_fields({"roles": "invite"}))
         if query is not None:
-            ret = ret.filter(
-                lambda doc:
-                    (
-                        doc['username']['main'].match(f"(?i){query}")
-                        or
+            if admin is True:
+                ret = ret.filter(
+                    lambda doc:
                         (
+                            doc['username']['main'].match(f"(?i){query}")
+                            or
                             doc['email']['main'].match(f"(?i){query}")
-                            and
-                            (admin is True or doc['email']['public'] is True)
-                        )
-                        or
-                        (
+                            or
                             doc['details']['first_name']['main'].match(f"(?i){query}")
-                            and
-                            (admin is True or doc['details']['first_name']['public'] is True)
-                        )
-                        or
-                        (
-
+                            or
                             doc['details']['last_name']['main'].match(f"(?i){query}")
-                            and
-                            (admin is True or doc['details']['last_name']['public'] is True)
                         )
-                    )
-            )
+                )
+            else:
+                ret = ret.filter(
+                    lambda doc:
+                        (
+                            doc['username']['main'].match(f"(?i){query}")
+                            or
+                            (
+                                doc['email']['main'].match(f"(?i){query}")
+                                and
+                                doc['email']['public'] is True
+                            )
+                            or
+                            (
+                                doc['details']['first_name']['main'].match(f"(?i){query}")
+                                and
+                                doc['details']['first_name']['public'] is True
+                            )
+                            or
+                            (
+
+                                doc['details']['last_name']['main'].match(f"(?i){query}")
+                                and
+                                doc['details']['last_name']['public'] is True
+                            )
+                        )
+                )
         ret = list(ret.map(lambda res : res['id']).slice(start, end).run())
         return [True, {"users": ret}, None]
 
