@@ -511,8 +511,9 @@ class user:
         map_func = lambda res : res['id']
         invite = bool(invite) if invite != 'false' and invite != 'False' else False
         expand = bool(expand) if expand != 'false' and expand != 'False' else False
+        ret = self.red
         if invite is False:
-            ret = self.red.filter(~r.row.has_fields({"roles": "invite"}))
+            ret = ret.filter(~r.row.has_fields({"roles": "invite"}))
         if query is not None:
             if admin is True:
                 if expand is True:
