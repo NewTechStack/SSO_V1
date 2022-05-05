@@ -507,7 +507,7 @@ class user:
         bypage = (bypage if bypage > 5 else 5)
         start = page * bypage
         end = (page + 1) * bypage
-        query = query if len(str(query)) > 0 else None
+        query = re.escape(str(query)) if len(str(query)) > 0 else None
         if invite is False:
             ret = self.red.filter(~r.row.has_fields({"roles": "invite"}))
         if query is not None:
@@ -529,6 +529,7 @@ class user:
                         )
                         or
                         (
+
                             doc['details']['last_name']['main'].match(f"(?i){query}")
                             and
                             (admin is True or doc['details']['last_name']['public'] is True)
