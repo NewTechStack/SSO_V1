@@ -560,7 +560,9 @@ class user:
                 )
         ret = list(ret.map(map_func).slice(start, end).run())
         total = self.red.count().run()
-        return [True, {"users": ret, "pagination": {"total": total, "in_search": len(ret), "page": { "actual": page, "min": 0, "max": total / math.ceil(total / bypage)}}}, None]
+        pagination = { "actual": page, "min": 0, "max": int(total / math.ceil(total / bypage))}
+        resume = {"total": total, "in_search": len(ret), "page": pagination}
+        return [True, {"users": ret, "pagination": resume}, None]
 
 
     def register(self, email, pass1, pass2, role = "user"):
