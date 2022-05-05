@@ -26,7 +26,7 @@ class user_registry:
                 (r.row["id_user"] == usr_id)
             )
         if creator is not None:
-            res = res.filter(lambda doc: (doc['roles']['creator']['active'] == creator).default(False))
+            res = res.filter(lambda doc: (doc['roles']['creator']['active'] == creator).default(not creator))
         res = list(res.eq_join(
                 'id_registry',
                 get_conn().db("auth").table('registry')
