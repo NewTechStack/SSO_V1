@@ -500,7 +500,7 @@ class user:
         self.set_role(id, "invite")
         return ret if not hash else self.__encoded_id(email)
 
-    def search_user(self, query, page = 0, bypage = 10, admin = False, invite = False):
+    def search_user(self, query, page = 0, bypage = 10, admin = False, invite = False, expand=False):
         page = int(page)
         bypage = int(bypage)
         page = (page if page > 0 else 0)
@@ -508,10 +508,20 @@ class user:
         start = page * bypage
         end = (page + 1) * bypage
         query = re.escape(str(query)) if len(str(query)) > 0 else None
+        map_func = lambda res : res['id']
+        invite = bool(invite) if invite != 'false' and invite != 'False' else False
+        expand = bool(expand) if expand != 'false' and expand != 'False' else False
         if invite is False:
             ret = self.red.filter(~r.row.has_fields({"roles": "invite"}))
         if query is not None:
             if admin is True:
+                if expand is False:
+                    map_func = lambda res: {
+                        "user_id": res['id'],
+                        "username": res['username']['main'],
+                        "email": res['email']['main'],
+                        "roles": res['roles']
+                    }
                 ret = ret.filter(
                     lambda doc:
                         (
@@ -550,7 +560,7 @@ class user:
                             )
                         )
                 )
-        ret = list(ret.map(lambda res : res['id']).slice(start, end).run())
+        ret = list(ret.map(map_func).slice(start, end).run())
         return [True, {"users": ret}, None]
 
 
