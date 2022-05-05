@@ -560,7 +560,7 @@ class user:
                 )
         ret = list(ret.map(map_func).slice(start, end).run())
         total = self.red.count().run()
-        pagination = { "actual": page, "min": 0, "max": int(total / math.ceil(total / bypage))}
+        pagination = { "actual": page, "min": 0, "max": int(math.ceil(total / bypage)) - 1 }
         resume = {"total": total, "in_search": len(ret), "page": pagination}
         return [True, {"users": ret, "pagination": resume}, None]
 
