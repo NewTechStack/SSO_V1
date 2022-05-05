@@ -509,18 +509,18 @@ class user:
         end = (page + 1) * bypage
         query = re.escape(str(query)) if len(str(query)) > 0 else None
         map_func = lambda res : res['id']
+        if admin and expand:
+            map_func = lambda res: {
+                "user_id": res['id'],
+                "username": res['username']['main'],
+                "email": res['email']['main'],
+                "roles": res['roles']
+            }
         ret = self.red
         if invite is False:
             ret = ret.filter(~r.row.has_fields({"roles": "invite"}))
         if query is not None:
             if admin is True:
-                if expand is True:
-                    map_func = lambda res: {
-                        "user_id": res['id'],
-                        "username": res['username']['main'],
-                        "email": res['email']['main'],
-                        "roles": res['roles']
-                    }
                 ret = ret.filter(
                     lambda doc:
                         (
