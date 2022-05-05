@@ -558,7 +558,8 @@ class user:
                         )
                 )
         ret = list(ret.map(map_func).slice(start, end).run())
-        return [True, {"users": ret}, None]
+        total = list(self.red.count().run())
+        return [True, {"users": ret, "total": total}, None]
 
 
     def register(self, email, pass1, pass2, role = "user"):
