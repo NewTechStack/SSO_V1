@@ -269,7 +269,7 @@ def registry_users(cn, nextc):
 
 def user_registries(cn, nextc):
     user_id = cn.rt["user"] if "user" in cn.rt and cn.rt["user"] != 'registry' else cn.private["user"].id
-    creator = True if "creator" in cn.get else False
+    creator = cn.get["creator"] if "creator" in cn.get else True
     err = user_registry(None, None).all_from_user(user_id, creator)
     return cn.call_next(nextc, err)
 
