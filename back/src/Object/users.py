@@ -9,6 +9,7 @@ import string
 import random
 import uuid
 import logging
+import math
 try:
     from .rethink import get_conn, r
 except:
@@ -559,7 +560,7 @@ class user:
                 )
         ret = list(ret.map(map_func).slice(start, end).run())
         total = self.red.count().run()
-        return [True, {"users": ret, "count": {"total": total, "in_search": len(ret)}}, None]
+        return [True, {"users": ret, "pagination": {"total": total, "in_search": len(ret), "page": { "actual": page, "min": 0, "max": total / math.ceil(total / bypage)}}, None]
 
 
     def register(self, email, pass1, pass2, role = "user"):
