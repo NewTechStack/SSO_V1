@@ -516,10 +516,7 @@ class user:
                 "email": res['email']['main'],
                 "roles": res['roles']
             }
-        ret = self.red
-        if invite is True:
-            print("only invite")
-            ret = ret.filter(lambda user: user['roles'].has_fields('invite') & user['roles']['invite']['active'] == True)
+        ret = ret.filter(lambda user: (user['roles']['invite']['active'] == invite).default(not Invite))
         if query is not None:
             if admin is True:
                 ret = ret.filter(
