@@ -509,8 +509,6 @@ class user:
         end = (page + 1) * bypage
         query = re.escape(str(query)) if len(str(query)) > 0 else None
         map_func = lambda res : res['id']
-        invite = bool(invite) if invite != 'false' and invite != 'False' else False
-        expand = bool(expand) if expand != 'false' and expand != 'False' else False
         ret = self.red
         if invite is False:
             ret = ret.filter(~r.row.has_fields({"roles": "invite"}))
