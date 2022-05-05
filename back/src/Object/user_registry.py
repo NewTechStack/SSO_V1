@@ -25,10 +25,10 @@ class user_registry:
         res = self.red.filter(
                 (r.row["id_user"] == usr_id)
             )
-        if creator is False:
-            res = res.filter(~r.row.has_fields({"roles": "creator"}))
-        else:
-            res = res.filter(r.row.has_fields({"roles": "creator"}))
+        # if creator is False:
+        #     res = res.filter(~r.row.has_fields({"roles": "creator"}))
+        # else:
+        #     res = res.filter(r.row.has_fields({"roles": "creator"}))
         res = list(res.eq_join(
                 'id_registry',
                 get_conn().db("auth").table('registry')

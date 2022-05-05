@@ -518,7 +518,7 @@ class user:
             }
         ret = self.red
         if invite is False:
-            ret = ret.filter(~r.row.has_fields({"roles": "invite"}))
+            ret = ret.filter(lambda user: user['roles'].has_fields('invite') is False | user['roles']['invite']['active'] is False )
         if query is not None:
             if admin is True:
                 ret = ret.filter(
