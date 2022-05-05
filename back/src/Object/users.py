@@ -561,6 +561,8 @@ class user:
         ret = list(ret.map(map_func).slice(start, end).run())
         total = self.red.count().run()
         pagination = { "actual": page, "min": 0, "max": int(math.ceil(total / bypage)) - 1 }
+        if pagination['actual'] > pagination['max']:
+            return [False, "Over pagination", 404]
         resume = {"total": total, "in_search": len(ret), "page": pagination}
         return [True, {"users": ret, "pagination": resume}, None]
 
