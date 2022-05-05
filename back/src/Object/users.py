@@ -515,13 +515,13 @@ class user:
                 ret = ret.filter(
                     lambda doc:
                         (
-                            query in doc['username']['main']
-                            or
-                            query in doc['email']['main']
-                            or
-                            query in doc['details']['first_name']['main']
-                            or
-                            query in doc['details']['last_name']['main']
+                            doc['username']['main'].match(f"(?i){query}").default(False)
+                            |
+                            doc['email']['main'].match(f"(?i){query}").default(False)
+                            |
+                            doc['details']['first_name']['main'].match(f"(?i){query}").default(False)
+                            |
+                            doc['details']['last_name']['main'].match(f"(?i){query}").default(False)
                         )
                 )
             else:
