@@ -72,14 +72,14 @@ class registry_granted:
         return details
 
     def history(self, registry_id, user_id):
-        res = self.red.filter(
+        res = list(self.red.filter(
             (r.row["user_id"] == user_id)
             &
             (r.row["registry_id"] == registry_id)
-            ).order_by(r.desc(r.row['date']['end'])).nth(0).run()
-        if res is None:
+            ).order_by(r.desc(r.row['date']['end'])).limit(1).run())
+        if len(res) == 0:
             return [False, "User never connected to this registry can't read information", 403]
-        res = dict(res)
+        res = res[0]
         askable = user(res['user_id']).askable
         ret = {
                 'registry_id': res['registry_id'],
