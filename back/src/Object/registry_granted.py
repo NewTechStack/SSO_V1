@@ -85,7 +85,7 @@ class registry_granted:
                 'registry_id': res['registry_id'],
                 'user_id': res['user_id'],
                 'data_shared': {
-                    asked:askable[asked]() for asked in res['data']
+                    asked:askable[asked]['data']() for asked in res['data']
                 }
             }
         return [True, ret, None]
