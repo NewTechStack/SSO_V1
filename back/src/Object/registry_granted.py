@@ -70,6 +70,22 @@ class registry_granted:
         details['browser']['hash'] = hashlib.md5(str(details['browser']).encode()).hexdigest()
         return details
 
+    def history(self, registry_id, user_id):
+        res = list(self.red.filter(
+            (r.row["user_id"] == user_id)
+            &
+            (r.row["registry_id"] == registry_id)
+            ).order_by(r.desc(r.row['date']['end'])))[0]
+        askable = user(res['user_id']).askable
+        ret = {
+                'registry_id': res['resgistry_id'],
+                'user_id': res['user_id'],
+                'data_shared': {
+                    asked:askable[asked]() for asked in res['data']
+                }
+            }
+        return [True, ret, None]
+
     def validate(self, user_id, registry_id, data, ip = '', user_agents = None, clic = False, exp = None):
         ret = self.model
         now = datetime.datetime.utcnow()

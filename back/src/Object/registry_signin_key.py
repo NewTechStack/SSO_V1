@@ -17,7 +17,7 @@ class registry_signin_key:
         self.id = str(id)
         self.last_check = None
         self.time_limit = {
-            "up": 180,
+            "up": 1200,
             "down": 10
         }
         try:

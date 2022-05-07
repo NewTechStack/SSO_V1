@@ -37,3 +37,10 @@ def registry_granted_logs(cn, nextc):
     user_id = cn.private['user'].id
     err = registry_granted().logs(user_id)
     return cn.call_next(nextc, err)
+
+def registry_granted_history(cn, nextc):
+    err = check.contain(cn.pr, ["user_id"])
+    if not err[0]:
+        return cn.toret.add_error(err[1], err[2])
+    err = registry_granted().history(cn.private["reg"].id, cn.pr['user_id'])
+    return cn.call_next(nextc, err)
