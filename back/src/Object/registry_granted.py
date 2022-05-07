@@ -75,7 +75,7 @@ class registry_granted:
             (r.row["user_id"] == user_id)
             &
             (r.row["registry_id"] == registry_id)
-            ).order_by(r.desc(r.row['date']['end'])))[0]
+            ).order_by(r.desc(r.row['date']['end'])).run())[0]
         askable = user(res['user_id']).askable
         ret = {
                 'registry_id': res['resgistry_id'],
