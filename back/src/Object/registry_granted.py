@@ -141,11 +141,13 @@ class registry_granted:
         ).order_by(r.desc(r.row['date']['end'])).run())
         if len(res) == 0:
             return [True, {"need_validation": True}, None]
+        askable = user(user_id).askable
         for potential in res:
             in_data = {i : False for i in data}
             for d in data:
                 if d in potential['data']:
-                    in_data[d] = True
+                    asked = askable[d]['data']()
+                    in_data[d] = asked is not None or asked is True 
             if all(i for i in in_data.values()):
                 self.validate(user_id, registry_id, data, user_agents, clic = False, exp=potential['date']['end'])
                 return [True, {"need_validation": False}, None]
