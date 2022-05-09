@@ -118,14 +118,8 @@ def user_login(cn, nextc):
     return cn.call_next(nextc, err)
 
 def user_update(cn, nextc):
-    cn.pr = check.setnoneopt(cn.pr, ["phone", "first_name", "last_name", "username", "email"])
-    err = cn.private["user"].updetails(
-        cn.pr["phone"],
-        cn.pr["first_name"],
-        cn.pr["last_name"],
-        cn.pr["username"],
-        cn.pr["email"],
-    )
+    cn.pr = check.setnoneopt(cn.pr, ['username', 'email', 'details'])
+    err = cn.private["user"].updetails(cn.pr['username'], cn.pr['email'], cn.pr['data'])
     return cn.call_next(nextc, err)
 
 def user_preferences(cn, nextc):

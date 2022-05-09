@@ -257,6 +257,7 @@ class user:
                 },
                 "location": {
                     "main": {
+                        "country": None,
                         "city": None,
                         "details": {},
                         "last_update": None
@@ -654,7 +655,7 @@ class user:
             self.set_role(self.id, "disabled", True)
         return [True, ret, None]
 
-    def updetails(self, phone = {}, fname = {}, lname = {}, username = None, email = {}, account_lang = []):
+    def updetails(self, username = None, email = {}, details = {}):
         up = {}
         date = str(datetime.datetime.utcnow())
 
@@ -686,96 +687,101 @@ class user:
                         "last_update": date
                     }
                 ).run()
-
-        if isinstance(phone, dict) and "lang" in phone and "number" in phone and \
-            isinstance(phone["lang"], str) and isinstance(phone["number"], str) and \
-            len(phone["number"]) >= 10:
-            try:
-                phone["number"] = phonenumbers.format_number(phonenumbers.parse(str(phone["number"]), str(phone["lang"])),
-                                                   phonenumbers.PhoneNumberFormat.INTERNATIONAL)
-            except phonenumbers.phonenumberutil.NumberParseException:
-                phone["number"] = None
-            if phone["number"] is not None:
-                phone["number"] = phone["number"].replace(" ", "")
-                up["phone"] = {}
-                up["phone"]["main"] = { "number": phone["number"], "lang": phone["lang"] }
-                up["phone"]["last_update"] = date
-                if up["phone"]["main"] != self.data()["details"]["phone"]["main"]:
-                    up["phone"]["verified"] =  {
-                        "main": False,
-                        "check_key": {
-                            "main": None,
-                            "until": None,
-                            "try": {
-                                "count": 0,
-                                "last": None,
+        if 'phone' in details:
+            phone = details['phone']
+            if isinstance(phone, dict) and "lang" in phone and "number" in phone and \
+                isinstance(phone["lang"], str) and isinstance(phone["number"], str) and \
+                len(phone["number"]) >= 10:
+                try:
+                    phone["number"] = phonenumbers.format_number(phonenumbers.parse(str(phone["number"]), str(phone["lang"])),
+                                                       phonenumbers.PhoneNumberFormat.INTERNATIONAL)
+                except phonenumbers.phonenumberutil.NumberParseException:
+                    phone["number"] = None
+                if phone["number"] is not None:
+                    phone["number"] = phone["number"].replace(" ", "")
+                    up["phone"] = {}
+                    up["phone"]["main"] = { "number": phone["number"], "lang": phone["lang"] }
+                    up["phone"]["last_update"] = date
+                    if up["phone"]["main"] != self.data()["details"]["phone"]["main"]:
+                        up["phone"]["verified"] =  {
+                            "main": False,
+                            "check_key": {
+                                "main": None,
+                                "until": None,
+                                "try": {
+                                    "count": 0,
+                                    "last": None,
+                                },
                             },
-                        },
-                        "last_update": date
-                    }
-                up["phone"]["last_update"] = date
-                if "public" in phone and isinstance(phone["public"], bool):
-                    up["phone"]["public"] = phone["public"]
+                            "last_update": date
+                        }
+                    up["phone"]["last_update"] = date
+                    if "public" in phone and isinstance(phone["public"], bool):
+                        up["phone"]["public"] = phone["public"]
+                    self.red.get(self.id).update(
+                        {
+                            "details": {
+                                "phone": up["phone"]
+                            },
+                            "last_update": date
+                        }
+                    ).run()
+                    if "verified" in up['phone']:
+                        up["phone"]["verified"] = False
+
+
+        for field in ['nationality', 'first_name', 'last_name']:
+            if field in details:
+                change = details[field]
+                up[field] = {}
+                if  isinstance(change, dict):
+                    if field in change and isinstance(change[field], str):
+                        up[field]["main"] = change[field]
+                        up[field]["last_update"] = date
+                        if up[field]["main"] != self.data()["details"][field]["main"]:
+                            up[field]["verified"] = {
+                                "main": False,
+                                "using": [],
+                                "last_update": None
+                            }
+                    if "public" in change and isinstance(change["public"], bool):
+                        up[field]["public"] = change["public"]
+                        up[field]["last_update"] = date
+                    self.red.get(self.id).update(
+                        {
+                            "details": {
+                                field: up[field],
+                            },
+                            "last_update": date
+                        }
+                    ).run()
+
+        field = 'location'
+        if field in details:
+            change = details[field]
+            up[field] = {}
+            if  isinstance(change, dict):
+                if field in change and isinstance(change[field], dict):
+                    if all(isinstance(change[field][i], str) for i in ['country', 'city', 'details']):
+                        up[field]["main"] = change[field]
+                        up[field]["last_update"] = date
+                        if up[field]["main"] != self.data()["details"][field]["main"]:
+                            up[field]["verified"] = {
+                                "main": False,
+                                "using": [],
+                                "last_update": None
+                                }
+                if "public" in change and isinstance(change["public"], bool):
+                    up[field]["public"] = change["public"]
+                    up[field]["last_update"] = date
                 self.red.get(self.id).update(
                     {
                         "details": {
-                            "phone": up["phone"]
+                            field: up[field],
                         },
                         "last_update": date
                     }
                 ).run()
-                if "verified" in up['phone']:
-                    up["phone"]["verified"] = False
-
-
-        if  isinstance(fname, dict) and "first_name" in fname and \
-            isinstance(fname["first_name"], str):
-            up["first_name"] = {}
-            up["first_name"]["main"] = fname["first_name"]
-            up["first_name"]["last_update"] = date
-            if "public" in fname and isinstance(fname["public"], bool):
-                up["first_name"]["public"] = fname["public"]
-            if up["first_name"]["main"] != self.data()["details"]["first_name"]["main"]:
-                up["first_name"]["verified"] = {
-                    "main": False,
-                    "using": [],
-                    "last_update": date
-                }
-            self.red.get(self.id).update(
-                {
-                    "details": {
-                        "first_name": up["first_name"]
-                    },
-                    "last_update": date
-                }
-            ).run()
-
-        if  isinstance(lname, dict) and "last_name" in lname and \
-            isinstance(lname["last_name"], str):
-            up["last_name"] = {}
-            up["last_name"]["main"] = lname["last_name"]
-            up["last_name"]["last_update"] = date
-            if "public" in lname and isinstance(lname["public"], bool):
-                up["last_name"]["public"] = lname["public"]
-            if up["last_name"]["main"] != self.data()["details"]["last_name"]["main"]:
-                up["last_name"]["verified"] = {
-                    "main": False,
-                    "using": [],
-                    "last_update": None
-                }
-            self.red.get(self.id).update(
-                {
-                    "details": {
-                        "last_name": up["last_name"],
-                        "verified": {
-                            "main": False,
-                            "using": [],
-                            "last_update": None
-                        }
-                    },
-                    "last_update": date
-                }
-            ).run()
 
         return [True, up, None]
 
