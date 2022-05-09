@@ -687,6 +687,8 @@ class user:
                         "last_update": date
                     }
                 ).run()
+        if details is None:
+            details = {}
         if 'phone' in details:
             phone = details['phone']
             if isinstance(phone, dict) and "lang" in phone and "number" in phone and \
