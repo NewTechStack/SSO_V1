@@ -741,7 +741,7 @@ class user:
                     if field in change and isinstance(change[field], str):
                         up[field]["main"] = change[field]
                         up[field]["last_update"] = date
-                        if ield not in self.data()["details"] or up[field]["main"] != self.data()["details"][field]["main"]:
+                        if field not in self.data()["details"] or up[field]["main"] != self.data()["details"][field]["main"]:
                             up[field]["verified"] = {
                                 "main": False,
                                 "using": [],
