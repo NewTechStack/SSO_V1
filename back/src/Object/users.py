@@ -694,11 +694,12 @@ class user:
             if isinstance(phone, dict) and "lang" in phone and "number" in phone and \
                 isinstance(phone["lang"], str) and isinstance(phone["number"], str) and \
                 len(phone["number"]) >= 10:
-                try:
-                    phone["number"] = phonenumbers.format_number(phonenumbers.parse(str(phone["number"]), str(phone["lang"])),
+                print('in')
+                # try:
+                phone["number"] = phonenumbers.format_number(phonenumbers.parse(str(phone["number"]), str(phone["lang"])),
                                                        phonenumbers.PhoneNumberFormat.INTERNATIONAL)
-                except phonenumbers.phonenumberutil.NumberParseException:
-                    phone["number"] = None
+                # except phonenumbers.phonenumberutil.NumberParseException:
+                    # phone["number"] = None
                 if phone["number"] is not None:
                     phone["number"] = phone["number"].replace(" ", "")
                     up["phone"] = {}
@@ -740,7 +741,7 @@ class user:
                     if field in change and isinstance(change[field], str):
                         up[field]["main"] = change[field]
                         up[field]["last_update"] = date
-                        if up[field]["main"] != self.data()["details"][field]["main"]:
+                        if ield not in self.data()["details"] or up[field]["main"] != self.data()["details"][field]["main"]:
                             up[field]["verified"] = {
                                 "main": False,
                                 "using": [],
@@ -767,7 +768,7 @@ class user:
                     if all(isinstance(change[field][i], str) for i in ['country', 'city', 'details']):
                         up[field]["main"] = change[field]
                         up[field]["last_update"] = date
-                        if up[field]["main"] != self.data()["details"][field]["main"]:
+                        if field not in self.data()["details"] or up[field]["main"] != self.data()["details"][field]["main"]:
                             up[field]["verified"] = {
                                 "main": False,
                                 "using": [],
