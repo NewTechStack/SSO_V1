@@ -147,8 +147,8 @@ class registry_granted:
             for d in data:
                 if d in potential['data']:
                     asked = askable[d]['data']()
-                    print(d, asked)
                     in_data[d] = asked is not None or asked is True
+            print(in_data)
             if all(i for i in in_data.values()):
                 self.validate(user_id, registry_id, data, user_agents, clic = False, exp=potential['date']['end'])
                 return [True, {"need_validation": False}, None]
