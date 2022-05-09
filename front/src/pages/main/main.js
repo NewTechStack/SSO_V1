@@ -28,26 +28,32 @@ export default class main extends React.Component{
     }
 
     componentDidMount() {
-        console.log(this.props)
+
         const isMobileViewPort = document.body.offsetWidth < 600;
         this.setState({isSidebarHidden:isMobileViewPort})
         if(utilFunctions.verif_session() === true){
             this.verif_acces_roles()
             let path_array = this.props.location.pathname.split("/")
-            console.log(path_array)
+            //console.log(path_array)
             let menuItems = ["infos","registres","admin"];
             let current = path_array[path_array.length -1]
-            console.log(current)
+            //console.log(current)
             this.setState({selectedItem:menuItems.find(x => x === current) ? current : path_array[path_array.length -2] === "registre" ? "registres" : "infos",session:true})
         }else{
-            this.props.history.push("/sso/login")
+            console.log(this.props.history.location)
+            if(this.props.history.location.pathname && this.props.history.location.pathname.trim() !== "" && this.props.history.location.pathname.length > 1){
+                let path = this.props.history.location.pathname + ((this.props.history.location.hash && this.props.history.location.hash.trim() !== "") ? this.props.history.location.hash :"" )
+                this.props.history.push("/sso/login?" + path)
+            }else{
+                this.props.history.push("/sso/login")
+            }
         }
 
     }
 
     verif_acces_roles(){
         let roles = JSON.parse(localStorage.getItem("roles")) || []
-        console.log(roles)
+        //console.log(roles)
         if(roles.find(x => x.role === "admin" || x.role === "creator")){
             this.setState({is_have_admin_acces:true})
         }
@@ -91,7 +97,7 @@ export default class main extends React.Component{
                             icon={<BallotIcon fontSize="medium" style={{color:"#1c94fe"}} />}
                             name="registres"
                             label="Registres"
-                            onClick={() => this.props.history.push('/main/registres')} />
+                            onClick={() => this.props.history.push('/main/registres#'+"registries")} />
                         {
                             this.state.is_have_admin_acces === true &&
                             <SidebarItem

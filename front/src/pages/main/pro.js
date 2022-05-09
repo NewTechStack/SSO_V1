@@ -190,7 +190,7 @@ export default function Pro(props){
     const [loading, setLoading] = React.useState(false);
     const [loadingBtnAdd, setLoadingBtnAdd] = React.useState(false);
     const [loadingBtnSearch, setLoadingBtnSearch] = React.useState(false);
-    const [selectedTab, setSelectedTab] = React.useState("registries");
+    const [selectedTab, setSelectedTab] = React.useState((props.history.location.hash && props.history.location.hash.trim() !== "") ? props.history.location.hash.substring(1) : "registries");
     const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
     const [openAddModal, setOpenAddModal] = React.useState(false);
     const [newReg_name, setNewReg_name] = React.useState("");
@@ -212,11 +212,12 @@ export default function Pro(props){
                 getOtherUserRegistres()
 
             }else{
-                enqueueSnackbar('Session expirée', { variant:"warning" })
-                enqueueSnackbar('Reconnexion en cours...', { variant:"info" })
-                setTimeout(() => {
+                /*if(props.history.location.pathname && props.history.location.pathname.trim() !== "" && props.history.location.pathname.length > 1){
+                    let path = props.history.location.pathname + ((props.history.location.hash && props.history.location.hash.trim() !== "") ? props.history.location.hash :"" )
+                    props.history.push("/sso/login?" + path)
+                }else{
                     props.history.push("/sso/login")
-                },1500)
+                }*/
             }
     }, []);
 
@@ -439,7 +440,7 @@ export default function Pro(props){
                         noHeader={true}
                         pointerOnHover={true}
                         onRowClicked={(row, e) => {
-                            props.history.push("/main/pro/registre/" + row.id )
+                            props.history.push("/main/pro/registre/" + row.id + "#details" )
                         }}
                     />
 
@@ -481,7 +482,7 @@ export default function Pro(props){
                                 noHeader={true}
                                 pointerOnHover={true}
                                 onRowClicked={(row, e) => {
-                                    props.history.push("/main/pro/registre/" + row.id )
+                                    props.history.push("/main/pro/registre/" + row.id + "#details" )
                                 }}
                             />
                         </div>
@@ -495,6 +496,7 @@ export default function Pro(props){
 
     const handleChangedTab = (event, selected) => {
         setSelectedTab(selected)
+        props.history.push("/main/registres#" + selected)
     }
 
     return(

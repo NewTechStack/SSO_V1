@@ -29,6 +29,7 @@ import HelpIcon from "@material-ui/icons/Help";
 import CloseIcon from '@material-ui/icons/Close';
 import jwt_decode from "jwt-decode";
 import utilFunctions from "../../tools/functions";
+import checkicon from "../../assets/icons/check_icon.png"
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -55,6 +56,7 @@ export default function Info(props){
 
     const { enqueueSnackbar } = useSnackbar();
 
+    let kyc_passport = React.useRef();
     const f_name_ref = React.useRef();
     const l_name_ref = React.useRef();
 
@@ -76,6 +78,7 @@ export default function Info(props){
 
     //security
     const [openDeleteAccountModal, setOpenDeleteAccountModal] = React.useState(false);
+    const [openConfirmUpdateModal, setOpenConfirmUpdateModal] = React.useState(false);
     const [newPwd1, setNewPwd1] = React.useState("");
     const [newPwd2, setNewPwd2] = React.useState("");
 
@@ -91,7 +94,12 @@ export default function Info(props){
                 getAccountInfo()
                 getUserInfo()
             }else{
-                props.history.push("/sso/login")
+                /*if(props.history.location.pathname && props.history.location.pathname.trim() !== "" && props.history.location.pathname.length > 1){
+                    let path = props.history.location.pathname + ((props.history.location.hash && props.history.location.hash.trim() !== "") ? props.history.location.hash :"" )
+                    props.history.push("/sso/login?" + path)
+                }else{
+                    props.history.push("/sso/login")
+                }*/
             }
     }, []);
 
@@ -108,8 +116,10 @@ export default function Info(props){
                     data: roles_object[key]
                 }));
                 setRoles(roles_array)
-                setFirstname(infoRes.data.first_name.main)
-                setLastname(infoRes.data.last_name.main)
+                if(infoRes.data.verified.identity && infoRes.data.verified.identity.score === 3 ){
+                    setFirstname((infoRes.data.verified.identity.data.first_name.main === true || infoRes.data.verified.identity.data.first_name.main === null) ? "" : infoRes.data.verified.identity.data.first_name.main === true )
+                    setLastname((infoRes.data.verified.identity.data.last_name.main === true || infoRes.data.verified.identity.data.last_name.main === null) ? "" : infoRes.data.verified.identity.data.last_name.main)
+                }
                 setSelected_fname_status(infoRes.data.last_name.public === true ? "public" : "private")
                 setPhone(infoRes.data.phone.main ? infoRes.data.phone.main.number ? infoRes.data.phone.main.number : "" : "")
                 setSelected_username(infoRes.data.username || "")
@@ -128,6 +138,51 @@ export default function Info(props){
             setLoading(false)
         })
     }
+
+    const getAsyncUserInfo = () => {
+
+        return new Promise( resolve => {
+
+            SSO_service.getUser(localStorage.getItem("usrtoken")).then(infoRes => {
+                console.log(infoRes)
+                if(infoRes.status === 200 && infoRes.succes === true){
+
+                    let roles_object = infoRes.data.roles || {}
+                    const roles_array = [];
+                    Object.keys(roles_object).forEach(key => roles_array.push({
+                        role: key,
+                        data: roles_object[key]
+                    }));
+                    setRoles(roles_array)
+                    if(infoRes.data.verified.identity && infoRes.data.verified.identity.score === 3 ){
+                        setFirstname((infoRes.data.verified.identity.data.first_name.main === true || infoRes.data.verified.identity.data.first_name.main === null) ? "" : infoRes.data.verified.identity.data.first_name.main === true )
+                        setLastname((infoRes.data.verified.identity.data.last_name.main === true || infoRes.data.verified.identity.data.last_name.main === null) ? "" : infoRes.data.verified.identity.data.last_name.main)
+                    }
+                    setSelected_fname_status(infoRes.data.last_name.public === true ? "public" : "private")
+                    setPhone(infoRes.data.phone.main ? infoRes.data.phone.main.number ? infoRes.data.phone.main.number : "" : "")
+                    setSelected_username(infoRes.data.username || "")
+                    setSelected_phone_status(infoRes.data.phone.public === true ? "public" : "private")
+                    setFname_lupdate(infoRes.data.first_name.last_update || "")
+                    setLname_lupdate(infoRes.data.first_name.last_update || "")
+                    setPhone_lupdate(infoRes.data.phone.last_update || "")
+                    setLoading(false)
+                    resolve(true)
+                }else{
+                    enqueueSnackbar('Une erreur est survenue lors de la récuperation de vos informations !', { variant:"error" })
+                    setLoading(false)
+                    resolve(false)
+                }
+            }).catch(err => {
+                console.log(err)
+                enqueueSnackbar('Une erreur est survenue lors de la récuperation de vos informations !', { variant:"error" })
+                setLoading(false)
+                resolve(false)
+            })
+
+        })
+
+    }
+
     const updateUser = (data) => {
         setLoading(true)
         SSO_service.updateUser(data,localStorage.getItem("usrtoken")).then( updateRes => {
@@ -148,6 +203,7 @@ export default function Info(props){
             setLoading(false)
         })
     }
+
     const handleChange = (panel) => (event, isExpanded) => {
         setExpanded(isExpanded ? panel : false);
     };
@@ -174,6 +230,33 @@ export default function Info(props){
             setLoading(false)
         })
     }
+
+    const getAsyncAccountInfo = () => {
+        return new Promise( resolve => {
+            setLoading(true)
+            SSO_service.getAccountInfo(localStorage.getItem("usrtoken")).then(infoRes => {
+                console.log(infoRes)
+                if(infoRes.status === 200 && infoRes.succes === true){
+                    setInfoAccount(infoRes.data)
+                    setSelected_email_status(infoRes.data.email.public === true ? "public" : "private")
+                    setSelected_username(infoRes.data.username || "")
+                    setLoading(false)
+                    resolve(true)
+                }else{
+                    enqueueSnackbar('Une erreur est survenue lors de la récuperation de vos informations !', { variant:"error" })
+                    setLoading(false)
+                    resolve(false)
+                }
+            }).catch(err => {
+                console.log(err)
+                enqueueSnackbar('Une erreur est survenue lors de la récuperation de vos informations !', { variant:"error" })
+                setLoading(false)
+                resolve(false)
+            })
+        })
+
+    }
+
     const deleteAccount = () => {
         setLoading(true)
         setTimeout(() => {
@@ -238,6 +321,30 @@ export default function Info(props){
         }
 
 
+    }
+
+
+    const upload_kyc_passport = (e) => {
+        setLoading(true)
+        let file = e.target.files[0]
+        const data = new FormData();
+        data.append("file", file);
+        SSO_service.kyc_upload_passport(localStorage.getItem("usrtoken"),localStorage.getItem("id"),data).then( async res => {
+            console.log(res)
+            if(res.status === 200 && res.succes === true){
+                await getAsyncAccountInfo()
+                await getAsyncUserInfo()
+                setLoading(false)
+                enqueueSnackbar('Opération effectuée avec succès', { variant:"success" })
+            }else{
+                setLoading(false)
+                enqueueSnackbar(res.error, { variant:"error" })
+            }
+        }).catch( err => {
+            console.log(err)
+            setLoading(false)
+            enqueueSnackbar("Une erreur est survenue, veuillez réessayer ultérieurement", { variant:"error" })
+        })
     }
 
     return(
@@ -366,7 +473,20 @@ export default function Info(props){
                                         id="panel1bh-header"
                                         translate="no"
                                     >
-                                        <Typography className={classes.heading}>Nom et Prénom</Typography>
+                                        <Typography className={classes.heading}>
+                                            Nom et Prénom&nbsp;
+                                            {
+                                                !loading  && infoAccount.verified.identity.score === 3 &&
+                                                <Popup content={
+                                                    <h6 style={{fontSize:"0.8rem"}}>Ce champ a été bien vérifié par KYC</h6>
+                                                }
+                                                       wide='very'
+                                                       size={"small"}
+                                                       trigger={<img alt="" src={checkicon} style={{width:20,height:20}}/>}
+                                                />
+                                            }
+
+                                        </Typography>
                                         <div>
                                             <Typography className={classes.secondaryHeadingTitle}>
                                                 {((firstname === null && lastname === null) || (firstname && firstname.trim() === "") || (lastname && lastname.trim() === "") ) ? "Non renseigné" : (firstname + " " + lastname)}
@@ -432,9 +552,14 @@ export default function Info(props){
                                                     <Button color="primary" style={{textTransform:"none"}}
                                                             onClick={handleChange('panel1')}>Annuler</Button>
                                                     <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
+                                                            disabled={firstname.trim() === ""|| lastname.trim() === ""}
                                                             onClick={() => {
-                                                                updateUser({first_name:{first_name:firstname,public:selected_fname_status !== "private"},
-                                                                    last_name:{last_name:lastname,public:selected_fname_status !== "private"}})
+                                                                if(infoAccount.verified.identity.score === 3){
+                                                                    setOpenConfirmUpdateModal(true)
+                                                                }else{
+                                                                    updateUser({first_name:{first_name:firstname,public:selected_fname_status !== "private"},
+                                                                        last_name:{last_name:lastname,public:selected_fname_status !== "private"}})
+                                                                }
                                                             }}
                                                     >
                                                         Enregistrer
@@ -667,7 +792,7 @@ export default function Info(props){
                                 </Accordion>
                                 <Accordion expanded={expanded_sec === 'panel6'}>
                                     <AccordionSummary
-                                        expandIcon={
+                                        /*expandIcon={
                                             <Popup content={
                                                 <h6 style={{fontSize:"0.8rem"}}>Fonctionnalité non encore disponible</h6>
                                             }
@@ -675,7 +800,7 @@ export default function Info(props){
                                                    size={"small"}
                                                    trigger={<ErrorIcon fontSize="small" color="error"/>}
                                             />
-                                        }
+                                        }*/
                                         aria-controls="panel2bh-content"
                                         id="panel2bh-header"
                                     >
@@ -684,7 +809,15 @@ export default function Info(props){
                                             !loading &&
                                             <div>
                                                 <Typography className={classes.secondaryHeadingTitle}>
-                                                    Contact:&nbsp;&nbsp;{infoAccount.verified.contact === true ? <AssignmentTurnedInIcon color="secondary"/> :
+                                                    Contact:&nbsp;&nbsp;{infoAccount.verified.contact.score === 2 ?
+                                                    <Popup content={
+                                                        <h6 style={{fontSize:"0.8rem"}}>Vérifié</h6>
+                                                    }
+                                                           wide='very'
+                                                           size={"small"}
+                                                           trigger={<img alt="" src={checkicon} style={{width:20,height:20}}/>}
+                                                    />
+                                                    :
                                                     <Popup content={
                                                         <h6 style={{fontSize:"0.8rem"}}>Numéro de contact n'est pas encore vérifié ! </h6>
                                                     }
@@ -692,10 +825,20 @@ export default function Info(props){
                                                            size={"small"}
                                                            trigger={<HelpIcon fontSize="small" color="disabled"/>}
                                                     />
+
                                                 }
+
                                                 </Typography>
                                                 <Typography className={classes.secondaryHeadingTitle}>
-                                                    Identité:&nbsp;&nbsp;{infoAccount.verified.identity === true ? <AssignmentTurnedInIcon color="secondary"/> :
+                                                    Identité:&nbsp;&nbsp;{infoAccount.verified.identity.score === 3 ?
+                                                    <Popup content={
+                                                        <h6 style={{fontSize:"0.8rem"}}>Votre identité a été bien vérifié par KYC</h6>
+                                                    }
+                                                           wide='very'
+                                                           size={"small"}
+                                                           trigger={<img alt="" src={checkicon} style={{width:20,height:20}}/>}
+                                                    />
+                                                     :
                                                     <Popup content={
                                                         <h6 style={{fontSize:"0.8rem"}}>Identité n'est pas encore vérifiée ! </h6>
                                                     }
@@ -704,6 +847,32 @@ export default function Info(props){
                                                            trigger={<HelpIcon fontSize="small" color="disabled"/>}
                                                     />
                                                 }
+                                                    {
+                                                        infoAccount.verified.identity.score <= 1 &&
+                                                        <div style={{marginTop:5,marginBottom:5}}>
+                                                            <div className="kyc-file-upload"
+                                                                 onClick={() => {
+                                                                     kyc_passport.click()
+                                                                 }}
+                                                            >
+                                                                Télécharger une copie de votre passeport
+                                                            </div>
+                                                        </div>
+                                                    }
+
+                                                    <input accept={["image/png", "image/jpeg", "image/jpg"]}
+                                                           style={{
+                                                               display: 'false',
+                                                               width: 0,
+                                                               height: 0
+                                                           }}
+                                                           ref={(ref) => (kyc_passport = ref)}
+                                                           onChange={(e) => {
+                                                               upload_kyc_passport(e)
+                                                           }}
+                                                           type={"file"}
+                                                    />
+
                                                 </Typography>
                                             </div>
                                         }
@@ -818,6 +987,29 @@ export default function Info(props){
                         }}
                         heading="Vous êtes sur le point de supprimer votre compte !"
                         appearance="danger"
+                    >
+                    </Modal>
+                )}
+            </ModalTransition>
+
+            <ModalTransition>
+                {openConfirmUpdateModal === true && (
+                    <Modal
+                        actions={[
+                            { text: 'Oui', onClick: () => {
+                                    setOpenConfirmUpdateModal(false)
+                                    updateUser({first_name:{first_name:firstname,public:selected_fname_status !== "private"},
+                                        last_name:{last_name:lastname,public:selected_fname_status !== "private"}})
+                                }},
+                            { text: 'Non', onClick: () => {
+                                    setOpenConfirmUpdateModal(false)
+                                }},
+                        ]}
+                        onClose={() => {
+                            setOpenConfirmUpdateModal(false)
+                        }}
+                        heading="Voulez-vous vraiment modifier ces informations ? Votre vérification KYC sera ignorée "
+                        appearance="warning"
                     >
                     </Modal>
                 )}

@@ -33,14 +33,20 @@ class accept_service extends Component {
     };
 
 
-    componentDidMount() {
+    async componentDidMount() {
 
 
         if(utilFunctions.verif_session() === false){
             this.props.history.push("/sso/extern/"+this.props.match.params.key+ "/" + this.props.match.params.auth)
         }else{
 
+            //console.log(localStorage.getItem("usrtoken"))
+
             this.setState({loading:true})
+
+            let user_data = await this.getAsyncUserInfo()
+            console.log(user_data)
+
             SSO_service.get_extern_info_key(localStorage.getItem("usrtoken"),this.state.key,{auth:this.state.auth}).then( res => {
                 console.log(res)
                 if(res.status === 200 && res.succes === true){
@@ -77,10 +83,15 @@ class accept_service extends Component {
                                             item === "is_email_verified" ? "Si votre adresse mail est verifié" :
                                                 item === "is_age_verified" ? "Si votre âge est verifié" :
                                                     item === "is_first_name_verified" ? "Si votre nom est verifié" :
+                                                        item === "nationality" ? "Votre nationalité" :
+                                                        item === "is_nationality_verified" ? "Si votre nationalité est verifié" :
+                                                        item === "address_city" ? "Votre ville d'adresse" :
+                                                        item === "is_address_city_verified" ? "Si votre ville d'adresse est verifié" :
+                                                        item === "address_details" ? "Votre adresse" :
+                                                        item === "is_address_details_verified" ? "Si votre adresse est verifié" :
                                                         item === "is_last_name_verified" ? "Si votre prénom est verifié" : item
+
     }
-
-
 
     extern_signin(){
         this.setState({loading:true})
@@ -97,12 +108,44 @@ class accept_service extends Component {
         }).catch( err => {
             console.log(err)
             this.setState({loading:false})
-            this.props.enqueueSnackbar('Une erreur est survenue, url invalide ou expiré !', { variant:"error",autoHideDuration:5000  })
+            this.props.enqueueSnackbar('Une erreur est survenue, url invalide ou expiré', { variant:"error",autoHideDuration:5000  })
 
         })
     }
 
+    updateUser = (data) => {
+        this.setState({loading:true})
+        SSO_service.updateUser(data,localStorage.getItem("usrtoken")).then( updateRes => {
+            if (updateRes.status === 200 && updateRes.succes === true) {
 
+            } else {
+                this.setState({loading:false})
+            }
+            console.log(updateRes)
+        }).catch(err => {
+            console.log(err)
+            this.setState({loading:false})
+        })
+    }
+
+    getAsyncUserInfo = () => {
+
+        return new Promise( resolve => {
+
+            SSO_service.getUser(localStorage.getItem("usrtoken")).then(infoRes => {
+                console.log(infoRes)
+                if(infoRes.status === 200 && infoRes.succes === true){
+                    resolve(true)
+                }else{
+                    resolve(false)
+                }
+            }).catch(err => {
+                console.log(err)
+            })
+
+        })
+
+    }
 
 
     render() {

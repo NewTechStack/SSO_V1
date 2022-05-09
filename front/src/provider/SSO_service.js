@@ -20,6 +20,13 @@ let SSO_service = {
         return headers;
     },
 
+    loadFileHeaders(usrtoken) {
+        let headers = new Headers();
+        headers.append("Content-Type", "multipart/form-data");
+        usrtoken && headers.append("usrtoken",usrtoken);
+        return headers;
+    },
+
     getToken(){
         return fetch(endpoint + '/token', {
             method: 'GET',
@@ -426,8 +433,37 @@ let SSO_service = {
         }).then(response => response.json()).catch(error => {
             console.log(error);
         });
-    }
+    },
 
+    kyc_upload_passport(usrtoken,id,data){
+        return fetch(endpoint + '/user/'+id+'/kyc' , {
+            method: 'POST',
+            headers:this.loadFileHeaders(usrtoken),
+            body:data
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+    getRegistryAskable(usrtoken,reg_id){
+        return fetch(endpoint + '/registry/'+reg_id+'/asked' , {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+
+    updateRegistryAskable(usrtoken,reg_id,data){
+        return fetch(endpoint + '/registry/'+reg_id+'/asked' , {
+            method: 'PUT',
+            headers:this.loadHeaders(usrtoken),
+            body:JSON.stringify(data)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
 
 
 

@@ -69,7 +69,12 @@ class login extends Component {
                             }));
                             localStorage.setItem("roles",JSON.stringify(roles_array))
                             this.setState({loading:false})
-                            this.props.history.push("/main")
+                            if(this.props.history.location.search && this.props.history.location.search.trim() !== "" && this.props.history.location.search.length > 1){
+                                let path = this.props.history.location.search.substring(1) + ((this.props.history.location.hash && this.props.history.location.hash.trim() !== "") ? this.props.history.location.hash :"" )
+                                this.props.history.push(path)
+                            }else{
+                                this.props.history.push("/main")
+                            }
                         }else{
                             this.props.enqueueSnackbar('Une erreur est survenue lors de la récuperation de vos informations !', { variant:"error" })
                             this.setState({loading:false})

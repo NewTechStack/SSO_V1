@@ -28,7 +28,9 @@ class signup extends Component {
         }
     };
 
-    componentDidMount() {}
+    componentDidMount() {
+        console.log(this.props)
+    }
 
 
     handleObjectChange = (object,name) => event => {
@@ -68,7 +70,12 @@ class signup extends Component {
 
                             setTimeout(() => {
                                 this.setState({loading:false})
-                                this.props.history.push("/main")
+                                if(this.props.history.location && this.props.history.location.search && this.props.history.location.search.trim() !== "" && this.props.history.location.search.length > 1){
+                                    let path = this.props.history.location.search.substring(1) + ((this.props.history.location.hash && this.props.history.location.hash.trim() !== "") ? this.props.history.location.hash :"" )
+                                    this.props.history.push(path)
+                                }else{
+                                    this.props.history.push("/main")
+                                }
                             },1000)
 
                         }else{

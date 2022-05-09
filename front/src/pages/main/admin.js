@@ -112,7 +112,12 @@ export default function Admin(props){
             if(utilFunctions.verif_session() === true){
                 verif_acces_roles()
             }else{
-                props.history.push("/sso/login")
+                /*if(props.history.location.pathname && props.history.location.pathname.trim() !== "" && props.history.location.pathname.length > 1){
+                    let path = props.history.location.pathname + ((props.history.location.hash && props.history.location.hash.trim() !== "") ? props.history.location.hash :"" )
+                    props.history.push("/sso/login?" + path)
+                }else{
+                    props.history.push("/sso/login")
+                }*/
             }
     }, []);
 

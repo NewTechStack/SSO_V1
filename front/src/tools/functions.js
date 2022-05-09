@@ -81,11 +81,11 @@ let utilFunctions = {
     verif_session(){
         try {
             var decoded = jwt_decode(localStorage.getItem("usrtoken"));
-            console.log(decoded)
+            //console.log(decoded)
             return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment() ||
                 decoded.payload === null || decoded.payload === undefined || decoded.payload.id !== localStorage.getItem("id"));
         }catch (err){
-            console.log(err)
+            //console.log(err)
             return false
         }
 

@@ -17,7 +17,9 @@ export default function Routes() {
                 <Redirect exact from={"/main"} to={"/main/infos"} />
                 <Route exact path="/main/infos" component={Info} />
                 <Route exact path="/main/admin" component={Admin} />
-                <Route exact path="/main/registres" component={Pro} />
+                <Route path="/main/registres"
+                       render={routeProps => <Pro {...routeProps}/>}
+                />
                 <Route exact path="/main/pro/registre/:reg" component={RegistreDetails} />
             </Switch>
 
