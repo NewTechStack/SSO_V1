@@ -400,6 +400,8 @@ class user:
                 information_data = self.askable[i]['data']()
                 if information_data is None:
                     return [False, f"Information not completed: {i}", 403]
+                if information_data is False:
+                    return [False, f"Invalid requirement: {i}", 403]
                 if information_in_payload is True:
                     payload[i] = information_data
                 else:
