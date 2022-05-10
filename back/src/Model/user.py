@@ -103,7 +103,9 @@ def user_register(cn, nextc):
     return cn.call_next(nextc, err)
 
 def user_kyc(cn, nextc):
-    err = cn.private["user"].KYC('')
+    if cn.req.files.get('passport') is None:
+        return return cn.toret.add_error(400, "Missing passport image")
+    err = cn.private["user"].KYC(img=cn.req.files.get('passport'))
     return cn.call_next(nextc, err)
 
 def user_login(cn, nextc):

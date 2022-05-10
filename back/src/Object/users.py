@@ -10,6 +10,7 @@ import random
 import uuid
 import logging
 import math
+import requests
 try:
     from .rethink import get_conn, r
 except:
@@ -1197,38 +1198,64 @@ class user:
         return [True, {}, None]
 
     def KYC(self, img):
-        now = str(datetime.datetime.utcnow())
+        name, ext = os.path.splitext(img.filename)
+        if ext not in ('.png', '.jpg', '.jpeg'):
+            return [False, "File extension not allowed.", 401]
+        ext = ext[1:]
+
+        now = datetime.datetime.utcnow()
+
+        url = "http://passport:8080/process"
+        files=[
+          ('imagefile',(img.filename,img.file,f'image/{ext}'))
+        ]
+        response = requests.request("POST", url, headers={}, data={}, files=files)
+        response = json.loads(response.text)
         generic = {
             "main": True,
-            "using": ['passport-2532525325325.jpg'],
+            "using": 'passport-' + str(response['number']),
             "last_update": now
         }
+        age = response['age']
+        add = 0
+        if int(str(now.year)[2:]) < int(age[:2]):
+            add = -1
+        age = str(int(str(d.year)[:2]) + add) + age
+        age = datetime.datetime.strptime(given, "%Y%m%d")
         data = {
         'details': {
                 "first_name": {
-                    "main" : None,
+                    "main" : response['first_name'].split(' ')[0],
                     "verified": generic,
-                    "last_update": now
+                    "last_update": str(now)
                 },
                 "last_name": {
-                    "main" : None,
+                    "main" : response['last_name'],
                     "verified": generic,
                     "last_update": now
                 },
                 "age": {
-                    "main": None,
+                    "main": str(age),
                     "verified": generic,
                     "last_update": now
                 },
                 "nationality": {
-                    "main": None,
+                    "main": response['nationality'],
                     "verified": generic,
                     "last_update": now
+                },
+                "passport": {
+                    str(response['number']): {
+                        'raw': response['raw'],
+                        'expiration': response['expiration'],
+                        'score': response['score']
+                    }
                 }
             }
         }
         self.red.get(self.id).update(data).run()
-        return [True, {}, None]
+        del data['details']['passport']
+        return [True, data['details'], None]
 
     def __random_key(self, length = 6):
         data = string.ascii_uppercase + string.digits

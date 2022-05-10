@@ -1,0 +1,18 @@
+FROM python:3.7-slim-stretch as base
+
+MAINTAINER Courtel Eliot <eliot.courtel@wanadoo.fr>
+WORKDIR /home/api
+
+FROM base as passport-reader
+
+RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y make
+RUN apt-get -y install tesseract-ocr && apt-get -y install tesseract-ocr-fra
+RUN apt install -y libsm6 libxext6
+RUN mkdir /uploads
+
+COPY ./src/requirements.txt ./
+RUN pip install -r requirements.txt
+
+COPY ./src/* ./
+
+ENTRYPOINT python3 server.py;

@@ -30,6 +30,15 @@ services:
      LETSENCRYPT_HOST: sso.${DOMAIN}
      LETSENCRYPT_EMAIL: ${EMAIL}
 
+  passport:
+    build:
+      context: ./passport-reader
+      dockerfile: Dockerfile.passport
+    expose:
+      - 8080
+    networks:
+      - proxy
+
   back:
     build:
       context: ./back
