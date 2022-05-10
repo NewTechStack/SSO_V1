@@ -17,7 +17,7 @@ class registry_signin_key:
         self.id = str(id)
         self.last_check = None
         self.time_limit = {
-            "up": 1200,
+            "up": 360000,
             "down": 10
         }
         try:
@@ -38,7 +38,7 @@ class registry_signin_key:
         }
 
     def create(self, registry, time, asked, redirect = None):
-        if not isinstance(time, int) or time < 10 or time > 180:
+        if not isinstance(time, int) or time < self.time_limit['down'] or time > self.time_limit['up']:
             return [False, "Invalid time argument", 400]
         if not isinstance(registry, str):
 	        return [False, "Invalid registry", 400]

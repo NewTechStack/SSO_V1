@@ -766,7 +766,14 @@ class user:
             up[field] = {}
             if  isinstance(change, dict):
                 if field in change and isinstance(change[field], dict):
-                    if all(isinstance(change[field][i], str) for i in ['country', 'city', 'details']):
+                    updated = False
+                    for i in ['country', 'city', 'details']):
+                        if i in change:
+                            if (i in ['country', 'city'] and isinstance(i, str)) or \
+                               (i in ['details'] and isinstance(i, dict)):
+                                updated = True
+                                up[field][i] = change[field][i]
+                    if updated:
                         up[field]["main"] = change[field]
                         up[field]["last_update"] = date
                         if field not in self.data()["details"] or up[field]["main"] != self.data()["details"][field]["main"]:
