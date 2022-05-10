@@ -767,7 +767,7 @@ class user:
             if  isinstance(change, dict):
                 if field in change and isinstance(change[field], dict):
                     updated = False
-                    for i in ['country', 'city', 'details']):
+                    for i in ['country', 'city', 'details']:
                         if i in change:
                             if (i in ['country', 'city'] and isinstance(i, str)) or \
                                (i in ['details'] and isinstance(i, dict)):
