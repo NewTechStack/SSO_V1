@@ -1210,6 +1210,8 @@ class user:
           ('imagefile',(img.filename,img.file,f'image/{ext}'))
         ]
         response = requests.request("POST", url, headers={}, data={}, files=files)
+        if response.status_code != 200:
+            return [False, json.loads(response.text)['error'], 400]
         response = json.loads(response.text)
         generic = {
             "main": True,
@@ -1220,8 +1222,8 @@ class user:
         add = 0
         if int(str(now.year)[2:]) < int(age[:2]):
             add = -1
-        age = str(int(str(d.year)[:2]) + add) + age
-        age = datetime.datetime.strptime(given, "%Y%m%d")
+        age = str(int(str(now.year)[:2]) + add) + age
+        age = datetime.datetime.strptime(age, "%Y%m%d")
         data = {
         'details': {
                 "first_name": {
