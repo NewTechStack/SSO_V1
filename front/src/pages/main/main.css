@@ -117,6 +117,9 @@
 .MuiPaper-root{
     background-color: unset!important;
 }
+.MuiAutocomplete-listbox{
+    background-color: #fff;
+}
 .MuiAccordionSummary-content{
     flex-wrap: wrap;
 }

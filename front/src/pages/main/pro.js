@@ -20,6 +20,7 @@ import {Label, Popup} from "semantic-ui-react";
 import HelpIcon from "@material-ui/icons/Help";
 import jwt_decode from "jwt-decode";
 import utilFunctions from "../../tools/functions";
+import PQueue from "p-queue";
 
 export default function Pro(props){
 
@@ -128,62 +129,6 @@ export default function Pro(props){
         }
     ];
 
-    const admin_users_columns = [
-        /*{
-            name: 'Action',
-            cell: row => <div>
-                <IconButton>
-                    <Edit />
-                </IconButton>
-            </div>,
-            grow:0.1
-        },*/
-        {
-            name: 'Email',
-            selector: 'email',
-            sortable: true,
-        },
-        {
-            name: 'Pseudo',
-            selector: 'username',
-            sortable: true,
-        },
-        {
-            name: 'roles',
-            cell: row => <div style={{paddingBottom:10}}>
-                {
-                    (row.roles || []).map( item => (
-                        <Label as='a' basic color='blue' size="mini">
-                            {item.role}
-                        </Label>
-                    ))
-                }
-            </div>,
-        },
-        {
-            name: 'Registres',
-            cell: row => <div style={{paddingBottom:10}}>
-                {
-                    (row.registries || []).map( (item,key) => (
-                        <Popup content={
-                            <div key={key} style={{display:"flex"}}>
-                                <SearchIcon fontSize={"small"} color="primary"/>
-                                <h6 style={{fontSize:"0.7rem",marginLeft:3,marginTop:4}}>Voir détails</h6>
-                            </div>
-                        }
-                               wide='very'
-                               size={"small"}
-                               trigger={
-                                   <Label as='a' basic color='blue' size="mini">
-                                       {item.registery.name.main}
-                                   </Label>
-                               }
-                        />
-                    ))
-                }
-            </div>,
-        }
-    ];
 
     const { enqueueSnackbar } = useSnackbar();
     const [is_have_acces_to_search_users, setIs_have_acces_to_search_users] = React.useState(false);
@@ -199,6 +144,7 @@ export default function Pro(props){
     const [selectedRegId, setSelectedRegId] = React.useState("");
     const [user_search_input, setUser_search_input] = React.useState("");
     const [admin_users, setAdmin_users] = React.useState();
+    const [updateScreen, setUpdateScreen] = React.useState(false);
 
 
     useEffect( () => {
@@ -274,7 +220,7 @@ export default function Pro(props){
     const getOtherUserRegistres = () => {
         setLoading(true)
         SSO_service.get_user_registry(localStorage.getItem("usrtoken")).then(res => {
-            console.log(res)
+
             if(res.status === 200 && res.succes === true){
 
                 if(res.data.registries && res.data.registries.length === 0){
@@ -283,6 +229,10 @@ export default function Pro(props){
                 }else{
                     let o_registries = res.data.registries || [];
                     let formated_regs = []
+
+                    let queue = new PQueue({concurrency: 1});
+                    let calls = [];
+
                     o_registries.map((reg,key) => {
 
                         let roles_object = reg.registry.roles || {}
@@ -292,27 +242,29 @@ export default function Pro(props){
                             data: roles_object[key]
                         }));
 
-                        SSO_service.getUserInfo(reg.by,localStorage.getItem("usrtoken")).then( infoRes => {
-                            console.log(infoRes)
-                            if (infoRes.status === 200 && infoRes.succes === true) {
+                        calls.push(
+                            () => SSO_service.getUserInfo(reg.by,localStorage.getItem("usrtoken")).then( infoRes => {
+                                if (infoRes.status === 200 && infoRes.succes === true) {
+                                    formated_regs.push({
+                                        id:reg.registry.id,
+                                        name:reg.registry.name.main,
+                                        date:reg.date,
+                                        last_update:reg.last_update,
+                                        roles:roles_array,
+                                        creator:infoRes.data.username
+                                    })
+                                }
+                            })
+                        )
+                    })
 
-                                formated_regs.push({
-                                    id:reg.registry.id,
-                                    name:reg.registry.name.main,
-                                    date:reg.date,
-                                    last_update:reg.last_update,
-                                    roles:roles_array,
-                                    creator:infoRes.data.username
-                                })
-
-                                setLoading(false)
-                                setOther_registres(formated_regs)
-
-                            }else{
-
-                            }
-                        })
-
+                    queue.addAll(calls).then(final => {
+                        setOther_registres(formated_regs)
+                        console.log(formated_regs)
+                        setLoading(false)
+                    }).catch(err => {
+                        console.log(err)
+                        setLoading(false)
                     })
                 }
             }else{

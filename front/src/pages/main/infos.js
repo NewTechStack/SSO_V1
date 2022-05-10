@@ -30,6 +30,9 @@ import CloseIcon from '@material-ui/icons/Close';
 import jwt_decode from "jwt-decode";
 import utilFunctions from "../../tools/functions";
 import checkicon from "../../assets/icons/check_icon.png"
+import MenuItem from '@material-ui/core/MenuItem';
+import {countryList} from "../../constants/defaultValues";
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -49,6 +52,13 @@ const useStyles = makeStyles((theme) => ({
         fontSize: theme.typography.pxToRem(15),
         color: theme.palette.text.secondary,
     },
+    option: {
+        fontSize: 15,
+        '& > span': {
+            marginRight: 10,
+            fontSize: 18,
+        },
+    }
 
 }));
 
@@ -64,16 +74,28 @@ export default function Info(props){
     const [loading, setLoading] = React.useState(true);
 
     const [roles, setRoles] = React.useState([]);
-    const [firstname, setFirstname] = React.useState("");
+    const [firstname, setFirstname] = React.useState(null);
     const [fname_lupdate, setFname_lupdate] = React.useState("");
 
-    const [lastname, setLastname] = React.useState("");
+    const [lastname, setLastname] = React.useState(null);
     const [lname_lupdate, setLname_lupdate] = React.useState("");
     const [phone, setPhone] = React.useState("");
     const [phone_lupdate, setPhone_lupdate] = React.useState("");
 
+    const [nationality, setNationality] = React.useState(null);
+    const [nationality_lupdate, setNationality_lupdate] = React.useState("");
+
+    //adress
+    const [adr_street, setAdr_street] = React.useState("");
+    const [adr_pc, setAdr_pc] = React.useState("");
+    const [adr_city, setAdr_city] = React.useState("");
+    const [adr_pays, setAdr_pays] = React.useState("");
+    const [location_lupdate, setLocation_lupdate] = React.useState("");
+
     const [selected_fname_status, setSelected_fname_status] = React.useState("private");
     const [selected_phone_status, setSelected_phone_status] = React.useState("private");
+    const [selected_nationality_status, setSelected_nationality_status] = React.useState("private");
+    const [selected_location_status, setSelected_location_status] = React.useState("private");
     const [expanded, setExpanded] = React.useState(false);
 
     //security
@@ -116,6 +138,8 @@ export default function Info(props){
                     data: roles_object[key]
                 }));
                 setRoles(roles_array)
+                setFirstname(infoRes.data.first_name.main ? infoRes.data.first_name.main : null)
+                setLastname(infoRes.data.last_name.main ? infoRes.data.last_name.main : null)
                 if(infoRes.data.verified.identity && infoRes.data.verified.identity.score === 3 ){
                     setFirstname((infoRes.data.verified.identity.data.first_name.main === true || infoRes.data.verified.identity.data.first_name.main === null) ? "" : infoRes.data.verified.identity.data.first_name.main === true )
                     setLastname((infoRes.data.verified.identity.data.last_name.main === true || infoRes.data.verified.identity.data.last_name.main === null) ? "" : infoRes.data.verified.identity.data.last_name.main)
@@ -124,9 +148,21 @@ export default function Info(props){
                 setPhone(infoRes.data.phone.main ? infoRes.data.phone.main.number ? infoRes.data.phone.main.number : "" : "")
                 setSelected_username(infoRes.data.username || "")
                 setSelected_phone_status(infoRes.data.phone.public === true ? "public" : "private")
+                setSelected_nationality_status(infoRes.data.nationality ? infoRes.data.nationality.public === true ? "public" : "private" : "private")
+                setSelected_location_status(infoRes.data.location ? infoRes.data.location.public === true ? "public" : "private" : "private")
                 setFname_lupdate(infoRes.data.first_name.last_update || "")
                 setLname_lupdate(infoRes.data.first_name.last_update || "")
                 setPhone_lupdate(infoRes.data.phone.last_update || "")
+
+                setNationality_lupdate(infoRes.data.nationality ? (infoRes.data.nationality.last_update || "") : "")
+                setNationality(infoRes.data.nationality ? infoRes.data.nationality.main : "")
+
+                setAdr_street(infoRes.data.location ? (infoRes.data.location.main.details || "") : "")
+                setAdr_pc(infoRes.data.location ? (infoRes.data.location.main.details.postal_code || "") : "")
+                setAdr_city( infoRes.data.location ? (infoRes.data.location.main.city || "") : "")
+                setAdr_pays(infoRes.data.location ? (infoRes.data.location.main.country || "") : "")
+                setLocation_lupdate(infoRes.data.location ? (infoRes.data.location.last_update || "") : "")
+
                 setLoading(false)
             }else{
                 enqueueSnackbar('Une erreur est survenue lors de la récuperation de vos informations !', { variant:"error" })
@@ -439,7 +475,7 @@ export default function Info(props){
                                             <div className="col-md-12 mt-1">
                                                 <TextField
                                                     //inputRef={f_username_ref}
-                                                    label="Nom"
+                                                    label="Pseudo"
                                                     variant="outlined"
                                                     size="small"
                                                     style={{width:"100%"}}
@@ -504,7 +540,7 @@ export default function Info(props){
                                         <div className="row mt-2">
                                             <div className="col-md-12 mt-1">
                                                 <TextField
-                                                    inputRef={f_name_ref}
+                                                    //inputRef={f_name_ref}
                                                     label="Nom"
                                                     variant="outlined"
                                                     size="small"
@@ -517,7 +553,7 @@ export default function Info(props){
                                         <div className="row mt-3">
                                             <div className="col-md-12 mt-1">
                                                 <TextField
-                                                    inputRef={l_name_ref}
+                                                    //inputRef={l_name_ref}
                                                     label="Prénom"
                                                     variant="outlined"
                                                     size="small"
@@ -552,13 +588,15 @@ export default function Info(props){
                                                     <Button color="primary" style={{textTransform:"none"}}
                                                             onClick={handleChange('panel1')}>Annuler</Button>
                                                     <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
-                                                            disabled={firstname.trim() === ""|| lastname.trim() === ""}
+                                                            disabled={(firstname === null || lastname === null) || ((firstname && firstname.trim() === "")|| (lastname && lastname.trim() === ""))}
                                                             onClick={() => {
                                                                 if(infoAccount.verified.identity.score === 3){
                                                                     setOpenConfirmUpdateModal(true)
                                                                 }else{
-                                                                    updateUser({first_name:{first_name:firstname,public:selected_fname_status !== "private"},
-                                                                        last_name:{last_name:lastname,public:selected_fname_status !== "private"}})
+                                                                    updateUser({details:{
+                                                                        first_name:{first_name:firstname,public:selected_fname_status !== "private"},
+                                                                            last_name:{last_name:lastname,public:selected_fname_status !== "private"}
+                                                                    }})
                                                                 }
                                                             }}
                                                     >
@@ -646,6 +684,213 @@ export default function Info(props){
                                                     <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
                                                             onClick={() => {
                                                                 updateUser({phone:{number:phone,lang:"FR",public:selected_phone_status !== "private"}})
+                                                            }}
+                                                    >
+                                                        Enregistrer
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </AccordionDetails>
+                                    <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
+                                </Accordion>
+
+                                <Accordion expanded={expanded_sec === 'panel4'}
+                                           onChange={handleChange_sec('panel4')}
+                                >
+                                    <AccordionSummary
+                                        expandIcon={expanded_sec === "panel4" ? <CloseIcon /> : <EditIcon/>}
+                                        aria-controls="panel2bh-content"
+                                        id="panel2bh-header"
+                                    >
+                                        <Typography className={classes.heading}>Nationalité</Typography>
+                                        <div>
+                                            <Typography className={classes.secondaryHeadingTitle}>
+                                                {!loading &&
+                                                ((nationality === null || nationality.trim() === "") ? "Non renseigné" : nationality)}
+                                            </Typography>
+                                            {
+                                                nationality_lupdate ?
+                                                    <Typography className={classes.secondaryHeading}>
+                                                        Dernière modification: {moment(nationality_lupdate).format("DD-MM-YYYY HH:mm")}
+                                                    </Typography> : null
+                                            }
+                                        </div>
+
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <div className="row mt-2">
+                                            <div className="col-md-12 mt-1">
+                                                <TextField
+                                                    //inputRef={f_username_ref}
+                                                    label="Nationalité"
+                                                    variant="outlined"
+                                                    size="small"
+                                                    style={{width:"100%"}}
+                                                    value={nationality}
+                                                    onChange={(e) => {setNationality(e.target.value)}}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-md-12 mt-1">
+                                                <h6>Choisissez qui peut voir votre nationalité</h6>
+                                                <ButtonGroup color="primary" aria-label="outlined primary button group"
+                                                             tabIndex={0} style={{marginTop:10}}
+                                                >
+                                                    <Button style={{textTransform:"none"}}
+                                                            className={selected_nationality_status === "private" ? "selectedBtnGroup no-focus" : "no-focus"}
+                                                            startIcon={<LockOutlinedIcon />}
+                                                            onClick={() => {setSelected_nationality_status("private")}}
+                                                    >Vous uniquement</Button>
+                                                    <Button style={{textTransform:"none"}}
+                                                            className={selected_nationality_status === "public" ? "selectedBtnGroup no-focus" : "no-focus"}
+                                                            startIcon={<GroupOutlinedIcon />}
+                                                            onClick={() => {setSelected_nationality_status("public")}}
+                                                    >Tout le monde</Button>
+                                                </ButtonGroup>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-4">
+                                            <div className="col-md-12">
+                                                <div style={{display:"flex",justifyContent:"flex-end"}}>
+                                                    <Button color="primary" style={{textTransform:"none"}}
+                                                            onClick={handleChange_sec('panel0')}>Annuler</Button>
+                                                    <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
+                                                            onClick={() => {
+                                                                updateUser({details:{nationality:{nationality:nationality,public:selected_nationality_status !== "private"}}})
+                                                            }}
+                                                    >
+                                                        Enregistrer
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </AccordionDetails>
+                                    <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
+                                </Accordion>
+
+                                <Accordion expanded={expanded_sec === 'panel5'}
+                                           onChange={handleChange_sec('panel5')}
+                                >
+                                    <AccordionSummary
+                                        expandIcon={expanded_sec === "panel5" ? <CloseIcon /> : <EditIcon/>}
+                                        aria-controls="panel2bh-content"
+                                        id="panel2bh-header"
+                                    >
+                                        <Typography className={classes.heading}>Adresse</Typography>
+                                        <div>
+                                            <Typography className={classes.secondaryHeadingTitle}>
+                                                {!loading && infoAccount.location ? ((infoAccount.location.main.details || "") + " " + (infoAccount.location.main.city || "") + ", " + (infoAccount.location.main.country || "")) : ""}
+                                            </Typography>
+                                            {
+                                                location_lupdate ?
+                                                    <Typography className={classes.secondaryHeading}>
+                                                        Dernière modification: {moment(location_lupdate).format("DD-MM-YYYY HH:mm")}
+                                                    </Typography> : null
+                                            }
+                                        </div>
+
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <div className="row mt-2">
+                                            <div className="col-lg-6 mt-1">
+                                                <TextField
+                                                    //inputRef={f_username_ref}
+                                                    label="Rue"
+                                                    placeholder="Exp: 10 rue de liberté"
+                                                    variant="outlined"
+                                                    size="small"
+                                                    style={{width:"100%"}}
+                                                    value={adr_street}
+                                                    onChange={(e) => {setAdr_street(e.target.value)}}
+                                                />
+                                            </div>
+                                            <div className="col-lg-6 mt-1">
+                                                <TextField
+                                                    //inputRef={f_username_ref}
+                                                    label="Code postal"
+                                                    variant="outlined"
+                                                    size="small"
+                                                    style={{width:"100%"}}
+                                                    value={adr_pc}
+                                                    onChange={(e) => {setAdr_pc(e.target.value)}}
+                                                />
+                                            </div>
+                                            <div className="col-lg-6 mt-3">
+                                                <TextField
+                                                    //inputRef={f_username_ref}
+                                                    label="Ville"
+                                                    variant="outlined"
+                                                    size="small"
+                                                    style={{width:"100%"}}
+                                                    value={adr_city}
+                                                    onChange={(e) => {setAdr_city(e.target.value)}}
+                                                />
+                                            </div>
+                                            <div className="col-lg-6 mt-3">
+                                                <Autocomplete
+                                                    autoComplete={"off"}
+                                                    autoHighlight={false}
+                                                    size="small"
+                                                    options={countryList}
+                                                    classes={{
+                                                        option: classes.option,
+                                                    }}
+                                                    noOptionsText={""}
+                                                    getOptionLabel={(option) => option.label}
+                                                    renderOption={(option) => (
+                                                        <React.Fragment>
+                                                            <span>{utilFunctions.countryToFlag(option.code)}</span>
+                                                            {option.label} ({option.code})
+                                                        </React.Fragment>
+                                                    )}
+                                                    onChange={(event,value) => {
+                                                        console.log(value)
+                                                        setAdr_pays(value.label)
+                                                    }}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            value={countryList.findIndex(x => x.label === adr_pays) > -1 ? adr_pays : "" }
+                                                            label="Pays"
+                                                            variant="outlined"
+                                                            inputProps={{
+                                                                ...params.inputProps,
+                                                                autoComplete: 'new-password', // disable autocomplete and autofill
+                                                            }}
+                                                        />
+                                                    )}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="row mt-3">
+                                            <div className="col-md-12 mt-1">
+                                                <h6>Choisissez qui peut voir votre adresse</h6>
+                                                <ButtonGroup color="primary" aria-label="outlined primary button group"
+                                                             tabIndex={0} style={{marginTop:10}}
+                                                >
+                                                    <Button style={{textTransform:"none"}}
+                                                            className={selected_location_status === "private" ? "selectedBtnGroup no-focus" : "no-focus"}
+                                                            startIcon={<LockOutlinedIcon />}
+                                                            onClick={() => {setSelected_location_status("private")}}
+                                                    >Vous uniquement</Button>
+                                                    <Button style={{textTransform:"none"}}
+                                                            className={selected_location_status === "public" ? "selectedBtnGroup no-focus" : "no-focus"}
+                                                            startIcon={<GroupOutlinedIcon />}
+                                                            onClick={() => {setSelected_location_status("public")}}
+                                                    >Tout le monde</Button>
+                                                </ButtonGroup>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-4">
+                                            <div className="col-md-12">
+                                                <div style={{display:"flex",justifyContent:"flex-end"}}>
+                                                    <Button color="primary" style={{textTransform:"none"}}
+                                                            onClick={handleChange_sec('panel0')}>Annuler</Button>
+                                                    <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
+                                                            onClick={() => {
+                                                                updateUser({details:{location:{location:{country:adr_pays,city:adr_city,details:adr_street},public:selected_location_status !== "private" }}})
                                                             }}
                                                     >
                                                         Enregistrer

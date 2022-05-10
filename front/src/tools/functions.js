@@ -28,25 +28,25 @@ let utilFunctions = {
             }
         }
         var newNode = {'text': parts[0], 'children': []};
-        if(parts[0].endsWith(".pdf")){
-            newNode.name =name;
+        if (parts[0].endsWith(".pdf")) {
+            newNode.name = name;
             newNode.type = type;
             newNode.file = file;
         }
         treeNode.push(newNode);
-        this.buildTree(parts.splice(1, parts.length), newNode.children, name,type,file);
+        this.buildTree(parts.splice(1, parts.length), newNode.children, name, type, file);
     },
 
-    getUID(){
+    getUID() {
         return Math.random().toString(36).substring(2, 15) + '-' +
-               Math.random().toString(36).substring(2, 15) + '-' +
-               Math.random().toString(36).substring(2, 15) + '-' +
-               Math.random().toString(36).substring(2, 15);
+            Math.random().toString(36).substring(2, 15) + '-' +
+            Math.random().toString(36).substring(2, 15) + '-' +
+            Math.random().toString(36).substring(2, 15);
     },
 
-    formatDuration(duration){
+    formatDuration(duration) {
         let hour = duration.split(".")[0];
-        let formatedHour = parseInt(hour) < 10 ? "0"+hour+"h" : hour+"h"
+        let formatedHour = parseInt(hour) < 10 ? "0" + hour + "h" : hour + "h"
         let minutePercent = duration.split(".")[1] || "0";
         let nbMinutes = parseFloat("0." + minutePercent) * 60;
         //console.log(formatedHour.concat(parseInt(nbMinutes) < 10 ? "0" : "").concat(nbMinutes.toString()))
@@ -54,7 +54,7 @@ let utilFunctions = {
         return formatedHour.concat(parseInt(nbMinutes) < 10 ? "0" : "").concat(parseInt(nbMinutes.toString()));
     },
 
-    durationToNumber(duration){
+    durationToNumber(duration) {
         let hourValue = duration.split("h")[0]
         let minuteValue = duration.split("h")[1]
         let hourFormated = parseInt(hourValue) || 0
@@ -62,7 +62,7 @@ let utilFunctions = {
         return hourFormated + (minuteFormated / 60)
     },
 
-    alphaSort(item1,item2,by){
+    alphaSort(item1, item2, by) {
         const a = item1[by].toLowerCase();
         const b = item2[by].toLowerCase();
 
@@ -78,17 +78,25 @@ let utilFunctions = {
     },
 
 
-    verif_session(){
+    verif_session() {
         try {
             var decoded = jwt_decode(localStorage.getItem("usrtoken"));
             //console.log(decoded)
             return !(localStorage.getItem("usrtoken") === null || localStorage.getItem("usrtoken") === undefined || moment(localStorage.getItem("exp")) < moment() ||
                 decoded.payload === null || decoded.payload === undefined || decoded.payload.id !== localStorage.getItem("id"));
-        }catch (err){
+        } catch (err) {
             //console.log(err)
             return false
         }
 
+    },
+
+    countryToFlag(isoCode) {
+        return typeof String.fromCodePoint !== 'undefined'
+            ? isoCode
+                .toUpperCase()
+                .replace(/./g, (char) => String.fromCodePoint(char.charCodeAt(0) + 127397))
+            : isoCode;
     }
 
 

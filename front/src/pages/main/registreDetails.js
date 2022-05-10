@@ -512,13 +512,7 @@ export default function RegistreDetails(props) {
     const askabale_columns = [
 
         {
-            name: 'Texte utilisateur',
-            selector: "user_text",
-            sortable: true,
-            grow: 0.4
-        },
-        {
-            name: 'Askable',
+            name: 'Informations',
             cell: row => <div>
                 <div style={{justifyContent: "center"}}>
                     <FormControlLabel
@@ -534,50 +528,61 @@ export default function RegistreDetails(props) {
                                 name="checkedA"
                             />
                         }
-                        label={row.askable.value}
+                        labelPlacement="start"
+                        label={row.user_text}
                     />
                 </div>
             </div>,
             grow: 0.3
         },
         {
-            name: 'Askable de vérification',
+            name: 'Vérification',
             cell: row => <div>
                 <div style={{justifyContent: "center"}}>
-                    <FormControlLabel
-                        control={
-                            <Switch
-                                checked={row.askable_verif.value ? row.askable_verif.checked : false }
-                                onChange={(event, checked) => {
-                                    console.log(row.askable_verif.value)
-                                    if(row.askable_verif.value === "is_age_verified"){
-                                        askable_registry_array.map( (item, key) => {
-                                            if(item.askable_verif !== false && item.askable_verif.value === "is_age_verified"){
-                                                item.askable_verif.checked = checked
-                                            }
-                                        })
-                                        setUpdateScreen(!updateScreen)
-                                        updateRegAskable()
-                                    }else{
-                                        row.askable_verif.checked = checked
-                                        setUpdateScreen(!updateScreen)
-                                        updateRegAskable()
-                                    }
-
-                                }}
-                                name="checkedB"
-                                disabled={row.askable_verif === false || row.askable_verif.value === "is_email_verified" || row.askable_verif.value === "is_phone_verified"}
-                            />
-                        }
-                        label={row.askable_verif === false ? "pas vérifiable" : row.askable_verif.value}
-                    />
-
                     {
-                        row.askable_verif !== false && row.askable_verif.value !== "is_email_verified" && row.askable_verif.value !== "is_phone_verified" &&
-                        <Label as='a' basic color={row.askable_verif !== false && row.askable_verif.checked === true ? "blue" :"grey"} size="mini">
-                            kyc
-                        </Label>
+                        row.askable.value !== "username" &&
+                            <>
+                                <FormControlLabel style={{marginRight:5}}
+                                                  control={
+                                                      <Switch
+                                                          checked={row.askable_verif.value ? row.askable_verif.checked : false }
+                                                          onChange={(event, checked) => {
+                                                              console.log(row.askable_verif.value)
+                                                              if(row.askable_verif.value === "is_age_verified"){
+                                                                  askable_registry_array.map( (item, key) => {
+                                                                      if(item.askable_verif !== false && item.askable_verif.value === "is_age_verified"){
+                                                                          item.askable_verif.checked = checked
+                                                                      }
+                                                                  })
+                                                                  setUpdateScreen(!updateScreen)
+                                                                  updateRegAskable()
+                                                              }else{
+                                                                  row.askable_verif.checked = checked
+                                                                  setUpdateScreen(!updateScreen)
+                                                                  updateRegAskable()
+                                                              }
+
+                                                          }}
+                                                          name="checkedB"
+                                                          disabled={row.askable_verif === false || row.askable_verif.value === "is_email_verified" || row.askable_verif.value === "is_phone_verified"}
+                                                      />
+                                                  }
+                                                  labelPlacement={"start"}
+                                                  label={""}
+                                />
+
+                                {
+                                    row.askable_verif !== false && row.askable_verif.value !== "is_email_verified" && row.askable_verif.value !== "is_phone_verified" ?
+                                    <Label as='a' basic color={row.askable_verif !== false && row.askable_verif.checked === true ? "blue" :"grey"} size="mini">
+                                        kyc
+                                    </Label> :
+                                        <Label as='a' basic color={row.askable_verif !== false && row.askable_verif.checked === true ? "blue" :"grey"} size="mini">
+                                            vérification
+                                        </Label>
+                                }
+                            </>
                     }
+
 
 
 
@@ -1589,7 +1594,7 @@ export default function RegistreDetails(props) {
                             }}
                             customStyles={customTableStyle}
                         />
-                        <h3 style={{marginTop:20,fontWeight: 700, fontSize: "1.02rem"}}>Association vérifiable</h3>
+                        <h3 style={{marginTop:20,fontWeight: 700, fontSize: "1.02rem"}}>Informations demandées</h3>
                         <div style={{marginTop:15}}>
                             <DataTable
                                 columns={askabale_columns}
