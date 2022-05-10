@@ -1216,7 +1216,7 @@ class user:
         generic = {
             "main": True,
             "using": 'passport-' + str(response['number']),
-            "last_update": now
+            "last_update": str(now)
         }
         age = response['age']
         add = 0
@@ -1224,12 +1224,13 @@ class user:
             add = -1
         age = str(int(str(now.year)[:2]) + add) + age
         age = datetime.datetime.strptime(age, "%Y%m%d")
+        now = str(now)
         data = {
         'details': {
                 "first_name": {
                     "main" : response['first_name'].split(' ')[0],
                     "verified": generic,
-                    "last_update": str(now)
+                    "last_update": now
                 },
                 "last_name": {
                     "main" : response['last_name'],
@@ -1250,7 +1251,8 @@ class user:
                     str(response['number']): {
                         'raw': response['raw'],
                         'expiration': response['expiration'],
-                        'score': response['score']
+                        'score': response['score'],
+                        'last_update': now
                     }
                 }
             }
