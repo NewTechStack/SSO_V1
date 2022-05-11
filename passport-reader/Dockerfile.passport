@@ -6,7 +6,7 @@ WORKDIR /home/api
 FROM base as passport-reader
 
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y make
-RUN apt-get -y install tesseract-ocr && apt-get -y install tesseract-ocr-fra
+RUN apt-get -y install tesseract-ocr && apt-get -y install tesseract-ocr-*
 RUN apt install -y libsm6 libxext6
 RUN mkdir /uploads
 
