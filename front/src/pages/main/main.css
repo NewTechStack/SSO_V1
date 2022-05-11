@@ -108,6 +108,16 @@
     padding-bottom: 1px!important;
 }
 
+.MuiAccordion-root.Mui-expanded {
+    margin: 0px !important;
+}
+.MuiAccordionSummary-root.Mui-expanded {
+    min-height: 48px !important;
+}
+.MuiAccordionSummary-content.Mui-expanded {
+    margin: 12px 0px !important;
+}
+
 .MuiPaper-rounded{
     border-radius: unset!important;
 }

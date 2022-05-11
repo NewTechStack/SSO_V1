@@ -1,3 +1,6 @@
+import { withStyles } from '@material-ui/core/styles';
+import Switch from '@material-ui/core/Switch';
+
 export const paginationOptions = { rowsPerPageText: 'lignes par page', rangeSeparatorText: 'de', selectAllRowsItem: true, selectAllRowsItemText: 'Total' }
 export const tableContextMessage = {singular:"Ligne",plural:"Lignes",message:"sélectionnés"}
 
@@ -425,7 +428,6 @@ export const countryList = [
     { code: 'ZM', label: 'Zambia', phone: '260' },
     { code: 'ZW', label: 'Zimbabwe', phone: '263' },
 ];
-
 export const nationalityList = [
     {
         "id": 1,
@@ -1403,3 +1405,18 @@ export const nationalityList = [
         "libelle": "Zimbabwe"
     }
 ]
+
+
+export const BlueSwitch = withStyles({
+    switchBase: {
+        color: "#fff",
+        '&$checked': {
+            color: "#1c94fe",
+        },
+        '&$checked + $track': {
+            backgroundColor: "#1c94fe",
+        },
+    },
+    checked: {},
+    track: {},
+})(Switch);

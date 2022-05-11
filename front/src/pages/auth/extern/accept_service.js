@@ -15,6 +15,8 @@ import utilFunctions from "../../../tools/functions";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import PhoneInput from "react-phone-input-2";
 import Typography from "@material-ui/core/Typography";
+import Autocomplete from "@material-ui/lab/Autocomplete";
+import {countryList} from "../../../constants/defaultValues";
 
 
 
@@ -36,7 +38,6 @@ class accept_service extends Component {
         show:"first",
         toAsk:[],
         confirmed:{},
-
         redirect:""
 
 
@@ -60,35 +61,62 @@ class accept_service extends Component {
             SSO_service.get_extern_info_key(localStorage.getItem("usrtoken"),this.state.key,{auth:this.state.auth}).then( res => {
                 if(res.status === 200 && res.succes === true){
                     console.log(res)
-                    /*let registries_list = res.data.data.registry_list || [];
-                    let registry = registries_list[0]*/
+                    if(!res.data.data && res.data.redirect && res.data.registry){
+                        window.location.replace(res.data.redirect)
+                    }else{
+                        SSO_service.getRegistryAskable(localStorage.getItem("usrtoken"),res.data.data.registry_id).then( regaskData => {
+                            console.log(regaskData)
+                            if(regaskData.status === 200 && regaskData.succes === true){
 
-                    let asked = res.data.data.asked || []
-                    let toAsk = []
-                    if(!user_data.first_name || (user_data.first_name && user_data.first_name.main === null)) toAsk.push("first_name")
-                    if(!user_data.last_name || (user_data.last_name && user_data.last_name.main === null)) toAsk.push("last_name")
-                    if(!user_data.phone || (user_data.phone && user_data.phone.main === null)) toAsk.push("phone")
-                    if(asked.findIndex(x => x === "is_first_name_verified") > -1  || asked.findIndex(x => x === "is_last_name_verified") > -1  ||
-                        asked.findIndex(x => x === "is_age_verified") > -1  ||  asked.findIndex(x => x === "is_nationality_verified") > -1  ||
-                        asked.findIndex(x => x === "is_address_city_verified") > -1  ||  asked.findIndex(x => x === "is_address_details_verified") > -1)
-                        toAsk.push("passport")
+                                let asked = regaskData.data.main || []
+                                let toAsk = []
+                                if(!user_data.first_name || (user_data.first_name && user_data.first_name.main === null)) toAsk.push("first_name")
+                                if(!user_data.last_name || (user_data.last_name && user_data.last_name.main === null)) toAsk.push("last_name")
+                                if(!user_data.phone || (user_data.phone && user_data.phone.main === null)) toAsk.push("phone")
+                                if(!user_data.location || (user_data.location && (user_data.location.main === null || user_data.location.main.city === null) )) toAsk.push("address_city")
+                                if(!user_data.location || (user_data.location && (user_data.location.main === null || user_data.location.main.details === null) )) toAsk.push("address_details")
+                                if(asked.findIndex(x => x === "is_first_name_verified") > -1  || asked.findIndex(x => x === "is_last_name_verified") > -1  ||
+                                    asked.findIndex(x => x === "is_age_verified") > -1  ||  asked.findIndex(x => x === "is_nationality_verified") > -1  ||
+                                    asked.findIndex(x => x === "is_address_city_verified") > -1  ||  asked.findIndex(x => x === "is_address_details_verified") > -1){
+                                    if(user_data.verified && user_data.verified.identity && user_data.verified.identity.score === 3){
+                                        console.log("PASSEPORT VERIFIED")
+                                    }else{
+                                        toAsk.push("passport")
+                                    }
 
-                    console.log(asked)
-                    console.log(toAsk)
-                    this.setState({
-                        loading:false,first_loading:false,
-                        asked:asked,toAsk:toAsk,
-                        redirect:res.data.data.redirect,
-                        registry_name:res.data.data.registry
-                    })
+                                }
+
+
+                                console.log(asked)
+                                console.log(toAsk)
+                                this.setState({
+                                    loading:false,first_loading:false,
+                                    asked:asked,toAsk:toAsk,
+                                    redirect:res.data.data.redirect,
+                                    registry_name:res.data.data.registry
+                                })
+
+                            }else{
+                                this.setState({error:true,loading:false,first_loading:false})
+                                this.props.enqueueSnackbar("Vous n'êtes pas autorisé à utiliser ce service", { variant:"error",autoHideDuration:5000 })
+                            }
+                        }).catch( err => {
+                            console.log(err)
+                            this.setState({error:true,loading:false,first_loading:false})
+                            this.props.enqueueSnackbar('Une erreur est survenue, url invalide ou expiré !', { variant:"error",autoHideDuration:5000  })
+                        })
+
+                    }
+
+
                 }else{
                     this.setState({error:true,loading:false,first_loading:false})
-                    this.props.enqueueSnackbar('Une erreur est survenue, url invalide ou expiré !', { variant:"error",autoHideDuration:10000 })
+                    this.props.enqueueSnackbar('Une erreur est survenue, url invalide ou expiré !', { variant:"error",autoHideDuration:5000 })
                 }
             }).catch( err => {
                 console.log(err)
                 this.setState({error:true,loading:false,first_loading:false})
-                this.props.enqueueSnackbar('Une erreur est survenue, url invalide ou expiré !', { variant:"error",autoHideDuration:10000  })
+                this.props.enqueueSnackbar('Une erreur est survenue, url invalide ou expiré !', { variant:"error",autoHideDuration:5000  })
             })
         }
     }
@@ -116,16 +144,18 @@ class accept_service extends Component {
 
     }
 
-    extern_signin(){
+    extern_signin(redirect_url){
         this.setState({loading:true})
+
         SSO_service.extern_signin(localStorage.getItem("usrtoken"),this.state.key,{auth:this.state.auth}).then( res => {
             console.log(res)
             if(res.status === 200 && res.succes === true){
-                this.setState({loading:false,approuved:true})
+                this.setState({approuved:true})
                 this.props.enqueueSnackbar('Connexion approuvée avec succès !', { variant:"success",autoHideDuration:10000 })
                 if(this.state.redirect !== ""){
                     setTimeout(() => {
-                        window.location.replace(this.state.redirect)
+                        this.setState({loading:false})
+                        window.location.replace(redirect_url)
                     },2500)
 
                 }
@@ -184,7 +214,7 @@ class accept_service extends Component {
                 <div>
                     <h4 style={{fontSize:"1.4rem",marginBottom:5}}>Veuillez indiquer votre Nom </h4>
                     <h5 style={{marginTop:15}}>Ces informations sont nécessaires pour continuer</h5>
-                    <div className="row mt-2">
+                    <div className="row mt-4">
                         <div className="col-md-12 mt-1">
                             <TextField
                                 //inputRef={f_username_ref}
@@ -205,6 +235,7 @@ class accept_service extends Component {
                         <div align="right" className="col-lg-12">
 
                                 <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
+                                        disabled={!this.state.confirmed.first_name || this.state.confirmed.first_name.trim() === ""}
                                         onClick={async () => {
                                             this.setState({loading:true})
                                             let update_user = await this.updateUser({details:{first_name:{first_name:this.state.confirmed.first_name}}})
@@ -230,7 +261,7 @@ class accept_service extends Component {
                 <div>
                     <h4 style={{fontSize:"1.4rem",marginBottom:5}}>Veuillez indiquer votre Prénom </h4>
                     <h5 style={{marginTop:15}}>Ces informations sont nécessaires pour continuer</h5>
-                    <div className="row mt-2">
+                    <div className="row mt-4">
                         <div className="col-md-12 mt-1">
                             <TextField
                                 //inputRef={f_username_ref}
@@ -251,6 +282,7 @@ class accept_service extends Component {
                         <div align="right" className="col-lg-12">
 
                             <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
+                                    disabled={!this.state.confirmed.last_name || this.state.confirmed.last_name.trim() === ""}
                                     onClick={async () => {
                                         this.setState({loading:true})
                                         let update_user = await this.updateUser({details:{last_name:{last_name:this.state.confirmed.last_name}}})
@@ -276,7 +308,7 @@ class accept_service extends Component {
                 <div>
                     <h4 style={{fontSize:"1.4rem",marginBottom:5}}>Veuillez indiquer votre numéro de téléphone </h4>
                     <h5 style={{marginTop:15}}>Ces informations sont nécessaires pour continuer</h5>
-                    <div className="row mt-2">
+                    <div className="row mt-4">
                         <div className="col-md-12 mt-1">
                             <PhoneInput
                                 country={'fr'}
@@ -294,6 +326,7 @@ class accept_service extends Component {
                         <div align="right" className="col-lg-12">
 
                             <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
+                                    disabled={!this.state.confirmed.phone || this.state.confirmed.phone.trim() === ""}
                                     onClick={async () => {
                                         this.setState({loading:true})
                                         let update_user = await this.updateUser({details:{phone:{number:this.state.confirmed.phone,lang: "FR",}}})
@@ -320,7 +353,7 @@ class accept_service extends Component {
                 <div>
                     <h4 style={{fontSize:"1.4rem",marginBottom:5}}>Veuillez indiquer votre nationalité </h4>
                     <h5 style={{marginTop:15}}>Ces informations sont nécessaires pour continuer</h5>
-                    <div className="row mt-2">
+                    <div className="row mt-4">
                         <div className="col-md-12 mt-1">
                             <TextField
                                 //inputRef={f_username_ref}
@@ -341,6 +374,7 @@ class accept_service extends Component {
                         <div align="right" className="col-lg-12">
 
                             <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
+                                    disabled={!this.state.confirmed.nationality || this.state.confirmed.nationality.trim() === ""}
                                     onClick={async () => {
                                         this.setState({loading:true})
                                         let update_user = await this.updateUser({details:{nationality:{nationality:this.state.confirmed.nationality}}})
@@ -361,14 +395,145 @@ class accept_service extends Component {
                     </div>
                 </div>
             )
-        }else if(ask === "address"){
+        }else if(ask === "address_city" || ask === "address_details"){
+            return(
+                <div>
+                    <h4 style={{fontSize:"1.4rem",marginBottom:5}}>Veuillez indiquer votre adresse </h4>
+                    <h5 style={{marginTop:15}}>Ces informations sont nécessaires pour continuer</h5>
+                    <div className="row mt-4">
+                        <div className="col-lg-12 mt-1">
+                            <TextField
+                                //inputRef={f_username_ref}
+                                label="Rue"
+                                placeholder="Exp: 10 rue de liberté"
+                                variant="outlined"
+                                size="small"
+                                style={{width:"100%"}}
+                                value={this.state.confirmed.street || ""}
+                                onChange={(e) => {
+                                    let confirmed = this.state.confirmed
+                                    confirmed.street = e.target.value
+                                    this.setState({confirmed:confirmed})
+                                }}
+                                InputLabelProps={{shrink:true}}
+                            />
+                        </div>
+                        <div className="col-lg-12 mt-3">
+                            <TextField
+                                //inputRef={f_username_ref}
+                                label="Code postal"
+                                variant="outlined"
+                                size="small"
+                                style={{width:"100%"}}
+                                value={this.state.confirmed.pc || ""}
+                                onChange={(e) => {
+                                    let confirmed = this.state.confirmed
+                                    confirmed.pc = e.target.value
+                                    this.setState({confirmed:confirmed})
+                                }}
+                                InputLabelProps={{shrink:true}}
+                            />
+                        </div>
+                        <div className="col-lg-12 mt-3">
+                            <TextField
+                                //inputRef={f_username_ref}
+                                label="Ville"
+                                variant="outlined"
+                                size="small"
+                                style={{width:"100%"}}
+                                value={this.state.confirmed.city || ""}
+                                onChange={(e) => {
+                                    let confirmed = this.state.confirmed
+                                    confirmed.city = e.target.value
+                                    this.setState({confirmed:confirmed})
+                                }}
+                                InputLabelProps={{shrink:true}}
+                            />
+                        </div>
+                        <div className="col-lg-12 mt-3">
+                            <Autocomplete
+                                autoComplete={"off"}
+                                autoHighlight={false}
+                                size="small"
+                                options={countryList}
+                                /*classes={{
+                                    option: classes.option,
+                                }}*/
+                                noOptionsText={""}
+                                getOptionLabel={(option) => option.label}
+                                renderOption={(option) => (
+                                    <React.Fragment>
+                                        <span>{utilFunctions.countryToFlag(option.code)}</span>
+                                        {option.label} ({option.code})
+                                    </React.Fragment>
+                                )}
+                                onChange={(event,value) => {
+                                    console.log(value)
+                                    let confirmed = this.state.confirmed
+                                    confirmed.pays = value.label
+                                    this.setState({confirmed:confirmed})
+                                }}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        value={countryList.findIndex(x => x.label === this.state.confirmed.pays || "") > -1 ? this.state.confirmed.pays : "" }
+                                        label="Pays"
+                                        variant="outlined"
+                                        inputProps={{
+                                            ...params.inputProps,
+                                            autoComplete: 'new-password', // disable autocomplete and autofill
+                                        }}
+                                        InputLabelProps={{shrink:true}}
+                                    />
+                                )}
+                            />
+                        </div>
+                    </div>
+                    <div className="row mt-4">
+                        <div align="right" className="col-lg-12">
+
+                            <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
+                                    disabled={!this.state.confirmed.street || this.state.confirmed.street.trim() === "" || !this.state.confirmed.city || this.state.confirmed.city.trim() === "" ||
+                                    !this.state.confirmed.pc || this.state.confirmed.pc.trim() === "" || !this.state.confirmed.pays || this.state.confirmed.pays.trim() === ""
+                                    }
+                                    onClick={async () => {
+                                        this.setState({loading:true})
+                                        let update_user = await this.updateUser({details:{location:{location:{country:this.state.confirmed.pays,city:this.state.confirmed.city,details:{street:this.state.confirmed.street,postal_code:this.state.confirmed.pc}},public:false }}})
+
+                                        if(update_user && update_user === "true"){
+                                            let toAsk = this.state.toAsk
+                                            let fin_ask_city_index = toAsk.findIndex(x => x === "address_city")
+                                            if(fin_ask_city_index > -1) toAsk.splice(fin_ask_city_index,1)
+
+                                            let fin_ask_details_index = toAsk.findIndex(x => x === "address_details")
+                                            if(fin_ask_details_index > -1) toAsk.splice(fin_ask_details_index,1)
+
+                                            if(toAsk.length === 0){
+                                                this.extern_signin(this.state.redirect)
+                                            }else{
+                                                this.setState({toAsk: toAsk,loading:false})
+                                            }
+
+                                        }else{
+                                            this.props.enqueueSnackbar('Une erreur est survenue', { variant:"error",autoHideDuration:5000  })
+                                            this.setState({loading:false})
+                                        }
+                                    }}
+                            >
+                                Continuer
+                            </Button>
+
+                        </div>
+                    </div>
+                </div>
+            )
 
         }else if(ask === "passport"){
             return (
                 <div>
                     <h4 style={{fontSize:"1.4rem",marginBottom:5}}>Veuillez télécharger votre passeport </h4>
                     <h5 style={{marginTop:15}}>C'est juste une étape de vérification de vos informations saisies</h5>
-                    <div className="row mt-2">
+                    <div className="row mt-4">
                         <div className="col-lg-12 mb-3 mt-3" align="center">
                             <div className="kyc-file-upload" style={{textAlign:"center",cursor:"pointer",maxWidth:400}}
                                  onClick={() => {
@@ -401,6 +566,7 @@ class accept_service extends Component {
                         <div align="right" className="col-lg-12">
 
                             <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
+                                    disabled={!this.state.passport_file}
                                     onClick={() => {
                                         this.verif_kyc_passport()
                                     }}
@@ -419,8 +585,8 @@ class accept_service extends Component {
         //this.setState({loading:true})
         let file = e.target.files[0]
 
-        if( file && file.size > 5000000){
-            alert("La taille maximale autorisée est de 5 Mo")
+        if( file && file.size > 10000000){
+            alert("La taille maximale autorisée est de 10 Mo")
         }else if(file && (file.type !== "image/png" && file.type !== "image/jpg" && file.type !== "image/jpeg")){
             alert("Format non autorisé")
         }
@@ -452,18 +618,20 @@ class accept_service extends Component {
     }
 
 
-    verif_kyc_passport = () => {
-        this.setState({loading:true})
+    verif_kyc_passport(){
+
+        let file =this.state.passport_file
         const data = new FormData();
-        data.append("file", this.state.passport_file);
+        data.append("passport",file,file.name)
+        this.setState({loading:true})
         SSO_service.kyc_upload_passport(localStorage.getItem("usrtoken"),localStorage.getItem("id"),data).then( async res => {
             console.log(res)
             if(res.status === 200 && res.succes === true){
                 this.setState({loading:false})
                 this.props.enqueueSnackbar("La vérification de votre passeport est bien effectué avec succès !", { variant:"success",autoHideDuration:5000  })
                 setTimeout(() => {
-                    this.extern_signin()
-                },3000)
+                    this.extern_signin(this.state.redirect)
+                },2000)
                 /*let toAsk = this.state.toAsk
                 toAsk.splice(toAsk.findIndex(x => x === "passport"),1)
                 this.setState({toAsk: toAsk})*/
@@ -480,7 +648,7 @@ class accept_service extends Component {
 
 
     render() {
-        console.log(this.state.confirmed)
+        console.log(this.state.toAsk)
         return (
             <>
                 <MuiBackdrop open={this.state.loading}  />
@@ -519,7 +687,7 @@ class accept_service extends Component {
                                                               show:this.state.toAsk
                                                           })
                                                       }else{
-                                                          this.extern_signin()
+                                                          this.extern_signin(this.state.redirect)
                                                       }
                                                   }}
                                             >

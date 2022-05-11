@@ -33,6 +33,7 @@ import checkicon from "../../assets/icons/check_icon.png"
 import MenuItem from '@material-ui/core/MenuItem';
 import {countryList} from "../../constants/defaultValues";
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -130,7 +131,7 @@ export default function Info(props){
         SSO_service.getUser(localStorage.getItem("usrtoken")).then(infoRes => {
             console.log(infoRes)
             if(infoRes.status === 200 && infoRes.succes === true){
-
+                console.log(infoRes)
                 let roles_object = infoRes.data.roles || {}
                 const roles_array = [];
                 Object.keys(roles_object).forEach(key => roles_array.push({
@@ -140,10 +141,10 @@ export default function Info(props){
                 setRoles(roles_array)
                 setFirstname(infoRes.data.first_name.main ? infoRes.data.first_name.main : null)
                 setLastname(infoRes.data.last_name.main ? infoRes.data.last_name.main : null)
-                if(infoRes.data.verified.identity && infoRes.data.verified.identity.score === 3 ){
+                /*if(infoRes.data.verified.identity && infoRes.data.verified.identity.score === 3 ){
                     setFirstname((infoRes.data.verified.identity.data.first_name.main === true || infoRes.data.verified.identity.data.first_name.main === null) ? "" : infoRes.data.verified.identity.data.first_name.main === true )
                     setLastname((infoRes.data.verified.identity.data.last_name.main === true || infoRes.data.verified.identity.data.last_name.main === null) ? "" : infoRes.data.verified.identity.data.last_name.main)
-                }
+                }*/
                 setSelected_fname_status(infoRes.data.last_name.public === true ? "public" : "private")
                 setPhone(infoRes.data.phone.main ? infoRes.data.phone.main.number ? infoRes.data.phone.main.number : "" : "")
                 setSelected_username(infoRes.data.username || "")
@@ -157,7 +158,7 @@ export default function Info(props){
                 setNationality_lupdate(infoRes.data.nationality ? (infoRes.data.nationality.last_update || "") : "")
                 setNationality(infoRes.data.nationality ? infoRes.data.nationality.main : "")
 
-                setAdr_street(infoRes.data.location ? (infoRes.data.location.main.details || "") : "")
+                setAdr_street(infoRes.data.location ? (infoRes.data.location.main.details.street || "") : "")
                 setAdr_pc(infoRes.data.location ? (infoRes.data.location.main.details.postal_code || "") : "")
                 setAdr_city( infoRes.data.location ? (infoRes.data.location.main.city || "") : "")
                 setAdr_pays(infoRes.data.location ? (infoRes.data.location.main.country || "") : "")
@@ -361,26 +362,39 @@ export default function Info(props){
 
 
     const upload_kyc_passport = (e) => {
-        setLoading(true)
+
         let file = e.target.files[0]
-        const data = new FormData();
-        data.append("file", file);
-        SSO_service.kyc_upload_passport(localStorage.getItem("usrtoken"),localStorage.getItem("id"),data).then( async res => {
-            console.log(res)
-            if(res.status === 200 && res.succes === true){
-                await getAsyncAccountInfo()
-                await getAsyncUserInfo()
+        if (file && file.size > 10000000) {
+            alert("La taille maximale autorisée est de 10 Mo")
+        }else if(file && (file.type !== "image/png" && file.type !== "image/jpg" && file.type !== "image/jpeg")){
+            alert("Format non autorisé")
+        }
+        else {
+            setLoading(true)
+            const data = new FormData();
+            data.append("passport", file,file.name);
+            console.log(data)
+            SSO_service.kyc_upload_passport(localStorage.getItem("usrtoken"),localStorage.getItem("id"),data).then( async res => {
+                console.log(res)
+                if(res.status === 200 && res.succes === true){
+                    setFirstname(res.data.first_name.main)
+                    setLastname(res.data.last_name.main)
+                    setNationality(res.data.nationality.main)
+                    /*await getAsyncAccountInfo()
+                    await getAsyncUserInfo()*/
+                    setLoading(false)
+                    enqueueSnackbar('Opération effectuée avec succès', { variant:"success" })
+                }else{
+                    setLoading(false)
+                    enqueueSnackbar(res.error, { variant:"error" })
+                }
+            }).catch( err => {
+                console.log(err)
                 setLoading(false)
-                enqueueSnackbar('Opération effectuée avec succès', { variant:"success" })
-            }else{
-                setLoading(false)
-                enqueueSnackbar(res.error, { variant:"error" })
-            }
-        }).catch( err => {
-            console.log(err)
-            setLoading(false)
-            enqueueSnackbar("Une erreur est survenue, veuillez réessayer ultérieurement", { variant:"error" })
-        })
+                enqueueSnackbar("Une erreur est survenue, veuillez réessayer ultérieurement", { variant:"error" })
+            })
+        }
+
     }
 
     return(
@@ -397,8 +411,8 @@ export default function Info(props){
 
 
                             <div style={{marginTop:40,padding:15}} className="accordion_form">
-                                <Accordion expanded={expanded_sec === 'panel-1'}
-                                           onChange={handleChange_sec('panel-1')}
+                                <Accordion expanded={expanded === 'panel-1'}
+                                           onChange={handleChange('panel-1')}
 
                                 >
                                     <AccordionSummary
@@ -457,8 +471,8 @@ export default function Info(props){
                                     </AccordionDetails>
                                     <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
                                 </Accordion>
-                                <Accordion expanded={expanded_sec === 'panel0'}
-                                           onChange={handleChange_sec('panel0')}
+                                <Accordion expanded={expanded === 'panel0'}
+                                           onChange={handleChange('panel0')}
                                 >
                                     <AccordionSummary
                                         expandIcon={<ChevronRightIcon />}
@@ -481,6 +495,7 @@ export default function Info(props){
                                                     style={{width:"100%"}}
                                                     value={selected_username}
                                                     onChange={(e) => {setSelected_username(e.target.value)}}
+                                                    InputLabelProps={{shrink:true}}
                                                 />
                                             </div>
                                         </div>
@@ -518,7 +533,7 @@ export default function Info(props){
                                                 }
                                                        wide='very'
                                                        size={"small"}
-                                                       trigger={<img alt="" src={checkicon} style={{width:20,height:20}}/>}
+                                                       trigger={<CheckCircleIcon fontSize="small" style={{color:"#1c94fe"}}/>}
                                                 />
                                             }
 
@@ -547,6 +562,7 @@ export default function Info(props){
                                                     style={{width:"100%"}}
                                                     value={firstname}
                                                     onChange={(e) => {setFirstname(e.target.value)}}
+                                                    InputLabelProps={{shrink:true}}
                                                 />
                                             </div>
                                         </div>
@@ -560,6 +576,7 @@ export default function Info(props){
                                                     style={{width:"100%"}}
                                                     value={lastname}
                                                     onChange={(e) => {setLastname(e.target.value)}}
+                                                    InputLabelProps={{shrink:true}}
                                                 />
                                             </div>
                                         </div>
@@ -608,21 +625,8 @@ export default function Info(props){
                                     </AccordionDetails>
                                     <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
                                 </Accordion>
-                                {/*<Accordion expanded={expanded === 'panel2'}
-                                           //onChange={handleChange('panel2')}
-                                >
-                                    <AccordionSummary
-                                        expandIcon={<ExpandMoreIcon style={{opacity:0,cursor:"unset",color:"#fff"}} />}
-                                        aria-controls="panel2bh-content"
-                                        id="panel2bh-header"
-                                    >
-                                        <Typography className={classes.heading}>Email</Typography>
-                                        <Typography className={classes.secondaryHeadingTitle}>
-                                            {localStorage.getItem("email")}
-                                        </Typography>
-                                    </AccordionSummary>
-                                </Accordion>*/}
-                                <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
+
+                                <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
                                     <AccordionSummary
                                         expandIcon={expanded === 'panel3' ? <CloseIcon /> : <EditIcon/>}
                                         aria-controls="panel3bh-content"
@@ -695,15 +699,27 @@ export default function Info(props){
                                     <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
                                 </Accordion>
 
-                                <Accordion expanded={expanded_sec === 'panel4'}
-                                           onChange={handleChange_sec('panel4')}
+                                <Accordion expanded={expanded === 'panel3'}
+                                           onChange={handleChange('panel3')}
                                 >
                                     <AccordionSummary
                                         expandIcon={expanded_sec === "panel4" ? <CloseIcon /> : <EditIcon/>}
                                         aria-controls="panel2bh-content"
                                         id="panel2bh-header"
                                     >
-                                        <Typography className={classes.heading}>Nationalité</Typography>
+                                        <Typography className={classes.heading}>
+                                            Nationalité&nbsp;
+                                            {
+                                                !loading  && infoAccount.verified.identity.score === 3 &&
+                                                <Popup content={
+                                                    <h6 style={{fontSize:"0.8rem"}}>Ce champ a été bien vérifié par KYC</h6>
+                                                }
+                                                       wide='very'
+                                                       size={"small"}
+                                                       trigger={<CheckCircleIcon fontSize="small" style={{color:"#1c94fe"}}/>}
+                                                />
+                                            }
+                                        </Typography>
                                         <div>
                                             <Typography className={classes.secondaryHeadingTitle}>
                                                 {!loading &&
@@ -729,6 +745,7 @@ export default function Info(props){
                                                     style={{width:"100%"}}
                                                     value={nationality}
                                                     onChange={(e) => {setNationality(e.target.value)}}
+                                                    InputLabelProps={{shrink:true}}
                                                 />
                                             </div>
                                         </div>
@@ -770,8 +787,8 @@ export default function Info(props){
                                     <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
                                 </Accordion>
 
-                                <Accordion expanded={expanded_sec === 'panel5'}
-                                           onChange={handleChange_sec('panel5')}
+                                <Accordion expanded={expanded === 'panel4'}
+                                           onChange={handleChange('panel4')}
                                 >
                                     <AccordionSummary
                                         expandIcon={expanded_sec === "panel5" ? <CloseIcon /> : <EditIcon/>}
@@ -781,7 +798,7 @@ export default function Info(props){
                                         <Typography className={classes.heading}>Adresse</Typography>
                                         <div>
                                             <Typography className={classes.secondaryHeadingTitle}>
-                                                {!loading && infoAccount.location ? ((infoAccount.location.main.details || "") + " " + (infoAccount.location.main.city || "") + ", " + (infoAccount.location.main.country || "")) : ""}
+                                                {!loading && infoAccount.location ? ((infoAccount.location.main.details.street || "") + " " + (infoAccount.location.main.details.postal_code || "") + " " + (infoAccount.location.main.city || "") + ", " + (infoAccount.location.main.country || "")) : ""}
                                             </Typography>
                                             {
                                                 location_lupdate ?
@@ -804,6 +821,7 @@ export default function Info(props){
                                                     style={{width:"100%"}}
                                                     value={adr_street}
                                                     onChange={(e) => {setAdr_street(e.target.value)}}
+                                                    InputLabelProps={{shrink:true}}
                                                 />
                                             </div>
                                             <div className="col-lg-6 mt-1">
@@ -815,6 +833,7 @@ export default function Info(props){
                                                     style={{width:"100%"}}
                                                     value={adr_pc}
                                                     onChange={(e) => {setAdr_pc(e.target.value)}}
+                                                    InputLabelProps={{shrink:true}}
                                                 />
                                             </div>
                                             <div className="col-lg-6 mt-3">
@@ -826,6 +845,7 @@ export default function Info(props){
                                                     style={{width:"100%"}}
                                                     value={adr_city}
                                                     onChange={(e) => {setAdr_city(e.target.value)}}
+                                                    InputLabelProps={{shrink:true}}
                                                 />
                                             </div>
                                             <div className="col-lg-6 mt-3">
@@ -859,6 +879,7 @@ export default function Info(props){
                                                                 ...params.inputProps,
                                                                 autoComplete: 'new-password', // disable autocomplete and autofill
                                                             }}
+                                                            InputLabelProps={{shrink:true}}
                                                         />
                                                     )}
                                                 />
@@ -890,7 +911,7 @@ export default function Info(props){
                                                             onClick={handleChange_sec('panel0')}>Annuler</Button>
                                                     <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
                                                             onClick={() => {
-                                                                updateUser({details:{location:{location:{country:adr_pays,city:adr_city,details:adr_street},public:selected_location_status !== "private" }}})
+                                                                updateUser({details:{location:{location:{country:adr_pays,city:adr_city,details:{street:adr_street,postal_code:adr_pc}},public:selected_location_status !== "private" }}})
                                                             }}
                                                     >
                                                         Enregistrer
@@ -901,43 +922,8 @@ export default function Info(props){
                                     </AccordionDetails>
                                     <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
                                 </Accordion>
-                                {/*<Accordion expanded={expanded === 'panel4'}
-                                           //onChange={handleChange('panel4')}
-                                >
-                                    <AccordionSummary
-                                        expandIcon={<EditIcon />}
-                                        aria-controls="panel4bh-content"
-                                        id="panel4bh-header"
-                                    >
-                                        <Typography className={classes.heading}>Date de naissance</Typography>
-                                        <Typography className={classes.secondaryHeading}>
-                                            {moment(birthday).format("DD-MM-YYYY")}
-                                        </Typography>
-                                    </AccordionSummary>
-                                    <AccordionDetails>
-                                        <div className="row mt-2">
-                                            <div className="col-md-12">
-                                                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                                    <KeyboardDatePicker
-                                                        margin="normal"
-                                                        id="date-picker-dialog"
-                                                        label="Date de naissance"
-                                                        format="dd/MM/yyyy"
-                                                        value={""}
-                                                        onChange={(date) => {setBirthday(moment(date).format("YYYY-MM-DD"))}}
-                                                        KeyboardButtonProps={{
-                                                            'aria-label': 'change date',
-                                                        }}
-                                                    />
-                                                </MuiPickersUtilsProvider>
-                                            </div>
-                                        </div>
 
-                                    </AccordionDetails>
-                                    <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
-                                </Accordion>*/}
                                 <Accordion expanded={true}
-                                           //onChange={handleChange('panel6')}
                                 >
                                     <AccordionSummary
                                         //expandIcon={<ExpandMoreIcon />}
@@ -973,29 +959,6 @@ export default function Info(props){
                                     </AccordionDetails>
                                     {/*<Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>*/}
                                 </Accordion>
-                                {/*<Accordion expanded={expanded === 'panel5'}
-                                    //onChange={handleChange('panel4')}
-                                >
-                                    <AccordionSummary
-                                        //expandIcon={<EditIcon />}
-                                        aria-controls="panel4bh-content"
-                                        id="panel4bh-header"
-                                    >
-                                        <Typography className={classes.heading}>Mot de passe</Typography>
-                                        <div>
-                                            <Typography className={classes.secondaryHeadingTitle}>
-                                                ••••••••
-                                            </Typography>
-                                            <Typography className={classes.secondaryHeading}>
-
-                                            </Typography>
-                                        </div>
-
-                                    </AccordionSummary>
-                                    <AccordionDetails>
-
-                                    </AccordionDetails>
-                                </Accordion>*/}
                             </div>
 
 
@@ -1013,7 +976,7 @@ export default function Info(props){
 
                             <div style={{marginTop:40,padding:15}} className="accordion_form">
 
-                                <Accordion expanded={expanded_sec === 'panel3'}>
+                                <Accordion expanded={expanded_sec === 'panel0'}>
                                     <AccordionSummary
                                         expandIcon={<ChevronRightIcon style={{cursor:"unset",color:"#fff",opacity:0}} />}
                                         aria-controls="panel3bh-content"
@@ -1035,7 +998,7 @@ export default function Info(props){
                                     <AccordionDetails>
                                     </AccordionDetails>
                                 </Accordion>
-                                <Accordion expanded={expanded_sec === 'panel6'}>
+                                <Accordion expanded={expanded_sec === 'panel1'}>
                                     <AccordionSummary
                                         /*expandIcon={
                                             <Popup content={
@@ -1060,7 +1023,7 @@ export default function Info(props){
                                                     }
                                                            wide='very'
                                                            size={"small"}
-                                                           trigger={<img alt="" src={checkicon} style={{width:20,height:20}}/>}
+                                                           trigger={<CheckCircleIcon fontSize="small" style={{color:"#1c94fe"}}/>}
                                                     />
                                                     :
                                                     <Popup content={
@@ -1081,7 +1044,7 @@ export default function Info(props){
                                                     }
                                                            wide='very'
                                                            size={"small"}
-                                                           trigger={<img alt="" src={checkicon} style={{width:20,height:20}}/>}
+                                                           trigger={<CheckCircleIcon fontSize="small" style={{color:"#1c94fe"}}/>}
                                                     />
                                                      :
                                                     <Popup content={
@@ -1125,8 +1088,8 @@ export default function Info(props){
 
                                     </AccordionSummary>
                                 </Accordion>
-                                <Accordion expanded={expanded_sec === 'panel4'}
-                                           onChange={handleChange_sec('panel4')}
+                                <Accordion expanded={expanded_sec === 'panel2'}
+                                           onChange={handleChange_sec('panel2')}
                                 >
                                     <AccordionSummary
                                         expandIcon={<ChevronRightIcon />}
@@ -1149,6 +1112,7 @@ export default function Info(props){
                                                     value={newPwd1}
                                                     type="password"
                                                     onChange={(e) => {setNewPwd1(e.target.value)}}
+                                                    InputLabelProps={{shrink:true}}
                                                 />
                                             </div>
                                         </div>
@@ -1162,6 +1126,7 @@ export default function Info(props){
                                                     value={newPwd2}
                                                     type="password"
                                                     onChange={(e) => {setNewPwd2(e.target.value)}}
+                                                    InputLabelProps={{shrink:true}}
                                                 />
                                             </div>
                                         </div>
@@ -1183,8 +1148,8 @@ export default function Info(props){
                                     </AccordionDetails>
                                     <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
                                 </Accordion>
-                                <Accordion expanded={expanded_sec === 'panel5'}
-                                           onChange={handleChange_sec('panel5')}
+                                <Accordion expanded={expanded_sec === 'panel3'}
+                                           onChange={handleChange_sec('panel3')}
                                 >
                                     <AccordionSummary
                                         expandIcon={<ChevronRightIcon />}
@@ -1243,8 +1208,10 @@ export default function Info(props){
                         actions={[
                             { text: 'Oui', onClick: () => {
                                     setOpenConfirmUpdateModal(false)
-                                    updateUser({first_name:{first_name:firstname,public:selected_fname_status !== "private"},
-                                        last_name:{last_name:lastname,public:selected_fname_status !== "private"}})
+                                    updateUser({details:{
+                                            first_name:{first_name:firstname,public:selected_fname_status !== "private"},
+                                            last_name:{last_name:lastname,public:selected_fname_status !== "private"}
+                                        }})
                                 }},
                             { text: 'Non', onClick: () => {
                                     setOpenConfirmUpdateModal(false)
@@ -1253,7 +1220,9 @@ export default function Info(props){
                         onClose={() => {
                             setOpenConfirmUpdateModal(false)
                         }}
-                        heading="Voulez-vous vraiment modifier ces informations ? Votre vérification KYC sera ignorée "
+                        heading={<h5 style={{fontSize:"1.2rem",marginTop:10}}>
+                            Voulez-vous vraiment modifier ces informations ? Votre vérification KYC sera ignorée
+                        </h5>}
                         appearance="warning"
                     >
                     </Modal>

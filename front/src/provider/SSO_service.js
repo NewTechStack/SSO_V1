@@ -22,7 +22,7 @@ let SSO_service = {
 
     loadFileHeaders(usrtoken) {
         let headers = new Headers();
-        headers.append("Content-Type", "multipart/form-data");
+        //headers.append("Content-Type", "multipart/form-data");
         usrtoken && headers.append("usrtoken",usrtoken);
         return headers;
     },

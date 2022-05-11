@@ -10,7 +10,7 @@ import {Divider, IconButton} from "@material-ui/core";
 import AtlButton from "@atlaskit/button";
 import AddIcon from "@material-ui/icons/Add";
 import DataTable from "react-data-table-component";
-import {paginationOptions, tableContextMessage} from "../../constants/defaultValues";
+import {BlueSwitch, paginationOptions, tableContextMessage} from "../../constants/defaultValues";
 import {Trash} from "../../components/icons";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import Typography from "@material-ui/core/Typography";
@@ -517,7 +517,7 @@ export default function RegistreDetails(props) {
                 <div style={{justifyContent: "center"}}>
                     <FormControlLabel
                         control={
-                            <Switch
+                            <BlueSwitch
                                 checked={row.askable.checked}
                                 onChange={(event, checked) => {
                                     row.askable.checked = checked
@@ -529,7 +529,9 @@ export default function RegistreDetails(props) {
                             />
                         }
                         labelPlacement="start"
-                        label={row.user_text}
+                        label={<Typography style={{width:95}}>{row.user_text}</Typography>}
+
+
                     />
                 </div>
             </div>,
@@ -544,7 +546,7 @@ export default function RegistreDetails(props) {
                             <>
                                 <FormControlLabel style={{marginRight:5}}
                                                   control={
-                                                      <Switch
+                                                      <BlueSwitch
                                                           checked={row.askable_verif.value ? row.askable_verif.checked : false }
                                                           onChange={(event, checked) => {
                                                               console.log(row.askable_verif.value)
