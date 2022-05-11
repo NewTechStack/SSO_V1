@@ -764,13 +764,13 @@ class user:
         if field in details:
             change = details[field]
             up[field] = {}
-            if  isinstance(change, dict):
+            if isinstance(change, dict):
                 if field in change and isinstance(change[field], dict):
                     updated = False
                     for i in ['country', 'city', 'details']:
-                        if i in change:
-                            if (i in ['country', 'city'] and isinstance(i, str)) or \
-                               (i in ['details'] and isinstance(i, dict)):
+                        if i in change[field]:
+                            if (i in ['country', 'city'] and isinstance(change[field][i], str)) or \
+                               (i in ['details'] and isinstance(change[field][i], dict)):
                                 updated = True
                                 up[field][i] = change[field][i]
                     if updated:
