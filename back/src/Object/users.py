@@ -69,7 +69,7 @@ class user:
             },
          "age": {
                 'in_payload': False,
-                'data': lambda : self.data()["details"]["last_name"]["main"]
+                'data': lambda : self.data()["details"]["age"]["main"]
             },
          "is_over_12": {
                 'in_payload': True,
@@ -848,7 +848,8 @@ class user:
                      res["details"]["phone"]["verified"]["main"]
             iscore = res["details"]["first_name"]["verified"]["main"] + \
                      res["details"]["last_name"]["verified"]["main"] + \
-                     res["details"]["age"]["verified"]["main"]
+                     res["details"]["age"]["verified"]["main"] +
+                     res["details"]["nationality"]["verified"]["main"]
             ret["verified"] = {}
             if id == self.id:
                 ret["email"] = {
@@ -885,6 +886,10 @@ class user:
                             "main": res["details"]["age"]["verified"]["main"],
                             "last_update": res["details"]["age"]["verified"]["last_update"]
                         },
+                        "nationality": {
+                            "main": res["details"]["nationality"]["verified"]["main"],
+                            "last_update": res["details"]["nationality"]["verified"]["main"]
+                        }
                     }
                 }
             else:
