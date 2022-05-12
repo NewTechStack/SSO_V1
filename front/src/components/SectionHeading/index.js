@@ -54,7 +54,8 @@ export default function SectionHeading({ onToogleSidebar }) {
                             localStorage.removeItem("lastname")
                             localStorage.removeItem("exp")
                             localStorage.removeItem("roles")
-                            window.location.reload()
+                            localStorage.removeItem("id")
+                            window.location.replace("/sso/login")
                         }}
                     />
                 </AvatarMenu>

@@ -70,11 +70,11 @@ class accept_service extends Component {
 
                                 let asked = regaskData.data.main || []
                                 let toAsk = []
-                                if(!user_data.first_name || (user_data.first_name && user_data.first_name.main === null)) toAsk.push("first_name")
-                                if(!user_data.last_name || (user_data.last_name && user_data.last_name.main === null)) toAsk.push("last_name")
-                                if(!user_data.phone || (user_data.phone && user_data.phone.main === null)) toAsk.push("phone")
-                                if(!user_data.location || (user_data.location && (user_data.location.main === null || user_data.location.main.city === null) )) toAsk.push("address_city")
-                                if(!user_data.location || (user_data.location && (user_data.location.main === null || user_data.location.main.details === null) )) toAsk.push("address_details")
+                                if(asked.findIndex(x => x === "first_name") > -1 && (!user_data.first_name || (user_data.first_name && user_data.first_name.main === null))) toAsk.push("first_name")
+                                if(asked.findIndex(x => x === "last_name") > -1 &&(!user_data.last_name || (user_data.last_name && user_data.last_name.main === null))) toAsk.push("last_name")
+                                if(asked.findIndex(x => x === "phone") > -1 && (!user_data.phone || (user_data.phone && user_data.phone.main === null))) toAsk.push("phone")
+                                if(asked.findIndex(x => x === "address_city") > -1 && (!user_data.location || (user_data.location && (user_data.location.main === null || user_data.location.main.city === null) ))) toAsk.push("address_city")
+                                if(asked.findIndex(x => x === "address_details") > -1 && (!user_data.location || (user_data.location && (user_data.location.main === null || user_data.location.main.details === null) ))) toAsk.push("address_details")
                                 if(asked.findIndex(x => x === "is_first_name_verified") > -1  || asked.findIndex(x => x === "is_last_name_verified") > -1  ||
                                     asked.findIndex(x => x === "is_age_verified") > -1  ||  asked.findIndex(x => x === "is_nationality_verified") > -1  ||
                                     asked.findIndex(x => x === "is_address_city_verified") > -1  ||  asked.findIndex(x => x === "is_address_details_verified") > -1){

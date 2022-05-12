@@ -39,6 +39,8 @@ import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import InlineDialog from '@atlaskit/inline-dialog';
 import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
+import { AutoDismissFlag,FlagGroup } from '@atlaskit/flag';
+import SuccessIcon from '@atlaskit/icon/glyph/check-circle';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -79,143 +81,143 @@ const customTableStyle = {
 
 const askable_array = [
     {
-        user_text:"nom d'utilisateur",
-        askable:{
-            value:"username",
-            checked:false
+        user_text: "nom d'utilisateur",
+        askable: {
+            value: "username",
+            checked: false
         },
-        askable_verif:false
+        askable_verif: false
     },
     {
-        user_text:"email",
-        askable:{
-            value:"email",
-            checked:false
+        user_text: "email",
+        askable: {
+            value: "email",
+            checked: false
         },
-        askable_verif:{
-            value:"is_email_verified",
-            checked:false
+        askable_verif: {
+            value: "is_email_verified",
+            checked: false
         }
     },
     {
-        user_text:"prénom",
-        askable:{
-            value:"first_name",
-            checked:false
+        user_text: "prénom",
+        askable: {
+            value: "first_name",
+            checked: false
         },
-        askable_verif:{
-            value:"is_first_name_verified",
-            checked:false
+        askable_verif: {
+            value: "is_first_name_verified",
+            checked: false
         }
     },
     {
-        user_text:"nom",
-        askable:{
-            value:"last_name",
-            checked:false
+        user_text: "nom",
+        askable: {
+            value: "last_name",
+            checked: false
         },
-        askable_verif:{
-            value:"is_last_name_verified",
-            checked:false
+        askable_verif: {
+            value: "is_last_name_verified",
+            checked: false
         }
     },
     {
-        user_text:"numéro de téléphone",
-        askable:{
-            value:"phone",
-            checked:false
+        user_text: "numéro de téléphone",
+        askable: {
+            value: "phone",
+            checked: false
         },
-        askable_verif:{
-            value:"is_phone_verified",
-            checked:false
+        askable_verif: {
+            value: "is_phone_verified",
+            checked: false
         }
     },
     {
-        user_text:"âge",
-        askable:{
-            value:"age",
-            checked:false
+        user_text: "âge",
+        askable: {
+            value: "age",
+            checked: false
         },
-        askable_verif:{
-            value:"is_age_verified",
-            checked:false
+        askable_verif: {
+            value: "is_age_verified",
+            checked: false
         }
     },
     {
-        user_text:"âgé.e d'au moins 12 ans",
-        askable:{
-            value:"is_over_12",
-            checked:false
+        user_text: "âgé.e d'au moins 12 ans",
+        askable: {
+            value: "is_over_12",
+            checked: false
         },
-        askable_verif:{
-            value:"is_age_verified",
-            checked:false
+        askable_verif: {
+            value: "is_age_verified",
+            checked: false
         }
     },
     {
-        user_text:"âgé.e d'au moins 16 ans",
-        askable:{
-            value:"is_over_16",
-            checked:false
+        user_text: "âgé.e d'au moins 16 ans",
+        askable: {
+            value: "is_over_16",
+            checked: false
         },
-        askable_verif:{
-            value:"is_age_verified",
-            checked:false
+        askable_verif: {
+            value: "is_age_verified",
+            checked: false
         }
     },
     {
-        user_text:"âgé.e d'au moins 18 ans",
-        askable:{
-            value:"is_over_18",
-            checked:false
+        user_text: "âgé.e d'au moins 18 ans",
+        askable: {
+            value: "is_over_18",
+            checked: false
         },
-        askable_verif:{
-            value:"is_age_verified",
-            checked:false
+        askable_verif: {
+            value: "is_age_verified",
+            checked: false
         }
     },
     {
-        user_text:"âgé.e d'au moins 21 ans",
-        askable:{
-            value:"is_over_21",
-            checked:false
+        user_text: "âgé.e d'au moins 21 ans",
+        askable: {
+            value: "is_over_21",
+            checked: false
         },
-        askable_verif:{
-            value:"is_age_verified",
-            checked:false
+        askable_verif: {
+            value: "is_age_verified",
+            checked: false
         }
     },
     {
-        user_text:"nationalité",
-        askable:{
-            value:"nationality",
-            checked:false
+        user_text: "nationalité",
+        askable: {
+            value: "nationality",
+            checked: false
         },
-        askable_verif:{
-            value:"is_nationality_verified",
-            checked:false
+        askable_verif: {
+            value: "is_nationality_verified",
+            checked: false
         }
     },
     {
-        user_text:"ville",
-        askable:{
-            value:"address_city",
-            checked:false
+        user_text: "ville",
+        askable: {
+            value: "address_city",
+            checked: false
         },
-        askable_verif:{
-            value:"is_address_city_verified",
-            checked:false
+        askable_verif: {
+            value: "is_address_city_verified",
+            checked: false
         }
     },
     {
-        user_text:"adresse",
-        askable:{
-            value:"address_details",
-            checked:false
+        user_text: "adresse",
+        askable: {
+            value: "address_details",
+            checked: false
         },
-        askable_verif:{
-            value:"is_address_details_verified",
-            checked:false
+        askable_verif: {
+            value: "is_address_details_verified",
+            checked: false
         }
     }
 
@@ -470,31 +472,32 @@ export default function RegistreDetails(props) {
         },
         {
             name: 'Key',
-            cell: row => row.key ? <div style={{justifyContent:"center",display:"flex"}}>
-                <div>{row.key}</div>
-                <div style={{marginLeft:4,alignSelf:"center"}}>
-                    <InlineDialog
-                        placement="top"
-                        onClose={() => {
-                            setOpenCopyKeyDialg(false)
-                        }}
-                        content={(
-                            <div>
-                                <p>Copié</p>
-                            </div>
-                        )}
-                        isOpen={openCopyKeyDialg}
-                    >
-                        <FileCopyOutlinedIcon fontSize="default"
-                                              style={{cursor:"pointer",marginTop:-3}}
-                                              onClick={() => {
-                                                  navigator.clipboard.writeText(row.key)
-                                                  setOpenCopyKeyDialg(!openCopyKeyDialg)
-                                              }}
-                        />
-                    </InlineDialog>
+            cell: row => row.key ? <div style={{justifyContent: "center", display: "flex"}}>
+                    <div>{row.key}</div>
+                    <div style={{marginLeft: 4, alignSelf: "center"}}>
+                        <InlineDialog
+                            placement="top"
+                            onClose={() => {
+                                setOpenCopyKeyDialg(false)
+                            }}
+                            content={(
+                                <div>
+                                    <p>Copié</p>
+                                </div>
+                            )}
+                            isOpen={false}
+                        >
+                            <FileCopyOutlinedIcon fontSize="default"
+                                                  style={{cursor: "pointer", marginTop: -3}}
+                                                  onClick={() => {
+                                                      navigator.clipboard.writeText(row.key)
+                                                      addFlag()
+                                                      //setOpenCopyKeyDialg(!openCopyKeyDialg)
+                                                  }}
+                            />
+                        </InlineDialog>
+                    </div>
                 </div>
-            </div>
                 : "---"
         },
         {
@@ -529,7 +532,7 @@ export default function RegistreDetails(props) {
                             />
                         }
                         labelPlacement="start"
-                        label={<Typography style={{width:95}}>{row.user_text}</Typography>}
+                        label={<Typography style={{width: 95}}>{row.user_text}</Typography>}
 
 
                     />
@@ -543,49 +546,51 @@ export default function RegistreDetails(props) {
                 <div style={{justifyContent: "center"}}>
                     {
                         row.askable.value !== "username" &&
-                            <>
-                                <FormControlLabel style={{marginRight:5}}
-                                                  control={
-                                                      <BlueSwitch
-                                                          checked={row.askable_verif.value ? row.askable_verif.checked : false }
-                                                          onChange={(event, checked) => {
-                                                              console.log(row.askable_verif.value)
-                                                              if(row.askable_verif.value === "is_age_verified"){
-                                                                  askable_registry_array.map( (item, key) => {
-                                                                      if(item.askable_verif !== false && item.askable_verif.value === "is_age_verified"){
-                                                                          item.askable_verif.checked = checked
-                                                                      }
-                                                                  })
-                                                                  setUpdateScreen(!updateScreen)
-                                                                  updateRegAskable()
-                                                              }else{
-                                                                  row.askable_verif.checked = checked
-                                                                  setUpdateScreen(!updateScreen)
-                                                                  updateRegAskable()
-                                                              }
+                        <>
+                            <FormControlLabel style={{marginRight: 5}}
+                                              control={
+                                                  <BlueSwitch
+                                                      checked={row.askable_verif.value ? row.askable_verif.checked : false}
+                                                      onChange={(event, checked) => {
+                                                          console.log(row.askable_verif.value)
+                                                          if (row.askable_verif.value === "is_age_verified") {
+                                                              askable_registry_array.map((item, key) => {
+                                                                  if (item.askable_verif !== false && item.askable_verif.value === "is_age_verified") {
+                                                                      item.askable_verif.checked = checked
+                                                                  }
+                                                              })
+                                                              setUpdateScreen(!updateScreen)
+                                                              updateRegAskable()
+                                                          } else {
+                                                              row.askable_verif.checked = checked
+                                                              setUpdateScreen(!updateScreen)
+                                                              updateRegAskable()
+                                                          }
 
-                                                          }}
-                                                          name="checkedB"
-                                                          disabled={row.askable_verif === false || row.askable_verif.value === "is_email_verified" || row.askable_verif.value === "is_phone_verified"}
-                                                      />
-                                                  }
-                                                  labelPlacement={"start"}
-                                                  label={""}
-                                />
+                                                      }}
+                                                      name="checkedB"
+                                                      disabled={row.askable_verif === false || row.askable_verif.value === "is_email_verified" || row.askable_verif.value === "is_phone_verified"}
+                                                  />
+                                              }
+                                              labelPlacement={"start"}
+                                              label={""}
+                            />
 
-                                {
-                                    row.askable_verif !== false && row.askable_verif.value !== "is_email_verified" && row.askable_verif.value !== "is_phone_verified" ?
-                                    <Label as='a' basic color={row.askable_verif !== false && row.askable_verif.checked === true ? "blue" :"grey"} size="mini">
+                            {
+                                row.askable_verif !== false && row.askable_verif.value !== "is_email_verified" && row.askable_verif.value !== "is_phone_verified" ?
+                                    <Label as='a' basic
+                                           color={row.askable_verif !== false && row.askable_verif.checked === true ? "blue" : "grey"}
+                                           size="mini">
                                         kyc
                                     </Label> :
-                                        <Label as='a' basic color={row.askable_verif !== false && row.askable_verif.checked === true ? "blue" :"grey"} size="mini">
-                                            vérification
-                                        </Label>
-                                }
-                            </>
+                                    <Label as='a' basic
+                                           color={row.askable_verif !== false && row.askable_verif.checked === true ? "blue" : "grey"}
+                                           size="mini">
+                                        vérification
+                                    </Label>
+                            }
+                        </>
                     }
-
-
 
 
                 </div>
@@ -644,6 +649,22 @@ export default function RegistreDetails(props) {
 
     const [openCopyKeyDialg, setOpenCopyKeyDialg] = React.useState(false);
 
+    const [flags, setFlags] =  React.useState([]);
+
+    const handleDismissFlag = () => {
+        setFlags(flags.slice(1));
+    };
+    const addFlag = () => {
+        setFlags([])
+        setTimeout(() => {
+            const newFlagId = flags.length + 1;
+            const newFlags = flags.slice();
+            newFlags.splice(0, 0, newFlagId);
+            setFlags(newFlags);
+        },200)
+
+    };
+
 
     useEffect(() => {
 
@@ -674,24 +695,24 @@ export default function RegistreDetails(props) {
 
     const getRegistryAsked = () => {
         setLoading(true)
-        SSO_service.getRegistryAskable(localStorage.getItem("usrtoken"),props.match.params.reg).then( getRes => {
+        SSO_service.getRegistryAskable(localStorage.getItem("usrtoken"), props.match.params.reg).then(getRes => {
             console.log(getRes)
             if (getRes.status === 200 && getRes.succes === true) {
                 let askable_array = askable_registry_array
                 let asked = getRes.data.main || []
-                asked.map( item => {
+                asked.map(item => {
                     let find_index = askable_array.findIndex(x => x.askable.value === item)
                     let find_verif_index = askable_array.findIndex(x => x.askable_verif !== false && x.askable_verif.value === item)
-                    if(find_index > -1){
+                    if (find_index > -1) {
                         askable_array[find_index].askable.checked = true
                     }
-                    if(find_verif_index > -1){
+                    if (find_verif_index > -1) {
                         askable_array[find_verif_index].askable_verif.checked = true
                     }
                 })
                 setAskable_registry_array(askable_array)
                 setLoading(false)
-            }else{
+            } else {
                 setLoading(false)
                 enqueueSnackbar(getRes.error, {variant: "error"})
             }
@@ -704,24 +725,24 @@ export default function RegistreDetails(props) {
     const updateRegAskable = () => {
         setLoading(true)
         let ask_array = []
-        askable_registry_array.map( item => {
-            if(item.askable.checked === true && ask_array.includes(item.askable.value) === false ) ask_array.push(item.askable.value)
-            if(item.askable_verif !==  false && item.askable_verif.checked === true && ask_array.includes(item.askable_verif.value) === false )  ask_array.push(item.askable_verif.value)
+        askable_registry_array.map(item => {
+            if (item.askable.checked === true && ask_array.includes(item.askable.value) === false) ask_array.push(item.askable.value)
+            if (item.askable_verif !== false && item.askable_verif.checked === true && ask_array.includes(item.askable_verif.value) === false) ask_array.push(item.askable_verif.value)
         })
 
         let data = {
-            asked:ask_array
+            asked: ask_array
         }
 
-        SSO_service.updateRegistryAskable(localStorage.getItem("usrtoken"),props.match.params.reg,data).then( updateRes => {
+        SSO_service.updateRegistryAskable(localStorage.getItem("usrtoken"), props.match.params.reg, data).then(updateRes => {
             console.log(updateRes)
             if (updateRes.status === 200 && updateRes.succes === true) {
                 setLoading(false)
-            }else{
+            } else {
                 setLoading(false)
                 enqueueSnackbar(updateRes.error, {variant: "error"})
             }
-        }).catch( err => {
+        }).catch(err => {
             setLoading(false)
             enqueueSnackbar("Une erreur est survenue", {variant: "error"})
         })
@@ -1204,7 +1225,7 @@ export default function RegistreDetails(props) {
                     setOpenUpdateUserRolesModal(false)
                     setLoadingBtnAdd(false)
                     enqueueSnackbar("Modification effectué avec succès", {variant: "success"})
-                },1000)
+                }, 1000)
             } else {
                 enqueueSnackbar(res.error, {variant: "error"})
                 setLoadingBtnAdd(false)
@@ -1596,9 +1617,101 @@ export default function RegistreDetails(props) {
                             }}
                             customStyles={customTableStyle}
                         />
-                        <h3 style={{marginTop:20,fontWeight: 700, fontSize: "1.02rem"}}>Informations demandées</h3>
-                        <div style={{marginTop:15}}>
-                            <DataTable
+                        <h3 style={{marginTop: 20, fontWeight: 700, fontSize: "1.02rem"}}>Informations demandées</h3>
+                        <div style={{marginTop: 25}}>
+                            {
+                                document.body.offsetWidth > 700 ?
+                                    <div className="row mt-1 mb-1"  style={{borderBottom:"1px solid rgba(0,0,0,.12)",height:30}}>
+                                        <div className="col-lg-4 mb-1">
+                                            <h5 style={{fontWeight:"bold"}}>Information</h5>
+                                        </div>
+                                        <div className="col-lg-4 mb-1">
+                                            <h5 style={{fontWeight:"bold"}}>Vérification</h5>
+                                        </div>
+                                    </div> :
+                                    <div className="row mt-1 mb-1"  style={{borderBottom:"1px solid rgba(0,0,0,.12)",height:30}}>
+                                        <div className="col-lg-12 mb-1">
+                                            <h5 style={{fontWeight:"bold"}}>Information/Vérification</h5>
+                                        </div>
+                                    </div>
+                            }
+
+                            {
+                                askable_registry_array.map((row, key) => (
+
+                                        <div className="row mt-1 mb-1" style={{borderBottom:"1px solid rgba(0,0,0,.12)"}}>
+                                            <div className="col-lg-4 mb-1">
+                                                <FormControlLabel
+                                                    control={
+                                                        <BlueSwitch
+                                                            checked={row.askable.checked}
+                                                            onChange={(event, checked) => {
+                                                                row.askable.checked = checked
+                                                                setUpdateScreen(!updateScreen)
+                                                                updateRegAskable()
+                                                            }}
+                                                            name="checkedA"
+                                                        />
+                                                    }
+                                                    labelPlacement="start"
+                                                    label={<Typography style={{minWidth:145}}>{row.user_text}</Typography>}
+                                                />
+                                            </div>
+                                            <div className="col-lg-4 mb-1">
+                                                {
+                                                    row.askable.value !== "username" && row.askable_verif.value !== "is_address_details_verified" && row.askable_verif.value !== "is_address_city_verified" &&
+                                                    row.askable.value !== "is_over_12" && row.askable.value !== "is_over_16" && row.askable.value !== "is_over_18" && row.askable.value !== "is_over_21" &&
+                                                    <>
+                                                        <FormControlLabel style={{marginRight: 5}}
+                                                                          control={
+                                                                              <BlueSwitch
+                                                                                  checked={row.askable_verif.value ? row.askable_verif.checked : false}
+                                                                                  onChange={(event, checked) => {
+                                                                                      console.log(row.askable_verif.value)
+                                                                                      if (row.askable_verif.value === "is_age_verified") {
+                                                                                          askable_registry_array.map((item, key) => {
+                                                                                              if (item.askable_verif !== false && item.askable_verif.value === "is_age_verified") {
+                                                                                                  item.askable_verif.checked = checked
+                                                                                              }
+                                                                                          })
+                                                                                          setUpdateScreen(!updateScreen)
+                                                                                          updateRegAskable()
+                                                                                      } else {
+                                                                                          row.askable_verif.checked = checked
+                                                                                          setUpdateScreen(!updateScreen)
+                                                                                          updateRegAskable()
+                                                                                      }
+
+                                                                                  }}
+                                                                                  name="checkedB"
+                                                                                  disabled={row.askable_verif === false || row.askable_verif.value === "is_email_verified" || row.askable_verif.value === "is_phone_verified"}
+                                                                              />
+                                                                          }
+                                                                          labelPlacement={"start"}
+                                                                          label={""}
+                                                        />
+
+                                                        {
+                                                            row.askable_verif !== false && row.askable_verif.value !== "is_email_verified" && row.askable_verif.value !== "is_phone_verified" ?
+                                                                <Label as='a' basic
+                                                                       color={row.askable_verif !== false && row.askable_verif.checked === true ? "blue" : "grey"}
+                                                                       size="mini">
+                                                                    kyc
+                                                                </Label> :
+                                                                <Label as='a' basic
+                                                                       color={row.askable_verif !== false && row.askable_verif.checked === true ? "blue" : "grey"}
+                                                                       size="mini">
+                                                                    vérification
+                                                                </Label>
+                                                        }
+                                                    </>
+                                                }
+                                            </div>
+                                        </div>
+
+                                ))
+                            }
+                            {/*<DataTable
                                 columns={askabale_columns}
                                 data={askable_registry_array}
                                 selectableRows={false}
@@ -1616,7 +1729,7 @@ export default function RegistreDetails(props) {
                                 onRowClicked={(row, e) => {
                                 }}
                                 customStyles={customTableStyle}
-                            />
+                            />*/}
                         </div>
 
                     </div>
@@ -1630,10 +1743,10 @@ export default function RegistreDetails(props) {
     };
 
     const handleChangedTab = (event, selected) => {
-        if(selected === "keys"){
+        if (selected === "keys") {
             getRegistryAsked()
             setSelectedTab(selected)
-        }else{
+        } else {
             setSelectedTab(selected)
         }
         props.history.push("/main/pro/registre/" + props.match.params.reg + "#" + selected)
@@ -1673,7 +1786,7 @@ export default function RegistreDetails(props) {
                     <div>
                         <div className="main_padding-form">
 
-                            <div style={{display: "flex", justifyContent: "space-between",marginTop:-18}}>
+                            <div style={{display: "flex", justifyContent: "space-between", marginTop: -18}}>
                                 <IconButton onClick={() => {
                                     props.history.push("/main/registres#registries")
                                 }}>
@@ -1782,9 +1895,14 @@ export default function RegistreDetails(props) {
                         width="medium"
                         actions={[
                             {
-                                text: 'Ajouter', className: "alt-font",style:{backgroundColor:"#1c94fe"}, onClick: () => {
+                                text: 'Ajouter',
+                                className: "alt-font",
+                                style: {backgroundColor: "#1c94fe"},
+                                onClick: () => {
                                     addNewRole()
-                                }, isLoading: loadingBtnAdd, isDisabled: newRole_name.trim() === ""
+                                },
+                                isLoading: loadingBtnAdd,
+                                isDisabled: newRole_name.trim() === ""
                             },
                             {
                                 text: 'Annuler', className: "alt-font", onClick: () => {
@@ -1853,7 +1971,7 @@ export default function RegistreDetails(props) {
                         width="medium"
                         actions={[
                             {
-                                text: 'Ajouter',style:{backgroundColor: "#1c94fe"},
+                                text: 'Ajouter', style: {backgroundColor: "#1c94fe"},
                                 className: "alt-font",
                                 onClick: () => {
                                     addNewUserToReg(newUserReg_email, new_user_roles)
@@ -1929,7 +2047,7 @@ export default function RegistreDetails(props) {
                         width="medium"
                         actions={[
                             {
-                                text: 'Modifier',style:{backgroundColor:"#1c94fe"},
+                                text: 'Modifier', style: {backgroundColor: "#1c94fe"},
                                 className: "alt-font",
                                 onClick: () => {
                                     console.log(roles)
@@ -2000,7 +2118,7 @@ export default function RegistreDetails(props) {
                         width="medium"
                         actions={[
                             {
-                                text: 'Modifier', className: "alt-font",style:{backgroundColor:"#1c94fe"},
+                                text: 'Modifier', className: "alt-font", style: {backgroundColor: "#1c94fe"},
                                 onClick: () => {
                                     updateRegRole(selectedRole.name, {
                                         name: newRole_name,
@@ -2074,9 +2192,14 @@ export default function RegistreDetails(props) {
                         width="medium"
                         actions={[
                             {
-                                text: 'Ajouter', className: "alt-font",style:{backgroundColor:newAction_name.trim() === "" ? "#f0f0f0" : "#1c94fe"}, onClick: () => {
+                                text: 'Ajouter',
+                                className: "alt-font",
+                                style: {backgroundColor: newAction_name.trim() === "" ? "#f0f0f0" : "#1c94fe"},
+                                onClick: () => {
                                     addNewAction()
-                                }, isLoading: loadingBtnAdd, isDisabled: newAction_name.trim() === ""
+                                },
+                                isLoading: loadingBtnAdd,
+                                isDisabled: newAction_name.trim() === ""
                             },
                             {
                                 text: 'Annuler', className: "alt-font", onClick: () => {
@@ -2173,9 +2296,13 @@ export default function RegistreDetails(props) {
                         width="medium"
                         actions={[
                             {
-                                text: 'Ajouter', className: "alt-font",style:{backgroundColor:newKey.trim() === "" ? "#f0f0f0" : "#1c94fe"}, onClick: () => {
+                                text: 'Ajouter',
+                                className: "alt-font",
+                                style: {backgroundColor: newKey.trim() === "" ? "#f0f0f0" : "#1c94fe"},
+                                onClick: () => {
                                     addNewKeyToReg(newKey)
-                                }, isLoading: loadingBtnAdd,
+                                },
+                                isLoading: loadingBtnAdd,
                                 isDisabled: newKey.trim() === ""
                             },
                             {
@@ -2214,6 +2341,26 @@ export default function RegistreDetails(props) {
                     </Modal>
                 )}
             </ModalTransition>
+
+            {flags.map((flagId) => {
+                return (
+                    <FlagGroup onDismissed={handleDismissFlag}>
+                    <AutoDismissFlag
+                        id={flagId}
+                        icon={
+                            <SuccessIcon
+                                primaryColor={"green"}
+                                label="Success"
+                                size="medium"
+                            />
+                        }
+                        key={flagId}
+                        title={"Key copié avec succès"}
+                        //description=""
+                    />
+                    </FlagGroup>
+                );
+            })}
 
         </div>
     )
