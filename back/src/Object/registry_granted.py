@@ -175,4 +175,17 @@ class registry_granted:
             if log['group'][2] not in ret['devices'][log['group'][0]][log['group'][1]]:
                 ret['devices'][log['group'][0]][log['group'][1]][log['group'][2]] = {}
             ret['devices'][log['group'][0]][log['group'][1]][log['group'][2]][log['group'][3]] = log['reduction']
-        return [True, ret, None]
+        res = []
+        for device in ret['devices']:
+            dev = list(ret['devices'][device].values())
+            res2 = []
+            for browser in dev:
+                bro = list(browser.values())
+                res3 = []
+                for ip in bro:
+                    res4 = list(ip.values())
+                    res3.append({"registry": res4})
+                res2.append({"ip": res3})
+            res.append({"browser": res2})
+        ret = {'devices': res}
+        return [True,  ret, None]
