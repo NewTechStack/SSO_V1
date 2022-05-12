@@ -141,13 +141,14 @@ export default function Pro(props){
     const [newReg_name, setNewReg_name] = React.useState("");
     const [registres, setRegistres] = React.useState();
     const [other_registres, setOther_registres] = React.useState();
+    const [registries_logs, setRegistries_logs] = React.useState();
     const [selectedRegId, setSelectedRegId] = React.useState("");
     const [user_search_input, setUser_search_input] = React.useState("");
     const [admin_users, setAdmin_users] = React.useState();
     const [updateScreen, setUpdateScreen] = React.useState(false);
 
 
-    useEffect( () => {
+    useEffect( async () => {
 
             if(utilFunctions.verif_session() === true){
                 verif_acces_roles().then( r => {
@@ -156,6 +157,7 @@ export default function Pro(props){
                     }
                 })
                 getOtherUserRegistres()
+                await getRegistriesLogs()
 
             }else{
                 /*if(props.history.location.pathname && props.history.location.pathname.trim() !== "" && props.history.location.pathname.length > 1){
@@ -214,6 +216,55 @@ export default function Pro(props){
         }).catch(err => {
             console.log(err)
             enqueueSnackbar("Une erreur est survenue !", { variant:"error" })
+        })
+    }
+
+    const getRegistriesLogs = () => {
+        return new Promise(resolve => {
+
+            SSO_service.getRegistriesLogs(localStorage.getItem("usrtoken")).then( logsRes => {
+                if(logsRes.status === 200 && logsRes.succes === true){
+                    let formated_data = []
+                    let data = Object.values(logsRes.data)
+                    data.map( item => {
+                        let formated = Object.values(item)
+                        formated.map( elem => {
+                            let formated2 = Object.values(elem)
+                            formated2.map( elem2 => {
+                                let formated3 = Object.values(elem2)
+                                formated3.map( elem3 => {
+                                    let val = Object.values(elem3)
+                                    formated_data.push(val)
+                                })
+                            })
+
+                        })
+                    })
+                    let devicesData = []
+                    formated_data.map( (device,i1) => {
+                        devicesData.push({
+                            ["device"+i1]:device
+                        })
+                    })
+                    devicesData.map( (item,i) => {
+                        item.map( (item1,i1) => {
+
+                        })
+                    })
+
+
+
+
+                    setRegistries_logs(logsRes.data)
+                    resolve("true")
+                }else{
+                    resolve("false")
+                }
+            }).catch( err => {
+                console.log(err)
+                resolve("false")
+            })
+
         })
     }
 
@@ -491,6 +542,16 @@ export default function Pro(props){
                         </div>
                     </div>
 
+                </div>
+
+                <div className="info_form">
+                    <div>
+                        <div className="main_padding-form">
+                            <h5 style={{fontSize:"1.25rem"}}>Logs</h5>
+                            <label style={{color:"#5f6368",fontSize:12}}>Quelques détails concernant l'activité sur vos registres</label>
+
+                        </div>
+                    </div>
                 </div>
             </div>
 

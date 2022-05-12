@@ -97,9 +97,18 @@ let utilFunctions = {
                 .toUpperCase()
                 .replace(/./g, (char) => String.fromCodePoint(char.charCodeAt(0) + 127397))
             : isoCode;
+    },
+
+    getAge(date_naiss){
+        let date = moment(date_naiss, 'YYYY-MM-DD')
+        let years = moment().diff(date, 'years')
+        let months = moment().diff(date.add(years, 'years'), 'months', false)
+        if(months > 0){
+            return years + " ans et " + months + " mois"
+        }else{
+            return years + " ans"
+        }
     }
-
-
 }
 
 

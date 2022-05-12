@@ -97,6 +97,7 @@ export default function Info(props){
     const [selected_phone_status, setSelected_phone_status] = React.useState("private");
     const [selected_nationality_status, setSelected_nationality_status] = React.useState("private");
     const [selected_location_status, setSelected_location_status] = React.useState("private");
+    const [selected_age_status, setSelected_age_status] = React.useState("private");
     const [expanded, setExpanded] = React.useState(false);
     const [expanded_sec, setExpanded_sec] = React.useState(false);
     const [expanded_perso, setExpanded_perso] = React.useState(false);
@@ -664,7 +665,7 @@ export default function Info(props){
                                         <Typography className={classes.heading}>
                                             Nom et Prénom&nbsp;
                                             {
-                                                !loading  && infoAccount.verified.identity.score === 3 &&
+                                                !loading  && infoAccount.verified && infoAccount.verified.identity && infoAccount.verified.identity.score === 4 &&
                                                 <Popup content={
                                                     <h6 style={{fontSize:"0.8rem"}}>Ce champ a été bien vérifié par KYC</h6>
                                                 }
@@ -744,7 +745,7 @@ export default function Info(props){
                                                     <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
                                                             disabled={(firstname === null || lastname === null) || ((firstname && firstname.trim() === "")|| (lastname && lastname.trim() === ""))}
                                                             onClick={() => {
-                                                                if(infoAccount.verified.identity.score === 3){
+                                                                if(infoAccount.verified.identity.score === 4){
                                                                     setOpenConfirmUpdateModal(true)
                                                                 }else{
                                                                     updateUser({details:{
@@ -759,6 +760,85 @@ export default function Info(props){
                                                 </div>
                                             </div>
                                         </div>
+                                    </AccordionDetails>
+                                    <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
+                                </Accordion>
+
+                                <Accordion expanded={expanded_perso === 'panel4'}
+                                           onChange={handleChange_perso('panel4')}
+
+                                >
+                                    <AccordionSummary
+                                        expandIcon={<ChevronRightIcon />}
+                                        aria-controls="panel1bh-content"
+                                        id="panel1bh-header"
+                                    >
+                                        <Typography className={classes.heading}>
+                                            Âge&nbsp;
+                                            {
+                                                !loading  && infoAccount.verified && infoAccount.verified.identity && infoAccount.verified.identity.score === 4 &&
+                                                <Popup content={
+                                                    <h6 style={{fontSize:"0.8rem"}}>Ce champ a été bien vérifié par KYC</h6>
+                                                }
+                                                       wide='very'
+                                                       size={"small"}
+                                                       trigger={<CheckCircleIcon fontSize="small" style={{color:"#1c94fe"}}/>}
+                                                />
+                                            }
+                                        </Typography>
+                                        <div>
+                                            {
+                                                !loading &&
+                                                <Typography className={classes.secondaryHeadingTitle}>
+                                                    { (infoAccount.age && infoAccount.age.main) ?
+                                                        utilFunctions.getAge(infoAccount.age.main)
+                                                        : ""}
+                                                    {(infoAccount.age && infoAccount.age.main) ?
+                                                        <p style={{color:"grey",fontSize:"0.6rem"}}>Naissance:&nbsp;&nbsp;{moment(infoAccount.age.main).format("DD MMMM YYYY")}</p> : ""
+                                                    }
+
+                                                </Typography>
+                                            }
+
+                                        </div>
+
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <div className="row mt-3">
+                                            <div className="col-md-12 mt-1">
+                                                <h6>Choisissez qui peut voir votre age</h6>
+                                                <ButtonGroup color="primary" aria-label="outlined primary button group"
+                                                             tabIndex={0} style={{marginTop:10}}
+                                                >
+                                                    <Button style={{textTransform:"none"}}
+                                                            className={selected_age_status === "private" ? "selectedBtnGroup no-focus" : "no-focus"}
+                                                            startIcon={<LockOutlinedIcon />}
+                                                            onClick={() => {setSelected_age_status("private")}}
+                                                    >Vous uniquement</Button>
+                                                    <Button style={{textTransform:"none"}}
+                                                            className={selected_age_status === "public" ? "selectedBtnGroup no-focus" : "no-focus"}
+                                                            startIcon={<GroupOutlinedIcon />}
+                                                            onClick={() => {setSelected_age_status("public")}}
+                                                    >Tout le monde</Button>
+                                                </ButtonGroup>
+                                            </div>
+                                        </div>
+                                        <div className="row mt-4">
+                                            <div className="col-md-12">
+                                                <div style={{display:"flex",justifyContent:"flex-end"}}>
+                                                    <Button color="primary" style={{textTransform:"none"}}
+                                                            onClick={handleChange_sec('panel-1')}>Annuler</Button>
+                                                    <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
+                                                            onClick={() => {
+                                                                updateUser({details:{age:{public:selected_email_status !== "private"}}})
+                                                            }}
+                                                    >
+                                                        Enregistrer
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </AccordionDetails>
                                     <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
                                 </Accordion>
@@ -843,6 +923,7 @@ export default function Info(props){
                                                             {option.label} ({option.code})
                                                         </React.Fragment>
                                                     )}
+                                                    value={countryList.find(x => x.label === adr_pays) ? countryList.find(x => x.label === adr_pays) : ""}
                                                     onChange={(event,value) => {
                                                         console.log(value)
                                                         setAdr_pays(value.label)
@@ -913,7 +994,7 @@ export default function Info(props){
                                         <Typography className={classes.heading}>
                                             Nationalité&nbsp;
                                             {
-                                                !loading  && infoAccount.verified.identity.score === 3 &&
+                                                !loading  && infoAccount.verified.identity.score === 4 &&
                                                 <Popup content={
                                                     <h6 style={{fontSize:"0.8rem"}}>Ce champ a été bien vérifié par KYC</h6>
                                                 }
@@ -940,15 +1021,40 @@ export default function Info(props){
                                     <AccordionDetails>
                                         <div className="row mt-2">
                                             <div className="col-md-12 mt-1">
-                                                <TextField
-                                                    //inputRef={f_username_ref}
-                                                    label="Nationalité"
-                                                    variant="outlined"
+                                                <Autocomplete
+                                                    autoComplete={"off"}
+                                                    autoHighlight={false}
                                                     size="small"
-                                                    style={{width:"100%"}}
-                                                    value={nationality}
-                                                    onChange={(e) => {setNationality(e.target.value)}}
-                                                    InputLabelProps={{shrink:true}}
+                                                    options={countryList}
+                                                    classes={{
+                                                        option: classes.option,
+                                                    }}
+                                                    noOptionsText={""}
+                                                    getOptionLabel={(option) => option.label}
+                                                    renderOption={(option) => (
+                                                        <React.Fragment>
+                                                            <span>{utilFunctions.countryToFlag(option.code)}</span>
+                                                            {option.label} ({option.code})
+                                                        </React.Fragment>
+                                                    )}
+                                                    value={countryList.find(x => x.label === nationality) ? countryList.find(x => x.label === nationality) : ""}
+                                                    onChange={(event,value) => {
+                                                        console.log(value)
+                                                        setNationality(value.label)
+                                                    }}
+                                                    renderInput={(params) => (
+                                                        <TextField
+                                                            {...params}
+                                                            value={countryList.findIndex(x => x.label === nationality) > -1 ? nationality : "" }
+                                                            label="Nationalité"
+                                                            variant="outlined"
+                                                            inputProps={{
+                                                                ...params.inputProps,
+                                                                autoComplete: 'new-password', // disable autocomplete and autofill
+                                                            }}
+                                                            InputLabelProps={{shrink:true}}
+                                                        />
+                                                    )}
                                                 />
                                             </div>
                                         </div>
@@ -1061,10 +1167,10 @@ export default function Info(props){
                                                     />
 
                                                 }
-
                                                 </Typography>
+
                                                 <Typography className={classes.secondaryHeadingTitle}>
-                                                    Identité:&nbsp;&nbsp;{infoAccount.verified.identity.score === 3 ?
+                                                    Identité:&nbsp;&nbsp;{infoAccount.verified.identity.score === 4 ?
                                                     <Popup content={
                                                         <h6 style={{fontSize:"0.8rem"}}>Votre identité a été bien vérifié par KYC</h6>
                                                     }
@@ -1082,7 +1188,7 @@ export default function Info(props){
                                                     />
                                                 }
                                                     {
-                                                        infoAccount.verified.identity.score <= 1 &&
+                                                        infoAccount.verified.identity.score < 4 &&
                                                         <div style={{marginTop:5,marginBottom:5}}>
                                                             <div className="kyc-file-upload"
                                                                  onClick={() => {

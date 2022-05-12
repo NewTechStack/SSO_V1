@@ -465,6 +465,15 @@ let SSO_service = {
         });
     },
 
+    getRegistriesLogs(usrtoken){
+        return fetch(endpoint + '/registries/logs' , {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
 
 
 
