@@ -848,7 +848,7 @@ class user:
                      res["details"]["phone"]["verified"]["main"]
             iscore = res["details"]["first_name"]["verified"]["main"] + \
                      res["details"]["last_name"]["verified"]["main"] + \
-                     res["details"]["age"]["verified"]["main"] +
+                     res["details"]["age"]["verified"]["main"] + \
                      res["details"]["nationality"]["verified"]["main"]
             ret["verified"] = {}
             if id == self.id:
