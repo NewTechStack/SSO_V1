@@ -75,10 +75,10 @@ export default function Info(props){
     const [loading, setLoading] = React.useState(true);
 
     const [roles, setRoles] = React.useState([]);
-    const [firstname, setFirstname] = React.useState(null);
+    const [firstname, setFirstname] = React.useState("");
+    const [lastname, setLastname] = React.useState("");
     const [fname_lupdate, setFname_lupdate] = React.useState("");
 
-    const [lastname, setLastname] = React.useState(null);
     const [lname_lupdate, setLname_lupdate] = React.useState("");
     const [phone, setPhone] = React.useState("");
     const [phone_lupdate, setPhone_lupdate] = React.useState("");
@@ -104,7 +104,7 @@ export default function Info(props){
 
     //security
     const [openDeleteAccountModal, setOpenDeleteAccountModal] = React.useState(false);
-    const [openConfirmUpdateModal, setOpenConfirmUpdateModal] = React.useState(false);
+    const [openConfirmUpdateModal, setOpenConfirmUpdateModal] = React.useState({open:false,action:""});
     const [newPwd1, setNewPwd1] = React.useState("");
     const [newPwd2, setNewPwd2] = React.useState("");
 
@@ -134,7 +134,7 @@ export default function Info(props){
         SSO_service.getUser(localStorage.getItem("usrtoken")).then(infoRes => {
             console.log(infoRes)
             if(infoRes.status === 200 && infoRes.succes === true){
-                console.log(infoRes)
+
                 let roles_object = infoRes.data.roles || {}
                 const roles_array = [];
                 Object.keys(roles_object).forEach(key => roles_array.push({
@@ -142,12 +142,9 @@ export default function Info(props){
                     data: roles_object[key]
                 }));
                 setRoles(roles_array)
-                setFirstname(infoRes.data.first_name.main ? infoRes.data.first_name.main : null)
-                setLastname(infoRes.data.last_name.main ? infoRes.data.last_name.main : null)
-                /*if(infoRes.data.verified.identity && infoRes.data.verified.identity.score === 3 ){
-                    setFirstname((infoRes.data.verified.identity.data.first_name.main === true || infoRes.data.verified.identity.data.first_name.main === null) ? "" : infoRes.data.verified.identity.data.first_name.main === true )
-                    setLastname((infoRes.data.verified.identity.data.last_name.main === true || infoRes.data.verified.identity.data.last_name.main === null) ? "" : infoRes.data.verified.identity.data.last_name.main)
-                }*/
+                setFirstname(infoRes.data.first_name.main ? infoRes.data.first_name.main : "")
+                setLastname(infoRes.data.last_name.main ? infoRes.data.last_name.main : "")
+
                 setSelected_fname_status(infoRes.data.last_name.public === true ? "public" : "private")
                 setPhone(infoRes.data.phone.main ? infoRes.data.phone.main.number ? infoRes.data.phone.main.number : "" : "")
                 setSelected_username(infoRes.data.username || "")
@@ -187,6 +184,7 @@ export default function Info(props){
                 console.log(infoRes)
                 if(infoRes.status === 200 && infoRes.succes === true){
 
+                    console.log(infoRes)
                     let roles_object = infoRes.data.roles || {}
                     const roles_array = [];
                     Object.keys(roles_object).forEach(key => roles_array.push({
@@ -194,18 +192,26 @@ export default function Info(props){
                         data: roles_object[key]
                     }));
                     setRoles(roles_array)
-                    if(infoRes.data.verified.identity && infoRes.data.verified.identity.score === 3 ){
-                        setFirstname((infoRes.data.verified.identity.data.first_name.main === true || infoRes.data.verified.identity.data.first_name.main === null) ? "" : infoRes.data.verified.identity.data.first_name.main === true )
-                        setLastname((infoRes.data.verified.identity.data.last_name.main === true || infoRes.data.verified.identity.data.last_name.main === null) ? "" : infoRes.data.verified.identity.data.last_name.main)
-                    }
+                    setFirstname(infoRes.data.first_name.main ? infoRes.data.first_name.main : "")
+                    setLastname(infoRes.data.last_name.main ? infoRes.data.last_name.main : "")
                     setSelected_fname_status(infoRes.data.last_name.public === true ? "public" : "private")
                     setPhone(infoRes.data.phone.main ? infoRes.data.phone.main.number ? infoRes.data.phone.main.number : "" : "")
                     setSelected_username(infoRes.data.username || "")
                     setSelected_phone_status(infoRes.data.phone.public === true ? "public" : "private")
+                    setSelected_nationality_status(infoRes.data.nationality ? infoRes.data.nationality.public === true ? "public" : "private" : "private")
+                    setSelected_location_status(infoRes.data.location ? infoRes.data.location.public === true ? "public" : "private" : "private")
                     setFname_lupdate(infoRes.data.first_name.last_update || "")
                     setLname_lupdate(infoRes.data.first_name.last_update || "")
                     setPhone_lupdate(infoRes.data.phone.last_update || "")
-                    setLoading(false)
+
+                    setNationality_lupdate(infoRes.data.nationality ? (infoRes.data.nationality.last_update || "") : "")
+                    setNationality(infoRes.data.nationality ? infoRes.data.nationality.main : "")
+
+                    setAdr_street(infoRes.data.location ? (infoRes.data.location.main.details.street || "") : "")
+                    setAdr_pc(infoRes.data.location ? (infoRes.data.location.main.details.postal_code || "") : "")
+                    setAdr_city( infoRes.data.location ? (infoRes.data.location.main.city || "") : "")
+                    setAdr_pays(infoRes.data.location ? (infoRes.data.location.main.country || "") : "")
+                    setLocation_lupdate(infoRes.data.location ? (infoRes.data.location.last_update || "") : "")
                     resolve(true)
                 }else{
                     enqueueSnackbar('Une erreur est survenue lors de la récuperation de vos informations !', { variant:"error" })
@@ -665,7 +671,7 @@ export default function Info(props){
                                         <Typography className={classes.heading}>
                                             Nom et Prénom&nbsp;
                                             {
-                                                !loading  && infoAccount.verified && infoAccount.verified.identity && infoAccount.verified.identity.score === 4 &&
+                                                !loading  && infoAccount.verified.identity.data.first_name.main === true && infoAccount.verified.identity.data.last_name.main === true &&
                                                 <Popup content={
                                                     <h6 style={{fontSize:"0.8rem"}}>Ce champ a été bien vérifié par KYC</h6>
                                                 }
@@ -678,7 +684,7 @@ export default function Info(props){
                                         </Typography>
                                         <div>
                                             <Typography className={classes.secondaryHeadingTitle}>
-                                                {((firstname === null && lastname === null) || (firstname && firstname.trim() === "") || (lastname && lastname.trim() === "") ) ? "Non renseigné" : (firstname + " " + lastname)}
+                                                {(firstname.trim() === "" && lastname.trim() === "") ? "Non renseigné" : (firstname + " " + lastname)}
                                             </Typography>
                                             {
                                                 (fname_lupdate || lname_lupdate) ?
@@ -727,12 +733,24 @@ export default function Info(props){
                                                     <Button style={{textTransform:"none"}}
                                                             className={selected_fname_status === "private" ? "selectedBtnGroup no-focus" : "no-focus"}
                                                             startIcon={<LockOutlinedIcon />}
-                                                            onClick={() => {setSelected_fname_status("private")}}
+                                                            onClick={() => {
+                                                                setSelected_fname_status("private")
+                                                                updateUser({details:{
+                                                                        first_name:{public:false},
+                                                                        last_name:{public:false}
+                                                                    }})
+                                                            }}
                                                     >Vous uniquement</Button>
                                                     <Button style={{textTransform:"none"}}
                                                             className={selected_fname_status === "public" ? "selectedBtnGroup no-focus" : "no-focus"}
                                                             startIcon={<GroupOutlinedIcon />}
-                                                            onClick={() => {setSelected_fname_status("public")}}
+                                                            onClick={() => {
+                                                                setSelected_fname_status("public")
+                                                                updateUser({details:{
+                                                                        first_name:{public:true},
+                                                                        last_name:{public:true}
+                                                                    }})
+                                                            }}
                                                     >Tout le monde</Button>
                                                 </ButtonGroup>
                                             </div>
@@ -743,16 +761,47 @@ export default function Info(props){
                                                     <Button color="primary" style={{textTransform:"none"}}
                                                             onClick={handleChange('panel1')}>Annuler</Button>
                                                     <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
-                                                            disabled={(firstname === null || lastname === null) || ((firstname && firstname.trim() === "")|| (lastname && lastname.trim() === ""))}
+                                                            disabled={firstname.trim() === "" && lastname.trim() === ""}
                                                             onClick={() => {
-                                                                if(infoAccount.verified.identity.score === 4){
-                                                                    setOpenConfirmUpdateModal(true)
+
+                                                                if((firstname !== infoAccount.first_name.main) || (lastname !== infoAccount.last_name.main)){
+
+                                                                    if(firstname !== infoAccount.first_name.main && lastname !== infoAccount.last_name.main){
+                                                                        if(infoAccount.verified.identity.data.first_name.main === true || infoAccount.verified.identity.data.last_name.main === true ){
+                                                                            console.log("1")
+                                                                            setOpenConfirmUpdateModal({open:true, action:"fullname"})
+                                                                        }else{
+                                                                            console.log("2")
+                                                                            updateUser({details:{
+                                                                                    first_name:{first_name:firstname,public:selected_fname_status !== "private"},
+                                                                                    last_name:{last_name:lastname,public:selected_fname_status !== "private"}
+                                                                                }})
+                                                                        }
+                                                                    }else if(firstname !== infoAccount.first_name.main){
+                                                                        if(infoAccount.verified.identity.data.first_name.main === true){
+                                                                            console.log("3")
+                                                                            setOpenConfirmUpdateModal({open:true, action:"firstname"})
+                                                                        }else{
+                                                                            console.log("4")
+                                                                            updateUser({details:{
+                                                                                    first_name:{first_name:firstname,public:selected_fname_status !== "private"}
+                                                                                }})
+                                                                        }
+                                                                    }else if(lastname !== infoAccount.last_name.main){
+                                                                        if(infoAccount.verified.identity.data.last_name.main === true){
+                                                                            console.log("5")
+                                                                            setOpenConfirmUpdateModal({open:true, action:"lastname"})
+                                                                        }else{
+                                                                            console.log("6")
+                                                                            updateUser({details:{
+                                                                                    last_name:{last_name:lastname,public:selected_fname_status !== "private"}
+                                                                                }})
+                                                                        }
+                                                                    }
                                                                 }else{
-                                                                    updateUser({details:{
-                                                                            first_name:{first_name:firstname,public:selected_fname_status !== "private"},
-                                                                            last_name:{last_name:lastname,public:selected_fname_status !== "private"}
-                                                                        }})
+                                                                    enqueueSnackbar('Aucun changement effectué', { variant:"warning" })
                                                                 }
+
                                                             }}
                                                     >
                                                         Enregistrer
@@ -776,7 +825,7 @@ export default function Info(props){
                                         <Typography className={classes.heading}>
                                             Âge&nbsp;
                                             {
-                                                !loading  && infoAccount.verified && infoAccount.verified.identity && infoAccount.verified.identity.score === 4 &&
+                                                !loading  && infoAccount.verified.identity.data.age.main === true &&
                                                 <Popup content={
                                                     <h6 style={{fontSize:"0.8rem"}}>Ce champ a été bien vérifié par KYC</h6>
                                                 }
@@ -813,17 +862,23 @@ export default function Info(props){
                                                     <Button style={{textTransform:"none"}}
                                                             className={selected_age_status === "private" ? "selectedBtnGroup no-focus" : "no-focus"}
                                                             startIcon={<LockOutlinedIcon />}
-                                                            onClick={() => {setSelected_age_status("private")}}
+                                                            onClick={() => {
+                                                                setSelected_age_status("private")
+                                                                updateUser({details:{age:{public:false}}})
+                                                            }}
                                                     >Vous uniquement</Button>
                                                     <Button style={{textTransform:"none"}}
                                                             className={selected_age_status === "public" ? "selectedBtnGroup no-focus" : "no-focus"}
                                                             startIcon={<GroupOutlinedIcon />}
-                                                            onClick={() => {setSelected_age_status("public")}}
+                                                            onClick={() => {
+                                                                setSelected_age_status("public")
+                                                                updateUser({details:{age:{public:true}}})
+                                                            }}
                                                     >Tout le monde</Button>
                                                 </ButtonGroup>
                                             </div>
                                         </div>
-                                        <div className="row mt-4">
+                                        {/*<div className="row mt-4">
                                             <div className="col-md-12">
                                                 <div style={{display:"flex",justifyContent:"flex-end"}}>
                                                     <Button color="primary" style={{textTransform:"none"}}
@@ -837,7 +892,7 @@ export default function Info(props){
                                                     </Button>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div>*/}
 
                                     </AccordionDetails>
                                     <Divider style={{marginTop:20,color:"rgba(0, 0, 0, 0.12)"}}/>
@@ -953,12 +1008,19 @@ export default function Info(props){
                                                     <Button style={{textTransform:"none"}}
                                                             className={selected_location_status === "private" ? "selectedBtnGroup no-focus" : "no-focus"}
                                                             startIcon={<LockOutlinedIcon />}
-                                                            onClick={() => {setSelected_location_status("private")}}
+                                                            onClick={() => {
+                                                                setSelected_location_status("private")
+                                                                updateUser({details:{location:{public:false }}})
+
+                                                            }}
                                                     >Vous uniquement</Button>
                                                     <Button style={{textTransform:"none"}}
                                                             className={selected_location_status === "public" ? "selectedBtnGroup no-focus" : "no-focus"}
                                                             startIcon={<GroupOutlinedIcon />}
-                                                            onClick={() => {setSelected_location_status("public")}}
+                                                            onClick={() => {
+                                                                setSelected_location_status("public")
+                                                                updateUser({details:{location:{public:true }}})
+                                                            }}
                                                     >Tout le monde</Button>
                                                 </ButtonGroup>
                                             </div>
@@ -969,6 +1031,7 @@ export default function Info(props){
                                                     <Button color="primary" style={{textTransform:"none"}}
                                                             onClick={handleChange_sec('panel0')}>Annuler</Button>
                                                     <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
+                                                            disabled={adr_street.trim() === "" || adr_pc.trim() === "" || adr_city.trim() === "" || adr_pays.trim() === ""}
                                                             onClick={() => {
                                                                 updateUser({details:{location:{location:{country:adr_pays,city:adr_city,details:{street:adr_street,postal_code:adr_pc}},public:selected_location_status !== "private" }}})
                                                             }}
@@ -994,7 +1057,7 @@ export default function Info(props){
                                         <Typography className={classes.heading}>
                                             Nationalité&nbsp;
                                             {
-                                                !loading  && infoAccount.verified.identity.score === 4 &&
+                                                !loading  && infoAccount.verified.identity.data.nationality.main === true &&
                                                 <Popup content={
                                                     <h6 style={{fontSize:"0.8rem"}}>Ce champ a été bien vérifié par KYC</h6>
                                                 }
@@ -1067,12 +1130,18 @@ export default function Info(props){
                                                     <Button style={{textTransform:"none"}}
                                                             className={selected_nationality_status === "private" ? "selectedBtnGroup no-focus" : "no-focus"}
                                                             startIcon={<LockOutlinedIcon />}
-                                                            onClick={() => {setSelected_nationality_status("private")}}
+                                                            onClick={() => {
+                                                                setSelected_nationality_status("private")
+                                                                updateUser({details:{nationality:{public:false}}})
+                                                            }}
                                                     >Vous uniquement</Button>
                                                     <Button style={{textTransform:"none"}}
                                                             className={selected_nationality_status === "public" ? "selectedBtnGroup no-focus" : "no-focus"}
                                                             startIcon={<GroupOutlinedIcon />}
-                                                            onClick={() => {setSelected_nationality_status("public")}}
+                                                            onClick={() => {
+                                                                setSelected_nationality_status("public")
+                                                                updateUser({details:{nationality:{public:true}}})
+                                                            }}
                                                     >Tout le monde</Button>
                                                 </ButtonGroup>
                                             </div>
@@ -1084,7 +1153,16 @@ export default function Info(props){
                                                             onClick={handleChange_sec('panel0')}>Annuler</Button>
                                                     <Button variant="contained" style={{textTransform:"none",marginLeft:15}} color="primary"
                                                             onClick={() => {
-                                                                updateUser({details:{nationality:{nationality:nationality,public:selected_nationality_status !== "private"}}})
+                                                                if(nationality !== infoAccount.nationality.main){
+                                                                    if(infoAccount.verified.identity.data.nationality.main === true){
+                                                                        setOpenConfirmUpdateModal({open:true, action:"nationality"})
+                                                                    }else{
+                                                                        updateUser({details:{nationality:{nationality:nationality,public:selected_nationality_status !== "private"}}})
+                                                                    }
+                                                                }else{
+                                                                    enqueueSnackbar("Aucun changement effectué",{variant:"warning"})
+                                                                }
+
                                                             }}
                                                     >
                                                         Enregistrer
@@ -1335,22 +1413,36 @@ export default function Info(props){
             </ModalTransition>
 
             <ModalTransition>
-                {openConfirmUpdateModal === true && (
+                {openConfirmUpdateModal.open === true && (
                     <Modal
                         actions={[
                             { text: 'Oui', onClick: () => {
-                                    setOpenConfirmUpdateModal(false)
-                                    updateUser({details:{
-                                            first_name:{first_name:firstname,public:selected_fname_status !== "private"},
-                                            last_name:{last_name:lastname,public:selected_fname_status !== "private"}
-                                        }})
+                                    if(openConfirmUpdateModal.action === "fullname"){
+                                        updateUser({details:{
+                                                first_name:{first_name:firstname,public:selected_fname_status !== "private"},
+                                                last_name:{last_name:lastname,public:selected_fname_status !== "private"}
+                                            }})
+                                    }else if(openConfirmUpdateModal.action === "firstname"){
+                                        updateUser({details:{
+                                                first_name:{first_name:firstname,public:selected_fname_status !== "private"}
+                                            }})
+                                    }else if(openConfirmUpdateModal.action === "lastname"){
+                                        updateUser({details:{
+                                                last_name:{last_name:lastname,public:selected_fname_status !== "private"}
+                                            }})
+                                    }else if(openConfirmUpdateModal.action === "nationality"){
+                                        updateUser({details:{nationality:{nationality:nationality,public:selected_nationality_status !== "private"}}})
+                                    }
+                                    setTimeout(() => {
+                                        setOpenConfirmUpdateModal({open: false,action:""})
+                                    },250)
                                 }},
                             { text: 'Non', onClick: () => {
-                                    setOpenConfirmUpdateModal(false)
+                                    setOpenConfirmUpdateModal({open: false,action:""})
                                 }},
                         ]}
                         onClose={() => {
-                            setOpenConfirmUpdateModal(false)
+                            setOpenConfirmUpdateModal({open: false,action:""})
                         }}
                         heading={<h5 style={{fontSize:"1.2rem",marginTop:10}}>
                             Voulez-vous vraiment modifier ces informations ? Votre vérification KYC sera ignorée
