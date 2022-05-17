@@ -510,9 +510,19 @@ export default function Pro(props){
                 <div className="info_form">
                     <div>
                         <div className="main_padding-form">
-
-                            <h5 style={{fontSize:"1.25rem"}}>Mes registres</h5>
-                            <label style={{color:"#5f6368",fontSize:12}}>Votre interface pour gérer vos registres</label>
+                            <div style={{display:"flex",justifyContent:"space-between"}}>
+                                <div>
+                                    <h5 style={{fontSize:"1.25rem"}}>Mes registres</h5>
+                                    <label style={{color:"#5f6368",fontSize:12}}>Votre interface pour gérer vos registres</label>
+                                </div>
+                                <p style={{cursor:"pointer",textDecoration:"underline",color:"#1c94fe",alignSelf:"center"}}
+                                   onClick={() => {
+                                       props.history.push("/main/pro/registres/logs")
+                                   }}
+                                >
+                                    Voir mon activité
+                                </p>
+                            </div>
 
                             <div className="rainbow-flex rainbow-flex_column rainbow_vertical-stretch mt-5">
                                 <Tabset
@@ -544,7 +554,7 @@ export default function Pro(props){
 
                 </div>
 
-                <div className="info_form">
+                {/*<div className="info_form">
                     <div>
                         <div className="main_padding-form">
                             <h5 style={{fontSize:"1.25rem"}}>Logs</h5>
@@ -552,7 +562,7 @@ export default function Pro(props){
 
                         </div>
                     </div>
-                </div>
+                </div>*/}
             </div>
 
 

@@ -8,6 +8,7 @@ import Info from "./infos";
 import Admin from "./admin";
 import Pro from "./pro"
 import RegistreDetails from "./registreDetails";
+import RegistriesLogs from "./registriesLogs";
 
 export default function Routes() {
     return (
@@ -21,6 +22,7 @@ export default function Routes() {
                        render={routeProps => <Pro {...routeProps}/>}
                 />
                 <Route exact path="/main/pro/registre/:reg" component={RegistreDetails} />
+                <Route exact path="/main/pro/registres/logs" component={RegistriesLogs} />
             </Switch>
 
     );
