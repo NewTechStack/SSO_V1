@@ -1,5 +1,6 @@
 from Controller.basic import check
 from Object.users import user
+from Object.user_ext_data import User_ext_data
 import json
 
 def origin_check(cn, nextc):
@@ -202,6 +203,21 @@ def user_invite_ext(cn, nextc):
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
     err = user().invite(cn.pr["email"], hash = True)
+    return cn.call_next(nextc, err)
+
+def user_ext_input_data(cn, nextc):
+    err = check.contain(cn.pr, ["email", "data"])
+    if not err[0]:
+        return cn.toret.add_error(err[1], err[2])
+    err = User_ext_data(email=cn.pr['email'], registry=cn.private["signin_reg"]).input(cn.pr['data'])
+    return cn.call_next(nextc, err)
+
+def user_ext_retrieve_data(cn, nextc):
+    err = User_ext_data(email=cn.pr['email'], registry=cn.private["signin_reg"]).get()
+    return cn.call_next(nextc, err)
+
+def user_int_retrieve_data(cn, nextc):
+    err = User_ext_data(id=cn.private["user"].id).get()
     return cn.call_next(nextc, err)
 
 def user_is_admin(cn, nextc):

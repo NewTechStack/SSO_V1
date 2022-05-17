@@ -9,7 +9,8 @@ dbs = {
         "registry_key",
         "registry_signin_key",
         "registry",
-        "registry_granted"
+        "registry_granted",
+        "user_ext_data"
        ]
     }
 
