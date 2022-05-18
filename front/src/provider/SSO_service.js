@@ -414,6 +414,14 @@ let SSO_service = {
         });
     },
 
+    get_intern_user_inserted_data(usrtoken){
+        return fetch(endpoint + '/intern/user/data' , {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
 
     get_extern_info_key(usrtoken,key,data){
         return fetch(endpoint + '/intern/key/'+key+'/infos' , {
@@ -430,6 +438,15 @@ let SSO_service = {
             method: 'POST',
             headers:this.loadHeaders(usrtoken),
             body:JSON.stringify(data)
+        }).then(response => response.json()).catch(error => {
+            console.log(error);
+        });
+    },
+
+    get_extern_user_data(usrtoken){
+        return fetch(endpoint + '/intern/user/data' , {
+            method: 'GET',
+            headers:this.loadHeaders(usrtoken),
         }).then(response => response.json()).catch(error => {
             console.log(error);
         });
