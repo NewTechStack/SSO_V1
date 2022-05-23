@@ -21,7 +21,7 @@ logging.basicConfig(format='%(asctime)s %(message)s', datefmt='[ %m/%d/%Y-%I:%M:
 TOKEN_ARR = {}
 
 class user:
-    def encoded_id(id=None, email=email, raw=False, registry_id=None):
+    def encoded_id(id=None, email=None, raw=False, registry_id=None):
         if registry_id is None:
             return [False, '0x0', 500]
         if id is None and email is None:
