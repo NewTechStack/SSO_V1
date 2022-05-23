@@ -105,7 +105,7 @@ class registry_granted:
         """
         ret = self.model
         now = datetime.datetime.utcnow()
-        if self.id == "-1":
+        if user_id == "-1":
             return [False, "Invalid user", 404]
         if clic is True:
             exp = now + datetime.timedelta(weeks = 4)
@@ -129,7 +129,7 @@ class registry_granted:
         return [True, {}, None]
 
     def need_validation(self, user_id, registry_id, data, ip = '', user_agents = None, strict = False):
-        if self.id == "-1":
+        if user_id == "-1":
             return [False, "Invalid user", 404]
         now = str(datetime.datetime.utcnow())
         details = self.__details(user_agents, ip)
@@ -168,7 +168,7 @@ class registry_granted:
         return [True, {"need_validation": True}, None]
 
     def logs(self, user_id):
-        if self.id == "-1":
+        if user_id == "-1":
             return [False, "Invalid user", 404]
         now = str(datetime.datetime.utcnow())
         ret = {'devices': {}}
