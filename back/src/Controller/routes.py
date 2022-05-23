@@ -57,27 +57,27 @@ def setuproute(app, call):
 
     @app.route('/registries/logs',              ['OPTIONS', 'GET'],        lambda x = None: call([user_verify_token, registry_granted_logs])) #done
 
-    @app.route('/extern/public',                ['POST'],                  lambda x = None: call([regi_check_key, user_publickey])) #done
-    @app.route('/extern/askable',               ['POST'],                  lambda x = None: call([regi_check_key, user_get_askable])) #for dev only
-    @app.route('/extern/key',                   ['POST'],                  lambda x = None: call([regi_check_key, regi_get_signin])) #done
-    @app.route('/extern/key/<>/token',          ['POST'],                  lambda x = None: call([regi_check_key, regi_wait_token])) #done
-    @app.route('/extern/user/invite',           ['POST'],                  lambda x = None: call([regi_check_key, user_invite_ext]))
-    @app.route('/extern/user/data',             ['POST'],                  lambda x = None: call([regi_check_key, user_invite_ext, user_ext_input_data]))
-    @app.route('/extern/user/retrieve/data',    ['POST'],                  lambda x = None: call([regi_check_key, user_invite_ext, user_ext_retrieve_data]))
-    @app.route('/extern/user/retrieve/granted', ['POST'],                  lambda x = None: call([regi_check_key, registry_granted_history]))
+    @app.route('/extern/public',                ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_publickey])) # remove options
+    @app.route('/extern/askable',               ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_get_askable]))
+    @app.route('/extern/key',                   ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, regi_get_signin]))
+    @app.route('/extern/key/<>/token',          ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, regi_wait_token]))
+    @app.route('/extern/user/invite',           ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_invite_ext]))
+    @app.route('/extern/user/data',             ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_invite_ext, user_ext_input_data]))
+    @app.route('/extern/user/retrieve/data',    ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, user_invite_ext, user_ext_retrieve_data]))
+    @app.route('/extern/user/retrieve/granted', ['OPTIONS', 'POST'],        lambda x = None: call([regi_check_key, registry_granted_history]))
 
     @app.route('/intern/key/<>/infos',          ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, regi_info_signin, registry_need_validation, regi_verify_signin, user_get_token, regi_end_signin]))
     @app.route('/intern/key/<>/signin',         ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, regi_info_signin, regi_verify_signin, user_get_token, regi_end_signin, registry_granted_click]))
     @app.route('/intern/user/data',             ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_int_retrieve_data]))
 
-    @app.route('/user/password/reset',          ['OPTIONS', 'POST'],        lambda x = None: call([user_tmp_spoof, user_password_reset])) #done not imp
-    @app.route('/user/password/change',         ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_password_reset])) #done not imp
-    @app.route('/user/password/change',         ['OPTIONS', 'POST'],        lambda x = None: call([user_tmp_spoof, user_password_change])) # done not imp
+    @app.route('/user/password/reset',          ['OPTIONS', 'POST'],        lambda x = None: call([user_tmp_spoof, user_password_reset]))
+    @app.route('/user/password/change',         ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_password_reset]))
+    @app.route('/user/password/change',         ['OPTIONS', 'POST'],        lambda x = None: call([user_tmp_spoof, user_password_change]))
 
-    @app.route('/admin/users',                  ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_is_admin, admin_user_search])) #done
-    @app.route('/admin/user/<>',                ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_is_admin, admin_user_infos])) #done
-    @app.route('/admin/user/<>/role',           ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_is_admin, user_set_role])) #done
-    @app.route('/admin/user/<>/registry',      ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_is_admin, user_registries])) #done
+    @app.route('/admin/users',                  ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_is_admin, admin_user_search]))
+    @app.route('/admin/user/<>',                ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_is_admin, admin_user_infos]))
+    @app.route('/admin/user/<>/role',           ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token, user_is_admin, user_set_role]))
+    @app.route('/admin/user/<>/registry',      ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token, user_is_admin, user_registries]))
 
     @app.route('/card',                         ['OPTIONS', 'GET'],         lambda x = None: call([user_verify_token]))
     @app.route('/card',                         ['OPTIONS', 'POST'],        lambda x = None: call([user_verify_token]))

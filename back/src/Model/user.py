@@ -202,7 +202,7 @@ def user_invite_ext(cn, nextc):
     err = check.contain(cn.pr, ["email"])
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
-    err = user().invite(cn.pr["email"], hash = True)
+    err = user().invite(cn.pr["email"], hash = True, registry_id=cn.private["signin_reg"])
     return cn.call_next(nextc, err)
 
 def user_ext_input_data(cn, nextc):

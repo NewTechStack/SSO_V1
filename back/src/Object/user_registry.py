@@ -74,6 +74,8 @@ class user_registry:
         return [True, {"users": res}, None]
 
     def get_role(self, user_id):
+        if user_id == "-1":
+            return [False, "Invalid user", 404]
         res = list(
             self.red.filter(
                 (r.row["id_registry"] == self.reg_id) & (r.row["id_user"] == user_id)

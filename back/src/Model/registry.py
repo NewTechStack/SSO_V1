@@ -222,7 +222,7 @@ def regi_end_signin(cn, nextc):
     if not err[0]:
         return cn.toret.add_error(err[1], err[2])
     if 'need_validation' in cn.private and cn.private['need_validation'] is True:
-            err = registry_signin_key().infos(key, cn.pr["auth"])
+        err = registry_signin_key().infos(key, cn.pr["auth"])
     elif not 'usrtoken' in cn.private:
         return cn.toret.add_error('Invalid signin', 403)
     else:

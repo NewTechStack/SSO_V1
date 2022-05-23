@@ -18,6 +18,7 @@ class registry_granted:
         self.model = {
             "registry_id": None,
             "user_id": None,
+            "user_id_hashed": None,
             "manual_validation": False,
             "data": {},
             "date": {
@@ -71,9 +72,16 @@ class registry_granted:
         details['browser']['hash'] = hashlib.md5(str(details['browser']).encode()).hexdigest()
         return details
 
-    def history(self, registry_id, user_id):
+    def history(self, registry_id, user_id, email = None):
+        if email is None and user_id is None:
+            return [False, "invalid arguments", 400]
+        if user_id is None:
+            user_id = user(email=email).id
+        if user_id == "-1":
+            return [False, "invalid user", 404]
+        user_id_hashed = user.encoded_id(id=user_id, registry_id=registry_id, raw = True)
         res = list(self.red.filter(
-            (r.row["user_id"] == user_id)
+            (r.row["user_id_hashed"] == user_id_hashed)
             &
             (r.row["registry_id"] == registry_id)
             ).order_by(r.desc(r.row['date']['end'])).limit(1).run())
@@ -83,7 +91,7 @@ class registry_granted:
         askable = user(res['user_id']).askable
         ret = {
                 'registry_id': res['registry_id'],
-                'user_id': res['user_id'],
+                'user_id': user_id_hashed,
                 'data_shared': {
                     asked:askable[asked]['data']() for asked in res['data']
                 }
@@ -91,12 +99,14 @@ class registry_granted:
         return [True, ret, None]
 
     def validate(self, user_id, registry_id, data, ip = '', user_agents = None, clic = False, exp = None):
-        ret = self.model
-        now = datetime.datetime.utcnow()
         """
         if clic by user exp in 4 weeks
         else but already clicked by the past and exp in les than 7 days exp in 7 days
         """
+        ret = self.model
+        now = datetime.datetime.utcnow()
+        if self.id == "-1":
+            return [False, "Invalid user", 404]
         if clic is True:
             exp = now + datetime.timedelta(weeks = 4)
         else:
@@ -110,6 +120,7 @@ class registry_granted:
             ret['details'] = self.__details(user_agents, ip)
         ret['registry_id'] = registry_id
         ret['user_id'] = user_id
+        ret['user_id'] = user_id
         ret['manual_validation'] = clic
         ret['data'] = data
         ret['date']['start'] = str(now)
@@ -118,6 +129,8 @@ class registry_granted:
         return [True, {}, None]
 
     def need_validation(self, user_id, registry_id, data, ip = '', user_agents = None, strict = False):
+        if self.id == "-1":
+            return [False, "Invalid user", 404]
         now = str(datetime.datetime.utcnow())
         details = self.__details(user_agents, ip)
         if user_agents is None:
@@ -155,6 +168,8 @@ class registry_granted:
         return [True, {"need_validation": True}, None]
 
     def logs(self, user_id):
+        if self.id == "-1":
+            return [False, "Invalid user", 404]
         now = str(datetime.datetime.utcnow())
         ret = {'devices': {}}
         logs = list(self.red.filter(

@@ -21,6 +21,23 @@ logging.basicConfig(format='%(asctime)s %(message)s', datefmt='[ %m/%d/%Y-%I:%M:
 TOKEN_ARR = {}
 
 class user:
+    def encoded_id(id=None, email=email, raw=False, registry_id=None):
+        if registry_id is None:
+            return [False, '0x0', 500]
+        if id is None and email is None:
+            return [False, '0x1', 500]
+        if id is not None and email is not None:
+            return [False, '0x2', 500]
+        if email is not None:
+            id = user(email=email).id
+        id = str(id) + str(registry_id)
+        hashed = hashlib.md5(
+                    id.encode()
+                ).hexdigest()
+        if raw:
+            return hashed
+        return [True, {'usrid': hashed }, None]
+
     def public_key():
         with open(f'{secret_path}jwt-key.pub', 'r', encoding='utf-8') as file:
             public_key = file.read()
@@ -393,7 +410,7 @@ class user:
             sub_payload = {}
             if len(roles) != 0:
                 payload["roles"] = roles
-            payload["id"] = hashlib.md5(str(id).encode()).hexdigest()
+            payload["id"] = user.encoded_id(id=id, registry_id=registry, raw=True)
             data = dict(self.red.get(id).run())
             if not all(a in self.askable for a in asked):
                 return [False, "Invalid information asked", 401]
@@ -468,13 +485,13 @@ class user:
             self.set_role(self.id, "disabled", False)
         return [True, {"usr_id": id}, None]
 
-    def invite(self, email, hash = False):
+    def invite(self, email, hash = False, registry_id=None):
         email = str(email)
         username = email.split('@')[0]
         ret = [True, {}, None]
         date = str(datetime.datetime.utcnow())
         if self.__exist(email):
-            return ret if not hash else self.__encoded_id(email)
+            return ret if not hash else user.encoded_id(email=email, registry_id=registry_id)
         data = {
             "username": {
                 "main" : username,
@@ -503,7 +520,7 @@ class user:
         res = dict(self.red.insert([data]).run())
         id = res["generated_keys"][0]
         self.set_role(id, "invite")
-        return ret if not hash else self.__encoded_id(email)
+        return ret if not hash else user.encoded_id(email=email, registry_id=registry_id)
 
     def search_user(self, query, page = 0, bypage = 10, admin = False, invite = False, expand=False):
         page = int(page)
@@ -849,7 +866,7 @@ class user:
             iscore = res["details"]["first_name"]["verified"]["main"] + \
                      res["details"]["last_name"]["verified"]["main"] + \
                      res["details"]["age"]["verified"]["main"] + \
-                     res["details"]["nationality"]["verified"]["main"]
+                     res["details"]["nationality"].get("verified", {}).get("main", False)
             ret["verified"] = {}
             if id == self.id:
                 ret["email"] = {
@@ -887,8 +904,8 @@ class user:
                             "last_update": res["details"]["age"]["verified"]["last_update"]
                         },
                         "nationality": {
-                            "main": res["details"]["nationality"]["verified"]["main"],
-                            "last_update": res["details"]["nationality"]["verified"]["main"]
+                            "main": res["details"]["nationality"].get("verified", {}).get("main", False),
+                            "last_update": res["details"]["nationality"].get("verified", {}).get("last_update", None)
                         }
                     }
                 }
@@ -1310,6 +1327,3 @@ class user:
     def __strong_pass(self, password):
         reg = "(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}"
         return re.match(reg, password)
-
-    def __encoded_id(self, email):
-         return [True, {'usrid': hashlib.md5(str(user(-1, email).id).encode()).hexdigest() }, None]
