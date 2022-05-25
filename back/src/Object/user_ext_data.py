@@ -14,7 +14,7 @@ class User_ext_data():
         self.id = id if id is not None else user(email=email).id
         self.user_id_hashed = None
         if registry is not None:
-            self.user_id_hashed = user.encoded_id(id=id, raw=True, registry_id=registry)
+            self.user_id_hashed = user.encoded_id(id=self.id, raw=True, registry_id=registry)
         try:
             self.red = get_conn().db("auth").table('user_ext_data')
         except:
