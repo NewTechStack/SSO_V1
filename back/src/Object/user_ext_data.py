@@ -38,9 +38,11 @@ class User_ext_data():
             return [False, "Invalid user", 404]
         ret = self.red
         if self.user_id_hashed is None:
+            id = self.id
             ret = ret.filter(r.row["usr_id"] == self.id)
         else:
+            id = self.user_id_hashed
             ret = ret.filter(r.row["user_id_hashed"] == self.user_id_hashed)
         if self.registry is not None:
             ret = ret.filter(r.row["registry"] == self.registry)
-        return [True, list(ret.run()), None]
+        return [True, {"results": list(ret.run()), "user_id": id}, None]
