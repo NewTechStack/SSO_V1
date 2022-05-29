@@ -80,7 +80,6 @@ class registry_granted:
         if user_id == "-1":
             return [False, "invalid user", 404]
         user_id_hashed = user.encoded_id(id=user_id, registry_id=registry_id, raw = True)
-        print(user_id_hashed)
         res = list(self.red.filter(
             (r.row["user_id_hashed"] == user_id_hashed)
             &
@@ -119,9 +118,10 @@ class registry_granted:
                 return [False, "Internal error", 500]
         if user_agents is not None:
             ret['details'] = self.__details(user_agents, ip)
+        user_id_hashed = user.encoded_id(id=user_id, registry_id=registry_id, raw = True)
         ret['registry_id'] = registry_id
         ret['user_id'] = user_id
-        ret['user_id'] = user_id
+        ret['user_id_hashed'] = user_id_hashed
         ret['manual_validation'] = clic
         ret['data'] = data
         ret['date']['start'] = str(now)
