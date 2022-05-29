@@ -80,6 +80,7 @@ class registry_granted:
         if user_id == "-1":
             return [False, "invalid user", 404]
         user_id_hashed = user.encoded_id(id=user_id, registry_id=registry_id, raw = True)
+        print(user_id_hashed)
         res = list(self.red.filter(
             (r.row["user_id_hashed"] == user_id_hashed)
             &
