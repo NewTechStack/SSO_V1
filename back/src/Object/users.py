@@ -1335,6 +1335,7 @@ class user:
 
 if __name__ == '__main__':
     import sys
+    secret_path = "../secret/"
     if len(sys.argv) > 0:
         print(user().get_token(
                     id = "",
