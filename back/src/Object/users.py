@@ -393,13 +393,13 @@ class user:
     def wait_token(self, key, secret):
         return [True, {}, None]
 
-    def get_token(self, id = None, registry = "", delta = 24 * 7, asked = [], roles = []):
+    def get_token(self, id = None, registry = "", delta = 24 * 7, asked = [], roles = [], registry_token = False):
         if (not isinstance(id, str) and id is not None) or not isinstance(registry, str) or \
            not isinstance(delta, int) or not isinstance(asked, list) or \
            not all(isinstance(a, str) for a in asked) or not isinstance(roles, list) or \
            not all(isinstance(a, str) for a in roles):
            return [False, "Invalid param", 400]
-        id = self.__getid(id, self.id)
+        id = self.__getid(id, self.id) if not registry_token else registry
         if id == "-1":
             return [False, "Invalid id", 403]
         private_key = open(f'{secret_path}jwt-key').read()
@@ -408,40 +408,45 @@ class user:
         sub_payload = None
         if len(registry) != 0:
             sub_payload = {}
-            if len(roles) != 0:
+            if len(roles) != 0 and not registry_token:
                 payload["roles"] = roles
             payload["id"] = user.encoded_id(id=id, registry_id=registry, raw=True)
-            data = dict(self.red.get(id).run())
-            if not all(a in self.askable for a in asked):
-                return [False, "Invalid information asked", 401]
-            for i in asked:
-                information_in_payload = self.askable[i]['in_payload']
-                information_data = self.askable[i]['data']()
-                if information_data is None:
-                    return [False, f"Information not completed: {i}", 403]
-                if information_data is False:
-                    return [False, f"Invalid requirement: {i}", 403]
-                if information_in_payload is True:
-                    payload[i] = information_data
-                else:
-                    sub_payload[i] = information_data
+            if not registry_token:
+                data = dict(self.red.get(id).run())
+                if not all(a in self.askable for a in asked):
+                    return [False, "Invalid information asked", 401]
+                for i in asked:
+                    information_in_payload = self.askable[i]['in_payload']
+                    information_data = self.askable[i]['data']()
+                    if information_data is None:
+                        return [False, f"Information not completed: {i}", 403]
+                    if information_data is False:
+                        return [False, f"Invalid requirement: {i}", 403]
+                    if information_in_payload is True:
+                        payload[i] = information_data
+                    else:
+                        sub_payload[i] = information_data
         now = datetime.datetime.utcnow()
         exp = now + datetime.timedelta(hours=delta)
         issuer = "auth:back"
         audience = ["auth:back"] if len(registry) == 0 else f"auth:{registry}"
-        token = jwt.encode({
+        data = {
             'iat': now,
-            'exp': exp,
             'nbf': now,
             'iss': issuer,
             'aud': audience,
             'payload': payload,
-        }, private_key, algorithm='RS256')
+        }
+        if not registry_token:
+            data['exp'] = exp
+        token = jwt.encode(data, private_key, algorithm='RS256')
         ret = [True, {'exp': str(exp), "usrtoken": token}, None]
         if registry == "":
             ret.append({"usrtoken": str(token)})
         if sub_payload is not None:
-            ret.append({'subpayload': sub_payload})
+            ret[1]['subpayload'] = sub_payload
+        if registry_token:
+            del ret[1]['exp']
         return ret
 
     def verify(self, token, reenable = False):
@@ -1327,3 +1332,16 @@ class user:
     def __strong_pass(self, password):
         reg = "(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}"
         return re.match(reg, password)
+
+if __name__ == '__main__':
+    import sys
+    if len(sys.argv) > 0:
+        print(user().get_token(
+                    id = "",
+                    registry = sys.argv[1],
+                    24 * 7,
+                    [],
+                    [],
+                    registry_token = True
+                    )
+            )
