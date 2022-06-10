@@ -1339,9 +1339,7 @@ if __name__ == '__main__':
         print(user().get_token(
                     id = "",
                     registry = sys.argv[1],
-                    24 * 7,
-                    [],
-                    [],
+                    delta = 24 * 7, asked = [], roles = [],
                     registry_token = True
                     )
             )
