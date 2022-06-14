@@ -51,6 +51,7 @@ class accept_service extends Component {
             this.setState({loading: true})
 
             let user_data = await this.getAsyncUserInfo()
+            console.log(user_data)
             let intern_user_data = await this.getAsyncInternUserData()
             console.log(intern_user_data)
 
@@ -68,6 +69,7 @@ class accept_service extends Component {
                         if (asked.findIndex(x => x === "first_name") > -1 && (!user_data.first_name || (user_data.first_name && user_data.first_name.main === null))) toAsk.push("first_name")
                         if (asked.findIndex(x => x === "last_name") > -1 && (!user_data.last_name || (user_data.last_name && user_data.last_name.main === null))) toAsk.push("last_name")
                         if (asked.findIndex(x => x === "phone") > -1 && (!user_data.phone || (user_data.phone && user_data.phone.main === null))) toAsk.push("phone")
+                        if (asked.findIndex(x => x === "nationality") > -1 && (!user_data.nationality || (user_data.nationality && user_data.nationality.main === null))) toAsk.push("nationality")
                         if (asked.findIndex(x => x === "address_city") > -1 && (!user_data.location || (user_data.location && (user_data.location.main === null || user_data.location.main.city === null)))) toAsk.push("address_city")
                         if (asked.findIndex(x => x === "address_details") > -1 && (!user_data.location || (user_data.location && (user_data.location.main === null || user_data.location.main.details === null)))) toAsk.push("address_details")
                         if (asked.findIndex(x => x === "is_first_name_verified") > -1 || asked.findIndex(x => x === "is_last_name_verified") > -1 ||
@@ -95,6 +97,11 @@ class accept_service extends Component {
                             if(toAsk.includes("phone") && intern_data.phone ){
                                 let confirmed = this.state.confirmed
                                 confirmed.phone = intern_data.phone
+                                this.setState({confirmed: confirmed})
+                            }
+                            if(toAsk.includes("nationality") && intern_data.nationality ){
+                                let confirmed = this.state.confirmed
+                                confirmed.nationality = intern_data.nationality
                                 this.setState({confirmed: confirmed})
                             }
                             if(toAsk.includes("address_city") && intern_data.adress.city ){
@@ -237,7 +244,7 @@ class accept_service extends Component {
 
             SSO_service.get_intern_user_inserted_data(localStorage.getItem("usrtoken")).then(internInfoRes => {
                 if (internInfoRes.status === 200 && internInfoRes.succes === true) {
-                    resolve(internInfoRes.data)
+                    resolve(internInfoRes.data.results || [])
                 } else {
                     resolve(false)
                 }
@@ -283,7 +290,11 @@ class accept_service extends Component {
                                         if (update_user && update_user === "true") {
                                             let toAsk = this.state.toAsk
                                             toAsk.splice(toAsk.findIndex(x => x === "first_name"), 1)
-                                            this.setState({toAsk: toAsk, loading: false})
+                                            if (toAsk.length === 0) {
+                                                this.extern_signin(this.state.redirect)
+                                            } else {
+                                                this.setState({toAsk: toAsk, loading: false})
+                                            }
                                         } else {
                                             this.props.enqueueSnackbar('Une erreur est survenue', {
                                                 variant: "error",
@@ -300,7 +311,8 @@ class accept_service extends Component {
                     </div>
                 </div>
             )
-        } else if (ask === "last_name") {
+        }
+        else if (ask === "last_name") {
             return (
                 <div>
                     <h4 style={{fontSize: "1.4rem", marginBottom: 5}}>Veuillez indiquer votre Prénom </h4>
@@ -333,7 +345,11 @@ class accept_service extends Component {
                                         if (update_user && update_user === "true") {
                                             let toAsk = this.state.toAsk
                                             toAsk.splice(toAsk.findIndex(x => x === "last_name"), 1)
-                                            this.setState({toAsk: toAsk, loading: false})
+                                            if (toAsk.length === 0) {
+                                                this.extern_signin(this.state.redirect)
+                                            } else {
+                                                this.setState({toAsk: toAsk, loading: false})
+                                            }
                                         } else {
                                             this.props.enqueueSnackbar('Une erreur est survenue', {
                                                 variant: "error",
@@ -350,7 +366,8 @@ class accept_service extends Component {
                     </div>
                 </div>
             )
-        } else if (ask === "phone") {
+        }
+        else if (ask === "phone") {
             return (
                 <div>
                     <h4 style={{fontSize: "1.4rem", marginBottom: 5}}>Veuillez indiquer votre numéro de téléphone </h4>
@@ -387,7 +404,11 @@ class accept_service extends Component {
                                         if (update_user && update_user === "true") {
                                             let toAsk = this.state.toAsk
                                             toAsk.splice(toAsk.findIndex(x => x === "phone"), 1)
-                                            this.setState({toAsk: toAsk, loading: false})
+                                            if (toAsk.length === 0) {
+                                                this.extern_signin(this.state.redirect)
+                                            } else {
+                                                this.setState({toAsk: toAsk, loading: false})
+                                            }
                                         } else {
                                             this.props.enqueueSnackbar('Une erreur est survenue', {
                                                 variant: "error",
@@ -405,7 +426,8 @@ class accept_service extends Component {
                 </div>
             )
 
-        } else if (ask === "nationality") {
+        }
+        else if (ask === "nationality") {
             return (
                 <div>
                     <h4 style={{fontSize: "1.4rem", marginBottom: 5}}>Veuillez indiquer votre nationalité </h4>
@@ -438,7 +460,11 @@ class accept_service extends Component {
                                         if (update_user && update_user === "true") {
                                             let toAsk = this.state.toAsk
                                             toAsk.splice(toAsk.findIndex(x => x === "nationality"), 1)
-                                            this.setState({toAsk: toAsk, loading: false})
+                                            if (toAsk.length === 0) {
+                                                this.extern_signin(this.state.redirect)
+                                            } else {
+                                                this.setState({toAsk: toAsk, loading: false})
+                                            }
                                         } else {
                                             this.props.enqueueSnackbar('Une erreur est survenue', {
                                                 variant: "error",
@@ -455,7 +481,8 @@ class accept_service extends Component {
                     </div>
                 </div>
             )
-        } else if (ask === "address_city" || ask === "address_details") {
+        }
+        else if (ask === "address_city" || ask === "address_details") {
             return (
                 <div>
                     <h4 style={{fontSize: "1.4rem", marginBottom: 5}}>Veuillez indiquer votre adresse </h4>
@@ -605,7 +632,8 @@ class accept_service extends Component {
                 </div>
             )
 
-        } else if (ask === "passport") {
+        }
+        else if (ask === "passport") {
             return (
                 <div>
                     <h4 style={{fontSize: "1.4rem", marginBottom: 5}}>Veuillez télécharger votre passeport </h4>
