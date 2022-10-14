@@ -422,10 +422,12 @@ class user:
                         return [False, f"Information not completed: {i}", 403]
                     if information_data is False:
                         return [False, f"Invalid requirement: {i}", 403]
+                    print(i, information_in_payload)
                     if information_in_payload is True:
                         payload[i] = information_data
                     else:
                         sub_payload[i] = information_data
+                        print(i, sub_payload)
         now = datetime.datetime.utcnow()
         exp = now + datetime.timedelta(hours=delta)
         issuer = "auth:back"
@@ -443,10 +445,12 @@ class user:
         ret = [True, {'exp': str(exp), "usrtoken": token}, None]
         if registry == "":
             ret.append({"usrtoken": str(token)})
+        print(sub_payload)
         if sub_payload is not None:
             ret[1]['subpayload'] = sub_payload
         if registry_token:
             del ret[1]['exp']
+        print(ret)
         return ret
 
     def verify(self, token, reenable = False):
