@@ -44,6 +44,7 @@ def user_get_token(cn, nextc):
     )
     if err[0]:
         cn.private['usrtoken']=err[1]['usrtoken']
+        cn.private['sub_payload'] = err[1]['sub_payload']
     return cn.call_next(nextc, err)
 
 def user_get_askable(cn, nextc):
