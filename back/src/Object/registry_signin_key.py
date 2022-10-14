@@ -43,8 +43,8 @@ class registry_signin_key:
         if not isinstance(registry, str):
 	        return [False, "Invalid registry", 400]
         urlregex = re.compile(r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*")
-        if redirect is not None and not urlregex.fullmatch(redirect):
-            return [False, "Invalid redirect url", 400]
+#         if redirect is not None and not urlregex.fullmatch(redirect):
+#             return [False, "Invalid redirect url", 400]
         key = str(uuid.uuid4())
         secret = str(hash(uuid.uuid4()))
         while self.__key_exist(key, secret=secret)[0]:
