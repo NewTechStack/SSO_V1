@@ -34,7 +34,7 @@ class registry_signin_key:
             "auth": None,
             "date": None,
             "usrtoken": None,
-	    "sub_payload" = None,
+	    "sub_payload": None,
             "asked": None
         }
 
