@@ -447,7 +447,7 @@ class user:
             ret.append({"usrtoken": str(token)})
         print(sub_payload)
         if sub_payload is not None:
-            ret[1]['subpayload'] = sub_payload
+            ret[1]['sub_payload'] = sub_payload
         if registry_token:
             del ret[1]['exp']
         print(ret)
