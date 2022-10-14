@@ -34,6 +34,7 @@ class registry_signin_key:
             "auth": None,
             "date": None,
             "usrtoken": None,
+	    "sub_payload" = None,
             "asked": None
         }
 
@@ -84,7 +85,7 @@ class registry_signin_key:
         del ret["secret"]
         return [True, {"data": ret}, None]
 
-    def signin(self, key, auth, usrtoken):
+    def signin(self, key, auth, usrtoken, sub_payload = None):
         res = self.__key_exist(key, auth=auth)
         if not res[0]:
             return [False, "Error invalid connection", 404]
@@ -98,7 +99,7 @@ class registry_signin_key:
             (r.row["key"] == key)
             &
             (r.row["auth"] == auth)
-        ).update({"usrtoken": usrtoken}).run())
+        ).update({"usrtoken": usrtoken, "sub_payload": sub_payload}).run())
         if res['replaced'] != 1:
             return [False, "Error", 500]
         return [True, ret, None]
@@ -118,7 +119,7 @@ class registry_signin_key:
             for update in query.changes().run():
                 res = update['new_val']
                 break
-        return [True, {"usrtoken": res['usrtoken']}, None]
+        return [True, {"usrtoken": res['usrtoken'], "sub_payload": res["sub_payload"]}, None]
 
     def verify_time(self, key_data):
         now = datetime.datetime.utcnow()
